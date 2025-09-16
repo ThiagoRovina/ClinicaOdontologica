@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ClinicaOdontApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CinicaOdontApplication.class, args);
+		SpringApplication.run(ClinicaOdontApplication.class, args);
 	}
 
 }
