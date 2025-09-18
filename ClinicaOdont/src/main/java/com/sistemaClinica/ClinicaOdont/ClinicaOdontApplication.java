@@ -9,6 +9,7 @@ public class ClinicaOdontApplication {
 	public static void main(String[] args) {
 
 		SpringApplication.run(ClinicaOdontApplication.class, args);
+
 	}
 
 }
