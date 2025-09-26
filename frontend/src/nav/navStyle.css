@@ -1,0 +1,60 @@
+.navbar-custom {
+    background-color: #9f4df1;
+}
+
+
+.navbar-custom .navbar-brand {
+    color: white;
+    font-weight: bold;
+    font-size: 32px;
+    font-family: 'KolkerBrush', cursive;
+    padding: 25px 10px;
+    transition: color 0.3s ease;
+}
+
+.navbar-custom .navbar-brand:hover {
+    color: #f0f0f0;
+}
+
+.navbar-custom .nav-link {
+    color: white;
+    margin-left: 10px;
+    padding: 14px 20px;
+    border-radius: 5px;
+    position: relative;
+    transition: background-color 0.2s ease;
+    overflow: hidden;
+    background-color: transparent;
+}
+
+
+.navbar-custom .nav-link:hover {
+    color: white;
+    background-color: #9b46f1;
+}
+
+
+.navbar-custom .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 0;
+    height: 0.5px;
+    background-color: white;
+    transition: width 0.2s ease-in-out;
+}
+
+
+.navbar-custom .nav-link:hover::after {
+    width: 100%;
+}
+
+
+.navbar-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.navbar-custom .navbar-toggler {
+    border-color: white;
+}

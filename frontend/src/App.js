@@ -1,35 +1,27 @@
-import React, {useEffect, useState} from 'react';
-
-import logo from './logo.svg';
+import NavBar from "./nav/NavBar";
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import './App.css';
+import PacienteFront from "./Paciente/PacienteFront";
+import AgendamentoFront from "./Agendamento/AgendamentoFront";
 
 
 function App() {
-    cons [groups, setGroups] = useState([]);
+    return (
+        <Router>
+            <NavBar/>
+            <div className="container mt-4">
+                <Routes>
+                    <Route path="/" element={<h2>Home</h2>} />
+                    <Route path="/Paciente/pacienteFront" element={PacienteFront()} />
+                    <Route path="/Agendamento" element={AgendamentoFront()} />
+                </Routes>
+            </div>
+        </Router>
 
-    useEffect(() => {
-        setLoading(true);
+    );
 
-        fetch('/api/groups')
-            .then(response => response.json())
-            .then(data => {
-                setGroups(data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching groups:', error);
-                setLoading(false);
-            });
-    }, []);
-    if (loading) {
-        return <p>Loading...</p>;
-    }
-
-  return (
-    <div className="App">
-      <h1>Ola react :)</h1>
-    </div>
-  );
 }
+
+
 
 export default App;
