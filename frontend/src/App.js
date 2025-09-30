@@ -11,8 +11,8 @@ function App() {
             <NavBar/>
             <div className="container mt-4">
                 <Routes>
-                    <Route path="/" element={<h2>Home</h2>} />
-                    <Route path="/Paciente/pacienteFront" element={PacienteFront()} />
+                    <Route path="/Home" element={<h2>Home</h2>} />
+                    <Route path="/Paciente" element={PacienteFront()} />
                     <Route path="/Agendamento" element={AgendamentoFront()} />
                 </Routes>
             </div>
