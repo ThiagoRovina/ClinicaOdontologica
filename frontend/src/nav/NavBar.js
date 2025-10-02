@@ -8,7 +8,7 @@ function NavBar() {
     return (
         <Navbar expand="lg" className="navbar-custom">
             <Container fluid>
-                <Navbar.Brand as={Link} to="/" className="text-white ms-5">SorriMais </Navbar.Brand>
+                <Navbar.Brand as={Link} to="/" className="text-white ms-5">OdontoSys</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
 
