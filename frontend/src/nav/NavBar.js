@@ -15,6 +15,7 @@ function NavBar() {
                     <Nav className="ms-auto">
                         <Nav.Link  as={Link} to="/">Home</Nav.Link>
                         <Nav.Link as={Link} to="./Paciente/pacienteFront">Pacientes</Nav.Link>
+                        <Nav.Link as={Link} to="/funcionarios">Funcionários</Nav.Link>
                         <Nav.Link as={Link} to="/Agendamento">Agendamentos</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>

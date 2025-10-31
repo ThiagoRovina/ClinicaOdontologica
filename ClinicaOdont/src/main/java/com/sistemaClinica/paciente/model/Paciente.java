@@ -1,6 +1,5 @@
 package com.sistemaClinica.paciente.model;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -8,25 +7,33 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Entity
-@Table(name = "PACIENTE")
+@Table(name = "PACIENTES")
 public class Paciente {
+
     @Id
-    @Column(name= "ID_PACIENTE")
-    public String idPaciente;
+    @Column(name = "id_paciente")
+    private String idPaciente;
 
-    @Column(name= "NM_PACIENTE")
-    public String nmPaciente;
+    @Column(name = "nm_paciente", nullable = false)
+    private String nome;
 
-    @Column(name= "NM_ENDERECO")
-    public String nmEndereco;
+    @Column(name = "dt_nascimento", nullable = false)
+    private LocalDate dataNascimento;
 
-    @Column(name= "CPFCNPJ_PACIENTE")
-    public String cpfCnpjPaciente;
+    @Column(name = "ds_endereco")
+    private String endereco;
 
+    @Column(name = "nu_telefone", nullable = false)
+    private String telefone;
 
+    @Column(name = "ds_email", unique = true)
+    private String email;
 
-
+    @Column(name = "nu_cpf", unique = true, nullable = false)
+    private String cpf;
 }
