@@ -41,11 +41,11 @@ const Funcionario = () => {
     };
 
     const handleAddFuncionario = () => {
-        navigate('/funcionarios/novo'); // Navega para a tela de cadastro
+        navigate('/funcionarios/novo');
     };
 
     const handleEditFuncionario = (id) => {
-        navigate(`/funcionarios/editar/${id}`); // Navega para a tela de edição com o ID
+        navigate(`/funcionarios/editar/${id}`);
     };
 
     return (
