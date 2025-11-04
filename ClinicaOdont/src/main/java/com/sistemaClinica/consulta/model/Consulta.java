@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class Consulta {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_consulta")
     private String idConsulta;
 
@@ -29,6 +30,17 @@ public class Consulta {
     @Column(name = "dt_hora_consulta", nullable = false)
     private LocalDateTime dataHora;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ds_status", nullable = false)
+    private StatusConsulta status;
+
     @Column(name = "ds_observacoes")
     private String observacoes;
+
+    @PrePersist
+    public void prePersist() {
+        if (status == null) {
+            status = StatusConsulta.AGENDADA;
+        }
+    }
 }

@@ -1,13 +1,12 @@
 package com.sistemaClinica.usuario.controller;
 
 import com.sistemaClinica.usuario.model.Usuario;
-import com.sistemaClinica.usuario.service.UsuarioService; // Precisaremos criar este serviço
+import com.sistemaClinica.usuario.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -24,5 +23,14 @@ public class UsuarioController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDetails> getUsuarioLogado(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).build(); // Não autorizado
+        }
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(userDetails);
     }
 }
