@@ -10,7 +10,6 @@ const TelaLogin = () => {
     const [searchParams] = useSearchParams();
 
     useEffect(() => {
-        // Verifica se a URL contém o parâmetro 'error' (adicionado pelo Spring Security em caso de falha no login)
         if (searchParams.has('error')) {
             setError('Email ou senha inválidos. Por favor, tente novamente.');
         }
@@ -24,13 +23,12 @@ const TelaLogin = () => {
                     
                     {error && <Alert variant="danger">{error}</Alert>}
 
-                    {/* O formulário envia os dados diretamente para o endpoint do Spring Security */}
                     <Form method="POST" action="/telaLogin/login">
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
                                 type="email"
-                                name="nmEmail" // O 'name' deve corresponder ao que o Spring Security espera
+                                name="nmEmail"
                                 placeholder="Digite seu email"
                                 value={nmEmail}
                                 onChange={(e) => setNmEmail(e.target.value)}
@@ -42,7 +40,7 @@ const TelaLogin = () => {
                             <Form.Label>Senha</Form.Label>
                             <Form.Control
                                 type="password"
-                                name="nmSenha" // O 'name' deve corresponder ao que o Spring Security espera
+                                name="nmSenha"
                                 placeholder="Digite sua senha"
                                 value={nmSenha}
                                 onChange={(e) => setNmSenha(e.target.value)}

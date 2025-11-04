@@ -1,10 +1,6 @@
 package com.sistemaClinica.funcionario.model;
 
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,8 +21,9 @@ public class Funcionario {
     @Column(name= "nu_matricula", unique = true, nullable = false)
     public int nuMatricula;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ds_cargo", nullable = false)
-    public String cargo;
+    public TipoFuncionario cargo;
 
     @Column(name = "dt_admissao", nullable = false)
     public LocalDate dataAdmissao;

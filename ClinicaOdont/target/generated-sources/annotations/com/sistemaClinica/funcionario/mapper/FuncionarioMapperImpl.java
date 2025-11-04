@@ -2,12 +2,13 @@ package com.sistemaClinica.funcionario.mapper;
 
 import com.sistemaClinica.funcionario.dto.FuncionarioDTO;
 import com.sistemaClinica.funcionario.model.Funcionario;
+import com.sistemaClinica.funcionario.model.TipoFuncionario;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-11-03T22:39:25-0300",
+    date = "2025-11-03T23:27:22-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.1 (Oracle Corporation)"
 )
 @Component
@@ -24,7 +25,9 @@ public class FuncionarioMapperImpl implements FuncionarioMapper {
         funcionarioDTO.setIdFuncionario( funcionario.getIdFuncionario() );
         funcionarioDTO.setNmFuncionario( funcionario.getNmFuncionario() );
         funcionarioDTO.setNuMatricula( funcionario.getNuMatricula() );
-        funcionarioDTO.setCargo( funcionario.getCargo() );
+        if ( funcionario.getCargo() != null ) {
+            funcionarioDTO.setCargo( funcionario.getCargo().name() );
+        }
         funcionarioDTO.setDataAdmissao( funcionario.getDataAdmissao() );
         funcionarioDTO.setEmail( funcionario.getEmail() );
         funcionarioDTO.setTelefone( funcionario.getTelefone() );
@@ -43,7 +46,9 @@ public class FuncionarioMapperImpl implements FuncionarioMapper {
         funcionario.setIdFuncionario( funcionarioDTO.getIdFuncionario() );
         funcionario.setNmFuncionario( funcionarioDTO.getNmFuncionario() );
         funcionario.setNuMatricula( funcionarioDTO.getNuMatricula() );
-        funcionario.setCargo( funcionarioDTO.getCargo() );
+        if ( funcionarioDTO.getCargo() != null ) {
+            funcionario.setCargo( Enum.valueOf( TipoFuncionario.class, funcionarioDTO.getCargo() ) );
+        }
         funcionario.setDataAdmissao( funcionarioDTO.getDataAdmissao() );
         funcionario.setEmail( funcionarioDTO.getEmail() );
         funcionario.setTelefone( funcionarioDTO.getTelefone() );

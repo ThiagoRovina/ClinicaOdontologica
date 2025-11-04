@@ -16,15 +16,14 @@ public class Usuario {
     private String idUsuario;
 
     @Column(name = "nm_email", unique = true, nullable = false)
-    private String nmEmail; // Usado como username para login
+    private String nmEmail;
 
     @Column(name = "nm_senha", nullable = false)
-    private String nmSenha; // Senha criptografada
+    private String nmSenha;
 
     @Column(name = "ds_role", nullable = false)
-    private String dsRole; // Ex: ROLE_ADMIN, ROLE_USER
+    private String dsRole;
 
-    // Construtor padrão necessário para JPA
     public Usuario() {}
 
     public Usuario(String nmEmail, String nmSenha, String dsRole) {
