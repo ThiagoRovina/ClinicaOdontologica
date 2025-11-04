@@ -40,7 +40,6 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        // Permite requisições OPTIONS (preflight) para todas as rotas
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/imagens/**").permitAll()
                         .requestMatchers("/", "/telaLogin", "/telaLogin/salvar").permitAll()
@@ -52,7 +51,7 @@ public class SecurityConfig {
                         .usernameParameter("nmEmail")
                         .passwordParameter("nmSenha")
                         .loginProcessingUrl("/telaLogin/login")
-                        .defaultSuccessUrl("/Home", true)
+                        .defaultSuccessUrl("http://localhost:3000/Home", true)
                         .permitAll()
                 )
                 .logout(logout -> logout

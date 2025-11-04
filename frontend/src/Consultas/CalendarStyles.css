@@ -1,0 +1,20 @@
+.dia-agendada {
+    background-color: #a7f3d0; /* verde-claro */
+}
+
+.dia-finalizada {
+    background-color: #16a34a; /* verde-escuro */
+    color: white;
+}
+
+.dia-cancelada {
+    background-color: #fca5a5; /* vermelho-claro */
+}
+
+/* Melhora o contraste do dia selecionado sobre as cores */
+.react-calendar__tile--active.dia-agendada,
+.react-calendar__tile--active.dia-finalizada,
+.react-calendar__tile--active.dia-cancelada {
+    background-color: #2563eb !important; /* Azul forte para o dia ativo */
+    color: white !important;
+}

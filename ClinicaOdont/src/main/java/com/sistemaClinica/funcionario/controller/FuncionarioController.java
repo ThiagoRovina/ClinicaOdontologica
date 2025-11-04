@@ -1,7 +1,8 @@
 package com.sistemaClinica.funcionario.controller;
 
+import com.sistemaClinica.funcionario.dto.FuncionarioCadastroDTO;
 import com.sistemaClinica.funcionario.dto.FuncionarioDTO;
-import com.sistemaClinica.funcionario.model.TipoFuncionario; // Importar o Enum
+import com.sistemaClinica.funcionario.model.TipoFuncionario;
 import com.sistemaClinica.funcionario.service.FuncionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +34,14 @@ public class FuncionarioController {
         return funcionarioDTO != null ? ResponseEntity.ok(funcionarioDTO) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
-    public FuncionarioDTO criar(@RequestBody FuncionarioDTO funcionarioDTO) {
-        return funcionarioService.salvar(funcionarioDTO);
+    @PostMapping("/cadastrar")
+    public ResponseEntity<?> cadastrarCompleto(@RequestBody FuncionarioCadastroDTO dto) {
+        try {
+            FuncionarioDTO funcionarioSalvo = funcionarioService.cadastrarFuncionarioEUsuario(dto);
+            return ResponseEntity.ok(funcionarioSalvo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

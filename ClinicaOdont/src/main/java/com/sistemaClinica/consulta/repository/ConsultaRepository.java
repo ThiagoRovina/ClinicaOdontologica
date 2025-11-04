@@ -1,0 +1,14 @@
+package com.sistemaClinica.consulta.repository;
+
+import com.sistemaClinica.consulta.model.Consulta;
+import com.sistemaClinica.consulta.model.StatusConsulta;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Repository
+public interface ConsultaRepository extends JpaRepository<Consulta, String> {
+    List<Consulta> findByDataHoraBetweenAndStatus(LocalDateTime start, LocalDateTime end, StatusConsulta status);
+}
