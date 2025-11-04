@@ -21,7 +21,6 @@ public class Funcionario {
     @Column(name= "nu_matricula", unique = true, nullable = false)
     public int nuMatricula;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "ds_cargo", nullable = false)
     public TipoFuncionario cargo;
 

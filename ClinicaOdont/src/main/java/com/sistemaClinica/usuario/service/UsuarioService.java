@@ -16,10 +16,10 @@ public class UsuarioService {
     private PasswordEncoder passwordEncoder;
 
     public Usuario registrar(Usuario novoUsuario) {
+
         if (usuarioRepository.findByNmEmail(novoUsuario.getNmEmail()).isPresent()) {
             throw new IllegalArgumentException("Este email já está em uso.");
         }
-
         novoUsuario.setNmSenha(passwordEncoder.encode(novoUsuario.getNmSenha()));
         novoUsuario.setDsRole("ROLE_USER");
 

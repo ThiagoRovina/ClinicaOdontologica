@@ -12,16 +12,17 @@ const FuncionarioCadastro = () => {
     const [funcionario, setFuncionario] = useState({
         nmFuncionario: '',
         nuMatricula: '',
-        cargo: '',
+        cargo: '', // Será preenchido pelo dropdown
         dataAdmissao: '',
         email: '',
         telefone: '',
     });
-    const [tiposFuncionario, setTiposFuncionario] = useState([]);
+    const [tiposFuncionario, setTiposFuncionario] = useState([]); // Novo estado para os tipos
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    // Efeito para buscar os tipos de funcionário
     useEffect(() => {
         axios.get(`${API_BASE_URL}/funcionarios/tipos`)
             .then(response => {
@@ -33,6 +34,7 @@ const FuncionarioCadastro = () => {
             });
     }, []);
 
+    // Efeito para buscar os dados do funcionário para edição
     useEffect(() => {
         if (id) {
             setLoading(true);
@@ -95,6 +97,7 @@ const FuncionarioCadastro = () => {
             {success && <Alert variant="success">{success}</Alert>}
             
             <Form onSubmit={handleSubmit}>
+                {/* ... outros campos do formulário ... */}
                 <Form.Group className="mb-3">
                     <Form.Label>Nome</Form.Label>
                     <Form.Control type="text" name="nmFuncionario" value={funcionario.nmFuncionario} onChange={handleChange} required />
@@ -104,6 +107,7 @@ const FuncionarioCadastro = () => {
                     <Form.Control type="number" name="nuMatricula" value={funcionario.nuMatricula} onChange={handleChange} required />
                 </Form.Group>
 
+                {/* Campo de Cargo alterado para um dropdown */}
                 <Form.Group className="mb-3">
                     <Form.Label>Cargo</Form.Label>
                     <Form.Select

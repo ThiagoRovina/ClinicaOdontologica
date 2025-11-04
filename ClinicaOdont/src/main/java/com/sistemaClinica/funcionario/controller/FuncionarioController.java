@@ -1,7 +1,7 @@
 package com.sistemaClinica.funcionario.controller;
 
 import com.sistemaClinica.funcionario.dto.FuncionarioDTO;
-import com.sistemaClinica.funcionario.model.TipoFuncionario;
+import com.sistemaClinica.funcionario.model.TipoFuncionario; // Importar o Enum
 import com.sistemaClinica.funcionario.service.FuncionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
