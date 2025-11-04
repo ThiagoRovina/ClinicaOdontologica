@@ -26,11 +26,11 @@ const TelaCadastro = () => {
         try {
             await axios.post(`${API_BASE_URL}/usuarios/registrar`, usuario);
             setSuccess("Usuário cadastrado com sucesso! Você será redirecionado para o login.");
-            setTimeout(() => navigate('/telaLogin'), 2000);
+            setTimeout(() => navigate('/telaLogin'), 2000); // Redireciona após 2 segundos
         } catch (err) {
             console.error("Erro ao registrar usuário:", err);
             if (err.response && err.response.data) {
-                setError(err.response.data);
+                setError(err.response.data); // Mostra a mensagem de erro do backend (ex: "email já em uso")
             } else {
                 setError("Erro ao registrar usuário. Tente novamente.");
             }
