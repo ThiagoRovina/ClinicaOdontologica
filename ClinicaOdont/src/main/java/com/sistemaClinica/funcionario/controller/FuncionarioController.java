@@ -1,6 +1,7 @@
 package com.sistemaClinica.funcionario.controller;
 
 import com.sistemaClinica.funcionario.dto.FuncionarioDTO;
+import com.sistemaClinica.funcionario.model.TipoFuncionario;
 import com.sistemaClinica.funcionario.service.FuncionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +11,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/funcionarios")
-@CrossOrigin(origins = "http://localhost:3000") // Adiciona a anotação CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class FuncionarioController {
 
     @Autowired
     private FuncionarioService funcionarioService;
+
+    @GetMapping("/tipos")
+    public TipoFuncionario[] getTiposFuncionario() {
+        return TipoFuncionario.values();
+    }
 
     @GetMapping
     public List<FuncionarioDTO> listarTodos() {

@@ -1,7 +1,7 @@
 package com.sistemaClinica.usuario.controller;
 
 import com.sistemaClinica.usuario.model.Usuario;
-import com.sistemaClinica.usuario.service.UsuarioService; // Precisaremos criar este serviço
+import com.sistemaClinica.usuario.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

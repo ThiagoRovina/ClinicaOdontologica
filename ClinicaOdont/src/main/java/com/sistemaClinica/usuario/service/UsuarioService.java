@@ -16,16 +16,12 @@ public class UsuarioService {
     private PasswordEncoder passwordEncoder;
 
     public Usuario registrar(Usuario novoUsuario) {
-        // Verifica se o email já está em uso
         if (usuarioRepository.findByNmEmail(novoUsuario.getNmEmail()).isPresent()) {
             throw new IllegalArgumentException("Este email já está em uso.");
         }
 
-        // Criptografa a senha antes de salvar
         novoUsuario.setNmSenha(passwordEncoder.encode(novoUsuario.getNmSenha()));
-
-        // Define uma role padrão para novos usuários
-        novoUsuario.setDsRole("ROLE_USER"); // Ou outra role padrão que você queira
+        novoUsuario.setDsRole("ROLE_USER");
 
         return usuarioRepository.save(novoUsuario);
     }

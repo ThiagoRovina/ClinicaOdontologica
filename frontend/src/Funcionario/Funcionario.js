@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Table, Button, Alert, Spinner } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
 const Funcionario = () => {
-    const navigate = useNavigate(); // Hook para navegação
+    const navigate = useNavigate();
 
     const [funcionarios, setFuncionarios] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ const Funcionario = () => {
     const handleDelete = async (id) => {
         try {
             await axios.delete(`${API_BASE_URL}/funcionarios/${id}`);
-            fetchFuncionarios(); // Recarrega a lista após a exclusão
+            fetchFuncionarios();
         } catch (err) {
             console.error("Erro ao deletar funcionário:", err);
             setError("Não foi possível deletar o funcionário. Tente novamente.");

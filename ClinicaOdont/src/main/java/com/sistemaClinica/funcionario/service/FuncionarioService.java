@@ -19,6 +19,12 @@ public class FuncionarioService {
     @Autowired
     private FuncionarioMapper funcionarioMapper;
 
+    public List<FuncionarioDTO> listarTiposFuncionarios() {
+        return funcionarioRepository.findAll().stream()
+                .map(funcionarioMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     public List<FuncionarioDTO> listarTodos() {
         return funcionarioRepository.findAll().stream()
                 .map(funcionarioMapper::toDto)
