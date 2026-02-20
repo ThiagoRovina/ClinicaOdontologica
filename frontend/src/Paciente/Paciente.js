@@ -85,6 +85,7 @@ const Paciente = () => {
                                 <td>{paciente.email}</td>
                                 <td>{paciente.telefone}</td>
                                 <td>
+                                    <Button variant="success" size="sm" className="me-2" onClick={() => navigate(`/pacientes/${paciente.idPaciente}/prontuario`)}>📋 Prontuário</Button>
                                     <Button variant="info" size="sm" className="me-2" onClick={() => handleEditPaciente(paciente.idPaciente)}>Editar</Button>
                                     <Button variant="danger" size="sm" onClick={() => handleDelete(paciente.idPaciente)}>Excluir</Button>
                                 </td>

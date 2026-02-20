@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 function NavBar() {
-    const { isAuthenticated, user, hasRole } = useAuth();
+    const { isAuthenticated, user, hasRole, logout } = useAuth();
 
     const isGerente = hasRole('ROLE_GERENTE');
     const isDentista = hasRole('ROLE_DENTISTA');
@@ -15,7 +15,7 @@ function NavBar() {
     return (
         <Navbar expand="lg" className="navbar-custom">
             <Container fluid>
-                <Navbar.Brand as={Link} to="/" className="text-white ms-5">OdontoSys</Navbar.Brand>
+                <Navbar.Brand as={Link} to="/" className="text-white ms-5">🦷 OdontoSys</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="ms-auto">
@@ -42,8 +42,16 @@ function NavBar() {
                                     <Nav.Link as={Link} to="/consultas">Consultas</Nav.Link>
                                 )}
 
+                                {isGerente && (
+                                    <Nav.Link as={Link} to="/procedimentos">Procedimentos</Nav.Link>
+                                )}
+
+                                {(isGerente || isRecepcionista) && (
+                                    <Nav.Link as={Link} to="/financeiro">Financeiro</Nav.Link>
+                                )}
+
                                 <NavDropdown title={user.username} id="basic-nav-dropdown">
-                                    <NavDropdown.Item href="/logout">Sair</NavDropdown.Item>
+                                    <NavDropdown.Item onClick={logout}>Sair</NavDropdown.Item>
                                 </NavDropdown>
                             </>
                         ) : (

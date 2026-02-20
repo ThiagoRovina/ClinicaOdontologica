@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-11-03T23:27:22-0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.1 (Oracle Corporation)"
+    date = "2026-02-20T01:14:17-0300",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
 public class FuncionarioMapperImpl implements FuncionarioMapper {
@@ -22,14 +22,14 @@ public class FuncionarioMapperImpl implements FuncionarioMapper {
 
         FuncionarioDTO funcionarioDTO = new FuncionarioDTO();
 
-        funcionarioDTO.setIdFuncionario( funcionario.getIdFuncionario() );
-        funcionarioDTO.setNmFuncionario( funcionario.getNmFuncionario() );
-        funcionarioDTO.setNuMatricula( funcionario.getNuMatricula() );
         if ( funcionario.getCargo() != null ) {
             funcionarioDTO.setCargo( funcionario.getCargo().name() );
         }
         funcionarioDTO.setDataAdmissao( funcionario.getDataAdmissao() );
         funcionarioDTO.setEmail( funcionario.getEmail() );
+        funcionarioDTO.setIdFuncionario( funcionario.getIdFuncionario() );
+        funcionarioDTO.setNmFuncionario( funcionario.getNmFuncionario() );
+        funcionarioDTO.setNuMatricula( funcionario.getNuMatricula() );
         funcionarioDTO.setTelefone( funcionario.getTelefone() );
 
         return funcionarioDTO;
@@ -43,14 +43,14 @@ public class FuncionarioMapperImpl implements FuncionarioMapper {
 
         Funcionario funcionario = new Funcionario();
 
-        funcionario.setIdFuncionario( funcionarioDTO.getIdFuncionario() );
-        funcionario.setNmFuncionario( funcionarioDTO.getNmFuncionario() );
-        funcionario.setNuMatricula( funcionarioDTO.getNuMatricula() );
         if ( funcionarioDTO.getCargo() != null ) {
             funcionario.setCargo( Enum.valueOf( TipoFuncionario.class, funcionarioDTO.getCargo() ) );
         }
         funcionario.setDataAdmissao( funcionarioDTO.getDataAdmissao() );
         funcionario.setEmail( funcionarioDTO.getEmail() );
+        funcionario.setIdFuncionario( funcionarioDTO.getIdFuncionario() );
+        funcionario.setNmFuncionario( funcionarioDTO.getNmFuncionario() );
+        funcionario.setNuMatricula( funcionarioDTO.getNuMatricula() );
         funcionario.setTelefone( funcionarioDTO.getTelefone() );
 
         return funcionario;
