@@ -50,6 +50,10 @@ function NavBar() {
                                     <Nav.Link as={Link} to="/financeiro">Financeiro</Nav.Link>
                                 )}
 
+                                {isGerente && (
+                                    <Nav.Link as={Link} to="/registrar">Cadastrar Usuário</Nav.Link>
+                                )}
+
                                 <NavDropdown title={user.username} id="basic-nav-dropdown">
                                     <NavDropdown.Item onClick={logout}>Sair</NavDropdown.Item>
                                 </NavDropdown>
@@ -57,7 +61,6 @@ function NavBar() {
                         ) : (
                             <>
                                 <Nav.Link as={Link} to="/telaLogin">Login</Nav.Link>
-                                <Nav.Link as={Link} to="/registrar">Registrar</Nav.Link>
                             </>
                         )}
                     </Nav>
