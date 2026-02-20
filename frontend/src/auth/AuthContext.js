@@ -3,12 +3,14 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
+const API_BASE_URL = 'http://localhost:8080';
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('/api/usuarios/me')
+        axios.get(`${API_BASE_URL}/api/usuarios/me`, { withCredentials: true })
             .then(response => {
                 setUser(response.data);
             })
@@ -25,11 +27,20 @@ export const AuthProvider = ({ children }) => {
         return user.authorities.some(auth => auth.authority === role);
     };
 
+    const logout = async () => {
+        try {
+            await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
+        } catch (_) { }
+        setUser(null);
+        window.location.href = '/telaLogin';
+    };
+
     const value = {
         user,
         loading,
         isAuthenticated: !!user,
-        hasRole
+        hasRole,
+        logout
     };
 
     return (
