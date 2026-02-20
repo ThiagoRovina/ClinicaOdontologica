@@ -44,21 +44,21 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/imagens/**").permitAll()
                         .requestMatchers("/", "/telaLogin", "/telaLogin/salvar").permitAll()
                         .requestMatchers("/api/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/telaLogin")
                         .usernameParameter("nmEmail")
                         .passwordParameter("nmSenha")
                         .loginProcessingUrl("/telaLogin/login")
                         .defaultSuccessUrl("http://localhost:3000/Home", true)
-                        .permitAll()
-                )
+                        .failureUrl("http://localhost:3000/telaLogin?error=true")
+                        .permitAll())
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("/telaLogin")
-                        .permitAll()
-                );
+                        .logoutSuccessUrl("http://localhost:3000/telaLogin?logout=true")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll());
 
         return http.build();
     }
@@ -67,7 +67,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

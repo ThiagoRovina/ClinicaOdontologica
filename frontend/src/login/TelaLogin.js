@@ -1,63 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Form, Button, Alert, Card } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
+import './login.css';
 
 const TelaLogin = () => {
     const [nmEmail, setNmEmail] = useState('');
     const [nmSenha, setNmSenha] = useState('');
     const [error, setError] = useState('');
-
     const [searchParams] = useSearchParams();
 
     useEffect(() => {
         if (searchParams.has('error')) {
-            setError('Email ou senha inválidos. Por favor, tente novamente.');
+            setError('Email ou senha inválidos. Tente novamente.');
+        }
+        if (searchParams.has('logout')) {
+            setError('');
         }
     }, [searchParams]);
 
     return (
-        <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '80vh' }}>
-            <Card style={{ width: '25rem' }}>
-                <Card.Body>
-                    <Card.Title className="text-center mb-4">Login - OdontoSys</Card.Title>
-                    
-                    {error && <Alert variant="danger">{error}</Alert>}
+        <div className="login-page">
+            <div className="login-card">
+                <div className="login-card__logo">🦷</div>
+                <h1 className="login-card__title">OdontoSys</h1>
+                <p className="login-card__subtitle">Acesse o sistema da clínica</p>
 
-                    {/* A action agora aponta para a URL completa do backend */}
-                    <Form method="POST" action="http://localhost:8080/telaLogin/login">
-                        <Form.Group className="mb-3" controlId="formBasicEmail">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control
-                                type="email"
-                                name="nmEmail"
-                                placeholder="Digite seu email"
-                                value={nmEmail}
-                                onChange={(e) => setNmEmail(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
+                {error && (
+                    <div className="login-alert login-alert--error">
+                        ⚠️ {error}
+                    </div>
+                )}
 
-                        <Form.Group className="mb-4" controlId="formBasicPassword">
-                            <Form.Label>Senha</Form.Label>
-                            <Form.Control
-                                type="password"
-                                name="nmSenha"
-                                placeholder="Digite sua senha"
-                                value={nmSenha}
-                                onChange={(e) => setNmSenha(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
+                {/* POST nativo ao Spring Security — necessário para session cookie */}
+                <form method="POST" action="http://localhost:8080/telaLogin/login" className="login-form">
+                    <div className="login-field">
+                        <label htmlFor="nmEmail">E-mail</label>
+                        <input
+                            id="nmEmail"
+                            type="email"
+                            name="nmEmail"
+                            placeholder="seuemail@clinica.com"
+                            value={nmEmail}
+                            onChange={(e) => setNmEmail(e.target.value)}
+                            required
+                            autoComplete="email"
+                        />
+                    </div>
 
-                        <div className="d-grid">
-                            <Button variant="primary" type="submit">
-                                Entrar
-                            </Button>
-                        </div>
-                    </Form>
-                </Card.Body>
-            </Card>
-        </Container>
+                    <div className="login-field">
+                        <label htmlFor="nmSenha">Senha</label>
+                        <input
+                            id="nmSenha"
+                            type="password"
+                            name="nmSenha"
+                            placeholder="••••••••"
+                            value={nmSenha}
+                            onChange={(e) => setNmSenha(e.target.value)}
+                            required
+                            autoComplete="current-password"
+                        />
+                    </div>
+
+                    <button type="submit" className="login-btn">
+                        Entrar
+                    </button>
+                </form>
+
+                <p className="login-footer">
+                    Não tem conta? <Link to="/registrar">Cadastre-se</Link>
+                </p>
+            </div>
+        </div>
     );
 };
 
