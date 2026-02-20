@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import './login.css';
 
 const TelaLogin = () => {
@@ -64,10 +64,6 @@ const TelaLogin = () => {
                         Entrar
                     </button>
                 </form>
-
-                <p className="login-footer">
-                    Não tem conta? <Link to="/registrar">Cadastre-se</Link>
-                </p>
             </div>
         </div>
     );
