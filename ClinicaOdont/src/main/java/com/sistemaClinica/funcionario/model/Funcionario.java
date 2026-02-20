@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Table(name = "FUNCIONARIOS")
 public class Funcionario {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name= "id_funcionario")
     public String idFuncionario;
 
