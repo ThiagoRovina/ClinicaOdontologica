@@ -2,8 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Table, Button, Alert, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import { API_BASE_URL } from '../config/api';
 
 const Paciente = () => {
     const navigate = useNavigate();

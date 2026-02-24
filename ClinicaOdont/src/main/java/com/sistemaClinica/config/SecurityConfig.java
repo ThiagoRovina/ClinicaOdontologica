@@ -15,6 +15,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.sistemaClinica.usuario.service.JpaUserDetailsService;
 
+import org.springframework.beans.factory.annotation.Value;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,9 +24,17 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JpaUserDetailsService jpaUserDetailsService;
+    private final List<String> allowedOrigins;
 
-    public SecurityConfig(JpaUserDetailsService jpaUserDetailsService) {
+    public SecurityConfig(
+            JpaUserDetailsService jpaUserDetailsService,
+            @Value("${app.cors.allowed-origins:http://localhost:3000}") String allowedOriginsCsv
+    ) {
         this.jpaUserDetailsService = jpaUserDetailsService;
+        this.allowedOrigins = Arrays.stream(allowedOriginsCsv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .toList();
     }
 
     @Bean
@@ -50,12 +59,12 @@ public class SecurityConfig {
                         .usernameParameter("nmEmail")
                         .passwordParameter("nmSenha")
                         .loginProcessingUrl("/telaLogin/login")
-                        .defaultSuccessUrl("http://localhost:3000/Home", true)
-                        .failureUrl("http://localhost:3000/telaLogin?error=true")
+                        .defaultSuccessUrl("/Home", true)
+                        .failureUrl("/telaLogin?error=true")
                         .permitAll())
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("http://localhost:3000/telaLogin?logout=true")
+                        .logoutSuccessUrl("/telaLogin?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll());
@@ -66,7 +75,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

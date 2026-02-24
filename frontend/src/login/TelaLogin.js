@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import './login.css';
+import { LOGIN_POST_URL } from '../config/api';
 
 const TelaLogin = () => {
     const [nmEmail, setNmEmail] = useState('');
@@ -31,7 +32,7 @@ const TelaLogin = () => {
                 )}
 
                 {/* POST nativo ao Spring Security — necessário para session cookie */}
-                <form method="POST" action="http://localhost:8080/telaLogin/login" className="login-form">
+                <form method="POST" action={LOGIN_POST_URL} className="login-form">
                     <div className="login-field">
                         <label htmlFor="nmEmail">E-mail</label>
                         <input
