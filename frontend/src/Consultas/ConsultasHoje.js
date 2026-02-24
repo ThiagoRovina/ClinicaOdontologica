@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Table, Button, Spinner, Alert } from 'react-bootstrap';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import { API_BASE_URL } from '../config/api';
 
 const ConsultasHoje = () => {
     const navigate = useNavigate();
