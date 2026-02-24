@@ -1,22 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './login.css';
-import { LOGIN_POST_URL } from '../config/api';
+import { useAuth } from '../auth/AuthContext';
 
 const TelaLogin = () => {
+    const navigate = useNavigate();
+    const { login } = useAuth();
     const [nmEmail, setNmEmail] = useState('');
     const [nmSenha, setNmSenha] = useState('');
     const [error, setError] = useState('');
-    const [searchParams] = useSearchParams();
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (searchParams.has('error')) {
-            setError('Email ou senha inválidos. Tente novamente.');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            await login(nmEmail, nmSenha);
+            navigate('/');
+        } catch (err) {
+            if (err.response?.status === 401) {
+                setError('Email ou senha inválidos. Tente novamente.');
+            } else {
+                setError('Erro ao autenticar. Tente novamente.');
+            }
+        } finally {
+            setLoading(false);
         }
-        if (searchParams.has('logout')) {
-            setError('');
-        }
-    }, [searchParams]);
+    };
 
     return (
         <div className="login-page">
@@ -31,8 +42,7 @@ const TelaLogin = () => {
                     </div>
                 )}
 
-                {/* POST nativo ao Spring Security — necessário para session cookie */}
-                <form method="POST" action={LOGIN_POST_URL} className="login-form">
+                <form onSubmit={handleSubmit} className="login-form">
                     <div className="login-field">
                         <label htmlFor="nmEmail">E-mail</label>
                         <input
@@ -61,8 +71,8 @@ const TelaLogin = () => {
                         />
                     </div>
 
-                    <button type="submit" className="login-btn">
-                        Entrar
+                    <button type="submit" className="login-btn" disabled={loading}>
+                        {loading ? 'Entrando...' : 'Entrar'}
                     </button>
                 </form>
             </div>

@@ -6,8 +6,8 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-24T16:39:27-0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.9 (Arch Linux)"
+    date = "2026-02-24T19:23:53-0300",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 public class DentistaMapperImpl implements DentistaMapper {
 
@@ -19,11 +19,11 @@ public class DentistaMapperImpl implements DentistaMapper {
 
         DentistaDTO dentistaDTO = new DentistaDTO();
 
-        dentistaDTO.setIdDentista( dentista.getIdDentista() );
-        dentistaDTO.setNome( dentista.getNome() );
-        dentistaDTO.setEspecializacao( dentista.getEspecializacao() );
         dentistaDTO.setCro( dentista.getCro() );
         dentistaDTO.setEmail( dentista.getEmail() );
+        dentistaDTO.setEspecializacao( dentista.getEspecializacao() );
+        dentistaDTO.setIdDentista( dentista.getIdDentista() );
+        dentistaDTO.setNome( dentista.getNome() );
         dentistaDTO.setTelefone( dentista.getTelefone() );
 
         return dentistaDTO;

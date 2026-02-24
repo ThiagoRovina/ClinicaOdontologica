@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
-import { API_BASE_URL, LOGOUT_URL } from '../config/api';
+import { API_BASE_URL, AUTH_LOGIN_URL, AUTH_LOGOUT_URL } from '../config/api';
 
 const AuthContext = createContext(null);
 
@@ -14,18 +14,20 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        axios.get(`${API_BASE_URL}/usuarios/me`, { withCredentials: true })
-            .then(response => {
-                setUser(normalizeUser(response.data));
-            })
-            .catch(() => {
-                setUser(null);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+    const refreshUser = useCallback(async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/usuarios/me`, { withCredentials: true });
+            setUser(normalizeUser(response.data));
+            return normalizeUser(response.data);
+        } catch (_) {
+            setUser(null);
+            return null;
+        }
     }, []);
+
+    useEffect(() => {
+        refreshUser().finally(() => setLoading(false));
+    }, [refreshUser]);
 
     const hasRole = (role) => {
         if (!user) return false;
@@ -36,12 +38,17 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const login = async (nmEmail, nmSenha) => {
+        await axios.post(AUTH_LOGIN_URL, { nmEmail, nmSenha }, { withCredentials: true });
+        await refreshUser();
+    };
+
     const logout = async () => {
         try {
-            await axios.post(LOGOUT_URL, {}, { withCredentials: true });
+            await axios.post(AUTH_LOGOUT_URL, {}, { withCredentials: true });
         } catch (_) { }
         setUser(null);
-        window.location.href = '/telaLogin';
+        window.location.assign('/telaLogin');
     };
 
     const value = {
@@ -49,6 +56,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         isAuthenticated: !!user,
         hasRole,
+        login,
+        refreshUser,
         logout
     };
 
