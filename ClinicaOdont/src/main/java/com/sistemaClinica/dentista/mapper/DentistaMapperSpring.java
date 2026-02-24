@@ -1,0 +1,41 @@
+package com.sistemaClinica.dentista.mapper;
+
+import com.sistemaClinica.dentista.dto.DentistaDTO;
+import com.sistemaClinica.dentista.model.Dentista;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DentistaMapperSpring implements DentistaMapper {
+
+    @Override
+    public DentistaDTO toDto(Dentista dentista) {
+        if (dentista == null) {
+            return null;
+        }
+
+        DentistaDTO dentistaDTO = new DentistaDTO();
+        dentistaDTO.setIdDentista(dentista.getIdDentista());
+        dentistaDTO.setNome(dentista.getNome());
+        dentistaDTO.setEspecializacao(dentista.getEspecializacao());
+        dentistaDTO.setCro(dentista.getCro());
+        dentistaDTO.setEmail(dentista.getEmail());
+        dentistaDTO.setTelefone(dentista.getTelefone());
+        return dentistaDTO;
+    }
+
+    @Override
+    public Dentista toEntity(DentistaDTO dentistaDTO) {
+        if (dentistaDTO == null) {
+            return null;
+        }
+
+        Dentista dentista = new Dentista();
+        dentista.setIdDentista(dentistaDTO.getIdDentista());
+        dentista.setNome(dentistaDTO.getNome());
+        dentista.setEspecializacao(dentistaDTO.getEspecializacao());
+        dentista.setCro(dentistaDTO.getCro());
+        dentista.setEmail(dentistaDTO.getEmail());
+        dentista.setTelefone(dentistaDTO.getTelefone());
+        return dentista;
+    }
+}
