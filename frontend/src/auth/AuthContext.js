@@ -4,6 +4,12 @@ import { API_BASE_URL, LOGOUT_URL } from '../config/api';
 
 const AuthContext = createContext(null);
 
+const normalizeUser = (data) => {
+    if (!data || typeof data !== 'object') return null;
+    const authorities = Array.isArray(data.authorities) ? data.authorities : [];
+    return { ...data, authorities };
+};
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -11,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         axios.get(`${API_BASE_URL}/usuarios/me`, { withCredentials: true })
             .then(response => {
-                setUser(response.data);
+                setUser(normalizeUser(response.data));
             })
             .catch(() => {
                 setUser(null);
@@ -23,7 +29,11 @@ export const AuthProvider = ({ children }) => {
 
     const hasRole = (role) => {
         if (!user) return false;
-        return user.authorities.some(auth => auth.authority === role);
+        if (!Array.isArray(user.authorities)) return false;
+        return user.authorities.some(auth => {
+            if (typeof auth === 'string') return auth === role;
+            return auth?.authority === role;
+        });
     };
 
     const logout = async () => {
