@@ -7,14 +7,12 @@ import com.sistemaClinica.dentista.model.Dentista;
 import com.sistemaClinica.paciente.dto.PacienteDTO;
 import com.sistemaClinica.paciente.model.Paciente;
 import javax.annotation.processing.Generated;
-import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-21T13:18:28-0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.2 (Amazon.com Inc.)"
+    date = "2026-02-24T14:25:11-0300",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.9 (Arch Linux)"
 )
-@Component
 public class ConsultaMapperImpl implements ConsultaMapper {
 
     @Override
@@ -29,6 +27,7 @@ public class ConsultaMapperImpl implements ConsultaMapper {
         consultaDTO.setPaciente( pacienteToPacienteDTO( consulta.getPaciente() ) );
         consultaDTO.setDentista( dentistaToDentistaDTO( consulta.getDentista() ) );
         consultaDTO.setDataHora( consulta.getDataHora() );
+        consultaDTO.setStatus( consulta.getStatus() );
         consultaDTO.setObservacoes( consulta.getObservacoes() );
 
         return consultaDTO;
@@ -46,6 +45,7 @@ public class ConsultaMapperImpl implements ConsultaMapper {
         consulta.setPaciente( pacienteDTOToPaciente( consultaDTO.getPaciente() ) );
         consulta.setDentista( dentistaDTOToDentista( consultaDTO.getDentista() ) );
         consulta.setDataHora( consultaDTO.getDataHora() );
+        consulta.setStatus( consultaDTO.getStatus() );
         consulta.setObservacoes( consultaDTO.getObservacoes() );
 
         return consulta;

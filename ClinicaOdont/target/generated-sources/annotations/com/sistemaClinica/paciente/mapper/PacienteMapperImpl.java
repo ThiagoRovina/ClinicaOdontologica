@@ -3,14 +3,12 @@ package com.sistemaClinica.paciente.mapper;
 import com.sistemaClinica.paciente.dto.PacienteDTO;
 import com.sistemaClinica.paciente.model.Paciente;
 import javax.annotation.processing.Generated;
-import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-21T13:18:28-0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.2 (Amazon.com Inc.)"
+    date = "2026-02-24T14:25:11-0300",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.9 (Arch Linux)"
 )
-@Component
 public class PacienteMapperImpl implements PacienteMapper {
 
     @Override

@@ -1,5 +1,6 @@
 package com.sistemaClinica.consulta.dto;
 
+import com.sistemaClinica.consulta.model.StatusConsulta;
 import com.sistemaClinica.dentista.dto.DentistaDTO;
 import com.sistemaClinica.paciente.dto.PacienteDTO;
 import lombok.Data;
@@ -12,5 +13,6 @@ public class ConsultaDTO {
     private PacienteDTO paciente;
     private DentistaDTO dentista;
     private LocalDateTime dataHora;
+    private StatusConsulta status;
     private String observacoes;
 }
