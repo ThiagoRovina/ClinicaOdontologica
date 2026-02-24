@@ -10,8 +10,8 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-24T16:39:27-0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.9 (Arch Linux)"
+    date = "2026-02-24T19:23:53-0300",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 public class ConsultaMapperImpl implements ConsultaMapper {
 
@@ -23,12 +23,12 @@ public class ConsultaMapperImpl implements ConsultaMapper {
 
         ConsultaDTO consultaDTO = new ConsultaDTO();
 
-        consultaDTO.setIdConsulta( consulta.getIdConsulta() );
-        consultaDTO.setPaciente( pacienteToPacienteDTO( consulta.getPaciente() ) );
-        consultaDTO.setDentista( dentistaToDentistaDTO( consulta.getDentista() ) );
         consultaDTO.setDataHora( consulta.getDataHora() );
-        consultaDTO.setStatus( consulta.getStatus() );
+        consultaDTO.setDentista( dentistaToDentistaDTO( consulta.getDentista() ) );
+        consultaDTO.setIdConsulta( consulta.getIdConsulta() );
         consultaDTO.setObservacoes( consulta.getObservacoes() );
+        consultaDTO.setPaciente( pacienteToPacienteDTO( consulta.getPaciente() ) );
+        consultaDTO.setStatus( consulta.getStatus() );
 
         return consultaDTO;
     }
@@ -51,24 +51,6 @@ public class ConsultaMapperImpl implements ConsultaMapper {
         return consulta;
     }
 
-    protected PacienteDTO pacienteToPacienteDTO(Paciente paciente) {
-        if ( paciente == null ) {
-            return null;
-        }
-
-        PacienteDTO pacienteDTO = new PacienteDTO();
-
-        pacienteDTO.setIdPaciente( paciente.getIdPaciente() );
-        pacienteDTO.setNome( paciente.getNome() );
-        pacienteDTO.setDataNascimento( paciente.getDataNascimento() );
-        pacienteDTO.setEndereco( paciente.getEndereco() );
-        pacienteDTO.setTelefone( paciente.getTelefone() );
-        pacienteDTO.setEmail( paciente.getEmail() );
-        pacienteDTO.setCpf( paciente.getCpf() );
-
-        return pacienteDTO;
-    }
-
     protected DentistaDTO dentistaToDentistaDTO(Dentista dentista) {
         if ( dentista == null ) {
             return null;
@@ -76,14 +58,32 @@ public class ConsultaMapperImpl implements ConsultaMapper {
 
         DentistaDTO dentistaDTO = new DentistaDTO();
 
-        dentistaDTO.setIdDentista( dentista.getIdDentista() );
-        dentistaDTO.setNome( dentista.getNome() );
-        dentistaDTO.setEspecializacao( dentista.getEspecializacao() );
         dentistaDTO.setCro( dentista.getCro() );
         dentistaDTO.setEmail( dentista.getEmail() );
+        dentistaDTO.setEspecializacao( dentista.getEspecializacao() );
+        dentistaDTO.setIdDentista( dentista.getIdDentista() );
+        dentistaDTO.setNome( dentista.getNome() );
         dentistaDTO.setTelefone( dentista.getTelefone() );
 
         return dentistaDTO;
+    }
+
+    protected PacienteDTO pacienteToPacienteDTO(Paciente paciente) {
+        if ( paciente == null ) {
+            return null;
+        }
+
+        PacienteDTO pacienteDTO = new PacienteDTO();
+
+        pacienteDTO.setCpf( paciente.getCpf() );
+        pacienteDTO.setDataNascimento( paciente.getDataNascimento() );
+        pacienteDTO.setEmail( paciente.getEmail() );
+        pacienteDTO.setEndereco( paciente.getEndereco() );
+        pacienteDTO.setIdPaciente( paciente.getIdPaciente() );
+        pacienteDTO.setNome( paciente.getNome() );
+        pacienteDTO.setTelefone( paciente.getTelefone() );
+
+        return pacienteDTO;
     }
 
     protected Paciente pacienteDTOToPaciente(PacienteDTO pacienteDTO) {

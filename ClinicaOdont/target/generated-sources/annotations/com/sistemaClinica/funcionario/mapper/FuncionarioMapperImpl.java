@@ -7,8 +7,8 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-24T16:39:27-0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.9 (Arch Linux)"
+    date = "2026-02-24T19:23:53-0300",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 public class FuncionarioMapperImpl implements FuncionarioMapper {
 
@@ -20,14 +20,14 @@ public class FuncionarioMapperImpl implements FuncionarioMapper {
 
         FuncionarioDTO funcionarioDTO = new FuncionarioDTO();
 
-        funcionarioDTO.setIdFuncionario( funcionario.getIdFuncionario() );
-        funcionarioDTO.setNmFuncionario( funcionario.getNmFuncionario() );
-        funcionarioDTO.setNuMatricula( funcionario.getNuMatricula() );
         if ( funcionario.getCargo() != null ) {
             funcionarioDTO.setCargo( funcionario.getCargo().name() );
         }
         funcionarioDTO.setDataAdmissao( funcionario.getDataAdmissao() );
         funcionarioDTO.setEmail( funcionario.getEmail() );
+        funcionarioDTO.setIdFuncionario( funcionario.getIdFuncionario() );
+        funcionarioDTO.setNmFuncionario( funcionario.getNmFuncionario() );
+        funcionarioDTO.setNuMatricula( funcionario.getNuMatricula() );
         funcionarioDTO.setTelefone( funcionario.getTelefone() );
 
         return funcionarioDTO;
