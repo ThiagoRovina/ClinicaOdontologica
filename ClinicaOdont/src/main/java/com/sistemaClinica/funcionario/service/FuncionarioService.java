@@ -47,7 +47,7 @@ public class FuncionarioService {
         
         // Mapeamento de Cargo para Papel (Role)
         String role = switch (dto.getCargo()) {
-            case ADMINISTRATIVO -> "ROLE_ADMINISTRATIVO";
+            case ADMINISTRATIVO -> "ROLE_RECEPCIONISTA";
             case DENTISTA -> "ROLE_DENTISTA";
             case GERENTE -> "ROLE_GERENTE";
             default -> "ROLE_USER"; // Uma role padrão para outros cargos

@@ -11,4 +11,8 @@ import java.util.List;
 @Repository
 public interface ConsultaRepository extends JpaRepository<Consulta, String> {
     List<Consulta> findByDataHoraBetweenAndStatus(LocalDateTime start, LocalDateTime end, StatusConsulta status);
+
+    long countByDataHoraBetween(LocalDateTime start, LocalDateTime end);
+
+    long countByDataHoraBetweenAndStatus(LocalDateTime start, LocalDateTime end, StatusConsulta status);
 }
