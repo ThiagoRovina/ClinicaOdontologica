@@ -71,12 +71,20 @@ const FuncionarioCadastro = () => {
                 // A lógica de edição não altera a senha aqui, seria em outra tela
                 await axios.put(`${API_BASE_URL}/funcionarios/${id}`, funcionario);
                 setSuccess("Funcionário atualizado com sucesso!");
+                setTimeout(() => navigate('/funcionarios'), 1500);
             } else {
                 // Usa o novo endpoint para cadastrar funcionário e usuário
-                await axios.post(`${API_BASE_URL}/funcionarios/cadastrar`, funcionario);
-                setSuccess("Funcionário e Usuário cadastrados com sucesso!");
+                const response = await axios.post(`${API_BASE_URL}/funcionarios/cadastrar`, funcionario);
+                const idDentista = response?.data?.idDentista;
+
+                if (funcionario.cargo === 'DENTISTA' && idDentista) {
+                    setSuccess("Funcionário dentista criado. Complete os dados clínicos (CRO e especialização).");
+                    setTimeout(() => navigate(`/dentistas/editar/${idDentista}`), 1500);
+                } else {
+                    setSuccess("Funcionário e Usuário cadastrados com sucesso!");
+                    setTimeout(() => navigate('/funcionarios'), 1500);
+                }
             }
-            setTimeout(() => navigate('/funcionarios'), 1500);
         } catch (err) {
             const errorMsg = err.response?.data || "Erro ao salvar funcionário. Verifique os dados e tente novamente.";
             setError(errorMsg);

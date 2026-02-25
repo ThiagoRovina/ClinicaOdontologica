@@ -26,15 +26,29 @@ public class DentistaController {
         return dentistaDTO != null ? ResponseEntity.ok(dentistaDTO) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/por-funcionario/{idFuncionario}")
+    public ResponseEntity<DentistaDTO> buscarPorFuncionario(@PathVariable String idFuncionario) {
+        DentistaDTO dentistaDTO = dentistaService.buscarPorFuncionarioId(idFuncionario);
+        return dentistaDTO != null ? ResponseEntity.ok(dentistaDTO) : ResponseEntity.notFound().build();
+    }
+
     @PostMapping
-    public DentistaDTO criar(@RequestBody DentistaDTO dentistaDTO) {
-        return dentistaService.salvar(dentistaDTO);
+    public ResponseEntity<?> criar(@RequestBody DentistaDTO dentistaDTO) {
+        try {
+            return ResponseEntity.ok(dentistaService.salvar(dentistaDTO));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DentistaDTO> atualizar(@PathVariable String id, @RequestBody DentistaDTO dentistaDTO) {
+    public ResponseEntity<?> atualizar(@PathVariable String id, @RequestBody DentistaDTO dentistaDTO) {
         dentistaDTO.setIdDentista(id);
-        return ResponseEntity.ok(dentistaService.salvar(dentistaDTO));
+        try {
+            return ResponseEntity.ok(dentistaService.salvar(dentistaDTO));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

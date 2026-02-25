@@ -1,5 +1,7 @@
 package com.sistemaClinica.funcionario.service;
 
+import com.sistemaClinica.dentista.model.Dentista;
+import com.sistemaClinica.dentista.repository.DentistaRepository;
 import com.sistemaClinica.funcionario.dto.FuncionarioCadastroDTO;
 import com.sistemaClinica.funcionario.dto.FuncionarioDTO;
 import com.sistemaClinica.funcionario.mapper.FuncionarioMapper;
@@ -27,15 +29,18 @@ public class FuncionarioService {
     @Autowired
     private FuncionarioMapper funcionarioMapper;
 
+    @Autowired
+    private DentistaRepository dentistaRepository;
+
     public List<FuncionarioDTO> listarTodos() {
         return funcionarioRepository.findAll().stream()
-                .map(funcionarioMapper::toDto)
+                .map(this::toDtoComDentista)
                 .collect(Collectors.toList());
     }
 
     public FuncionarioDTO buscarPorId(String id) {
         return funcionarioRepository.findById(id)
-                .map(funcionarioMapper::toDto)
+                .map(this::toDtoComDentista)
                 .orElse(null);
     }
 
@@ -65,15 +70,69 @@ public class FuncionarioService {
         funcionario.setTelefone(dto.getTelefone());
 
         Funcionario funcionarioSalvo = funcionarioRepository.save(funcionario);
-        return funcionarioMapper.toDto(funcionarioSalvo);
+
+        if (funcionarioSalvo.getCargo() == TipoFuncionario.DENTISTA) {
+            upsertDentistaParaFuncionario(funcionarioSalvo);
+        }
+
+        return toDtoComDentista(funcionarioSalvo);
     }
 
+    @Transactional
     public FuncionarioDTO salvar(FuncionarioDTO funcionarioDTO) {
         Funcionario funcionario = funcionarioMapper.toEntity(funcionarioDTO);
-        return funcionarioMapper.toDto(funcionarioRepository.save(funcionario));
+        Funcionario funcionarioSalvo = funcionarioRepository.save(funcionario);
+
+        if (funcionarioSalvo.getCargo() == TipoFuncionario.DENTISTA) {
+            upsertDentistaParaFuncionario(funcionarioSalvo);
+        }
+
+        return toDtoComDentista(funcionarioSalvo);
     }
 
     public void deletar(String id) {
         funcionarioRepository.deleteById(id);
+    }
+
+    private FuncionarioDTO toDtoComDentista(Funcionario funcionario) {
+        FuncionarioDTO dto = funcionarioMapper.toDto(funcionario);
+        dentistaRepository.findByFuncionario_IdFuncionario(funcionario.getIdFuncionario())
+                .ifPresent(dentista -> dto.setIdDentista(dentista.getIdDentista()));
+        return dto;
+    }
+
+    private Dentista upsertDentistaParaFuncionario(Funcionario funcionario) {
+        Dentista dentista = dentistaRepository.findByFuncionario_IdFuncionario(funcionario.getIdFuncionario())
+                .orElseGet(Dentista::new);
+
+        dentista.setFuncionario(funcionario);
+        dentista.setNome(funcionario.getNmFuncionario());
+        dentista.setEmail(funcionario.getEmail());
+        dentista.setTelefone(funcionario.getTelefone());
+
+        if (dentista.getEspecializacao() == null || dentista.getEspecializacao().isBlank()) {
+            dentista.setEspecializacao("A DEFINIR");
+        }
+
+        if (dentista.getCro() == null || dentista.getCro().isBlank()) {
+            dentista.setCro(gerarCroProvisorio(funcionario.getNuMatricula()));
+        }
+
+        return dentistaRepository.save(dentista);
+    }
+
+    private String gerarCroProvisorio(int nuMatricula) {
+        String base = "PENDENTE-" + nuMatricula;
+        if (!dentistaRepository.existsByCro(base)) {
+            return base;
+        }
+
+        int sufixo = 1;
+        String candidato = base + "-" + sufixo;
+        while (dentistaRepository.existsByCro(candidato)) {
+            sufixo++;
+            candidato = base + "-" + sufixo;
+        }
+        return candidato;
     }
 }

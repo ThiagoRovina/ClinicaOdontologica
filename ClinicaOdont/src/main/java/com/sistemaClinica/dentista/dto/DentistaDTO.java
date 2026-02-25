@@ -10,4 +10,5 @@ public class DentistaDTO {
     private String cro;
     private String email;
     private String telefone;
+    private String idFuncionario;
 }

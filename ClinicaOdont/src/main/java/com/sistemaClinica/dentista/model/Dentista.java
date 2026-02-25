@@ -1,5 +1,6 @@
 package com.sistemaClinica.dentista.model;
 
+import com.sistemaClinica.funcionario.model.Funcionario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,4 +30,8 @@ public class Dentista {
 
     @Column(name = "nu_telefone")
     private String telefone;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_funcionario", unique = true)
+    private Funcionario funcionario;
 }

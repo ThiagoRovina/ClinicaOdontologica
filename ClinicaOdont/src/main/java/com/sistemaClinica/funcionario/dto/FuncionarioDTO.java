@@ -14,4 +14,5 @@ public class FuncionarioDTO {
     private LocalDate dataAdmissao;
     private String email;
     private String telefone;
+    private String idDentista;
 }
