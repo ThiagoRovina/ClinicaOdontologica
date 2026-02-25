@@ -28,13 +28,19 @@ public class SecurityConfig {
 
     private final JpaUserDetailsService jpaUserDetailsService;
     private final List<String> allowedOrigins;
+    private final List<String> allowedOriginPatterns;
 
     public SecurityConfig(
             JpaUserDetailsService jpaUserDetailsService,
-            @Value("${app.cors.allowed-origins:http://localhost:3000}") String allowedOriginsCsv
+            @Value("${app.cors.allowed-origins:http://localhost:3000}") String allowedOriginsCsv,
+            @Value("${app.cors.allowed-origin-patterns:https://*.vercel.app}") String allowedOriginPatternsCsv
     ) {
         this.jpaUserDetailsService = jpaUserDetailsService;
         this.allowedOrigins = Arrays.stream(allowedOriginsCsv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .toList();
+        this.allowedOriginPatterns = Arrays.stream(allowedOriginPatternsCsv.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isBlank())
                 .toList();
@@ -79,6 +85,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedOriginPatterns(allowedOriginPatterns);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
