@@ -27,14 +27,22 @@ public class PacienteController {
     }
 
     @PostMapping
-    public PacienteDTO criar(@RequestBody PacienteDTO pacienteDTO) {
-        return pacienteService.salvar(pacienteDTO);
+    public ResponseEntity<?> criar(@RequestBody PacienteDTO pacienteDTO) {
+        try {
+            return ResponseEntity.ok(pacienteService.salvar(pacienteDTO));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PacienteDTO> atualizar(@PathVariable String id, @RequestBody PacienteDTO pacienteDTO) {
+    public ResponseEntity<?> atualizar(@PathVariable String id, @RequestBody PacienteDTO pacienteDTO) {
         pacienteDTO.setIdPaciente(id);
-        return ResponseEntity.ok(pacienteService.salvar(pacienteDTO));
+        try {
+            return ResponseEntity.ok(pacienteService.salvar(pacienteDTO));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
