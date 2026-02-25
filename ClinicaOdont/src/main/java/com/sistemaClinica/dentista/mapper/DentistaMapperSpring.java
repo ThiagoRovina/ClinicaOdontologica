@@ -20,6 +20,9 @@ public class DentistaMapperSpring implements DentistaMapper {
         dentistaDTO.setCro(dentista.getCro());
         dentistaDTO.setEmail(dentista.getEmail());
         dentistaDTO.setTelefone(dentista.getTelefone());
+        if (dentista.getFuncionario() != null) {
+            dentistaDTO.setIdFuncionario(dentista.getFuncionario().getIdFuncionario());
+        }
         return dentistaDTO;
     }
 

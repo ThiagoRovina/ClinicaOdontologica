@@ -39,7 +39,7 @@ const Dentista = () => {
     return (
         <div className="container mt-5">
             <h2>Gerenciamento de Dentistas</h2>
-            <Button variant="primary" className="mb-3" onClick={() => navigate('/dentistas/novo')}>Adicionar Dentista</Button>
+            <Button variant="primary" className="mb-3" onClick={() => navigate('/funcionarios/novo')}>Novo Funcionário Dentista</Button>
 
             {loading && <div className="text-center"><Spinner animation="border" /></div>}
             {error && <Alert variant="danger">{error}</Alert>}
