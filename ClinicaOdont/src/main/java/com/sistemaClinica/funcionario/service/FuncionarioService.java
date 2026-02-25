@@ -2,12 +2,14 @@ package com.sistemaClinica.funcionario.service;
 
 import com.sistemaClinica.dentista.model.Dentista;
 import com.sistemaClinica.dentista.repository.DentistaRepository;
+import com.sistemaClinica.consulta.repository.ConsultaRepository;
 import com.sistemaClinica.funcionario.dto.FuncionarioCadastroDTO;
 import com.sistemaClinica.funcionario.dto.FuncionarioDTO;
 import com.sistemaClinica.funcionario.mapper.FuncionarioMapper;
 import com.sistemaClinica.funcionario.model.Funcionario;
 import com.sistemaClinica.funcionario.model.TipoFuncionario;
 import com.sistemaClinica.funcionario.repository.FuncionarioRepository;
+import com.sistemaClinica.prontuario.repository.ProntuarioRepository;
 import com.sistemaClinica.usuario.model.Usuario;
 import com.sistemaClinica.usuario.repository.UsuarioRepository;
 import com.sistemaClinica.usuario.service.UsuarioService;
@@ -35,6 +37,12 @@ public class FuncionarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ConsultaRepository consultaRepository;
+
+    @Autowired
+    private ProntuarioRepository prontuarioRepository;
 
     public List<FuncionarioDTO> listarTodos() {
         return funcionarioRepository.findAll().stream()
@@ -99,7 +107,18 @@ public class FuncionarioService {
         Funcionario funcionario = funcionarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado."));
 
-        dentistaRepository.deleteByFuncionario_IdFuncionario(funcionario.getIdFuncionario());
+        Dentista dentista = dentistaRepository.findByFuncionario_IdFuncionario(funcionario.getIdFuncionario())
+                .orElse(null);
+
+        if (dentista != null) {
+            long totalConsultas = consultaRepository.countByDentista_IdDentista(dentista.getIdDentista());
+            long totalProntuarios = prontuarioRepository.countByDentista_IdDentista(dentista.getIdDentista());
+            if (totalConsultas > 0 || totalProntuarios > 0) {
+                throw new IllegalArgumentException("Não é possível excluir: dentista possui consultas/prontuários vinculados.");
+            }
+            dentistaRepository.deleteByFuncionario_IdFuncionario(funcionario.getIdFuncionario());
+        }
+
         usuarioRepository.deleteByNmEmail(funcionario.getEmail());
         funcionarioRepository.delete(funcionario);
     }

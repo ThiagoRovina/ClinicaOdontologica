@@ -15,4 +15,6 @@ public interface ConsultaRepository extends JpaRepository<Consulta, String> {
     long countByDataHoraBetween(LocalDateTime start, LocalDateTime end);
 
     long countByDataHoraBetweenAndStatus(LocalDateTime start, LocalDateTime end, StatusConsulta status);
+
+    long countByDentista_IdDentista(String idDentista);
 }
