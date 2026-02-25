@@ -9,6 +9,7 @@ import com.sistemaClinica.funcionario.model.Funcionario;
 import com.sistemaClinica.funcionario.model.TipoFuncionario;
 import com.sistemaClinica.funcionario.repository.FuncionarioRepository;
 import com.sistemaClinica.usuario.model.Usuario;
+import com.sistemaClinica.usuario.repository.UsuarioRepository;
 import com.sistemaClinica.usuario.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,9 @@ public class FuncionarioService {
 
     @Autowired
     private DentistaRepository dentistaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public List<FuncionarioDTO> listarTodos() {
         return funcionarioRepository.findAll().stream()
@@ -90,8 +94,14 @@ public class FuncionarioService {
         return toDtoComDentista(funcionarioSalvo);
     }
 
+    @Transactional
     public void deletar(String id) {
-        funcionarioRepository.deleteById(id);
+        Funcionario funcionario = funcionarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado."));
+
+        dentistaRepository.deleteByFuncionario_IdFuncionario(funcionario.getIdFuncionario());
+        usuarioRepository.deleteByNmEmail(funcionario.getEmail());
+        funcionarioRepository.delete(funcionario);
     }
 
     private FuncionarioDTO toDtoComDentista(Funcionario funcionario) {
