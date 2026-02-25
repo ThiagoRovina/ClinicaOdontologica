@@ -35,7 +35,10 @@ const Funcionario = () => {
             fetchFuncionarios(); // Recarrega a lista após a exclusão
         } catch (err) {
             console.error("Erro ao deletar funcionário:", err);
-            setError("Não foi possível deletar o funcionário. Tente novamente.");
+            const mensagem = typeof err.response?.data === 'string'
+                ? err.response.data
+                : "Não foi possível deletar o funcionário. Tente novamente.";
+            setError(mensagem);
         }
     };
 
