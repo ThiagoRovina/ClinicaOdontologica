@@ -46,6 +46,11 @@ public class DentistaService {
     @Transactional
     public DentistaDTO salvar(DentistaDTO dentistaDTO) {
         Dentista dentista = null;
+        boolean isNovoDentista = dentistaDTO.getIdDentista() == null || dentistaDTO.getIdDentista().isBlank();
+
+        if (isNovoDentista && (dentistaDTO.getIdFuncionario() == null || dentistaDTO.getIdFuncionario().isBlank())) {
+            throw new IllegalArgumentException("Novo dentista deve estar vinculado a um funcionário.");
+        }
 
         if (dentistaDTO.getIdDentista() != null && !dentistaDTO.getIdDentista().isBlank()) {
             dentista = dentistaRepository.findById(dentistaDTO.getIdDentista()).orElse(null);

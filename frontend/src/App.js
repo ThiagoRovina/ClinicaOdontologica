@@ -11,7 +11,6 @@ import DentistaCadastro from "./Dentista/DentistaCadastro";
 import Consultas from "./Consultas/Consultas";
 import ConsultasHoje from "./Consultas/ConsultasHoje";
 import TelaLogin from "./login/TelaLogin";
-import TelaCadastro from "./login/TelaCadastro";
 import { AuthProvider } from './auth/AuthContext';
 import axios from 'axios';
 import Dashboard from "./Dashboard/Dashboard";
@@ -30,7 +29,6 @@ function App() {
                 <div className="container-fluid px-0">
                     <Routes>
                         <Route path="/telaLogin" element={<TelaLogin />} />
-                        <Route path="/registrar" element={<TelaCadastro />} />
 
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/Home" element={<Dashboard />} />
@@ -41,7 +39,6 @@ function App() {
                         <Route path="/pacientes/:id/prontuario" element={<ProntuarioPaciente />} />
 
                         <Route path="/dentistas" element={<Dentista />} />
-                        <Route path="/dentistas/novo" element={<DentistaCadastro />} />
                         <Route path="/dentistas/editar/:id" element={<DentistaCadastro />} />
 
                         <Route path="/funcionarios" element={<Funcionario />} />

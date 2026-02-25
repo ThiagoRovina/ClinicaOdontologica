@@ -59,7 +59,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/usuarios/registrar", "/error").permitAll()
+                        .requestMatchers("/api/auth/login", "/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios/registrar").hasRole("GERENTE")
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) ->
