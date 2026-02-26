@@ -1,63 +1,73 @@
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/mapper/ConsultaMapperSpring.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/model/StatusLancamento.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/dto/FuncionarioCadastroDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dashboard/service/DashboardService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/dto/ProntuarioDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dashboard/controller/DashboardController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/model/Procedimento.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/controller/ConsultaController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/mapper/ProcedimentoMapper.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/repository/ConsultaRepository.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/model/Usuario.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/service/PacienteService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/model/LancamentoFinanceiro.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dashboard/dto/DashboardResumoDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/model/StatusConsulta.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/mapper/DentistaMapperSpring.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/model/Prontuario.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/mapper/FuncionarioMapper.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/model/Paciente.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/repository/ProcedimentoRepository.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/mapper/ProcedimentoMapperSpring.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/service/ProcedimentoService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/service/JpaUserDetailsService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/dto/PacienteDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/controller/FuncionarioController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/dto/FuncionarioDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/controller/FinanceiroController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/repository/ProntuarioRepository.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/service/FinanceiroService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/model/Dentista.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/dto/DentistaDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/repository/FuncionarioRepository.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/controller/ProcedimentoController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/repository/LancamentoFinanceiroRepository.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/config/CorsConfig.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/controller/PacienteController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/dto/ProcedimentoDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/repository/UsuarioRepository.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/controller/DentistaController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/mapper/PacienteMapper.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/repository/PacienteRepository.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/mapper/FuncionarioMapperSpring.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/dto/LancamentoFinanceiroDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/repository/DentistaRepository.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/service/UsuarioService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/model/TipoLancamento.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/mapper/PacienteMapperSpring.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/mapper/ConsultaMapper.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/ClinicaOdont/ClinicaOdontApplication.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/service/ConsultaService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/config/SecurityConfig.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/mapper/DentistaMapper.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/controller/UsuarioController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/service/DentistaService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/service/FuncionarioService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/model/Funcionario.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/service/ProntuarioService.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/dto/ConsultaDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/model/Consulta.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/dto/ProntuarioUpsertDTO.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/controller/ProntuarioController.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/config/DataInitializer.java
-/home/thiago/IdeaProjects/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/model/TipoFuncionario.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/mapper/DentistaMapperSpring.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/model/Prontuario.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/config/SecurityConfig.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/model/LancamentoFinanceiro.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/mapper/FuncionarioMapperSpring.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/dto/FuncionarioDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/service/DentistaService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/repository/ConsultaRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/config/DataInitializer.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/dto/FuncionarioCadastroDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/controller/ConsultaController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/repository/LancamentoFinanceiroRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/controller/ProcedimentoController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/service/PacienteService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/mapper/PacienteMapperSpring.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/model/StatusConsulta.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/controller/ProntuarioController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/util/CpfUtils.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/service/JpaUserDetailsService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/model/Paciente.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/mapper/ConsultaMapperSpring.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/dto/PacienteDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/dto/LancamentoFinanceiroDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/model/TipoLancamento.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/model/Procedimento.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/dto/ProcedimentoDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/dto/ProntuarioDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/repository/UsuarioRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/listaespera/controller/ListaEsperaController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/auth/dto/LoginRequest.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/model/StatusLancamento.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/repository/PacienteRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/listaespera/dto/ListaEsperaDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/controller/PacienteController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/service/FinanceiroService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/service/ProcedimentoService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/mapper/ConsultaMapper.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/model/TipoFuncionario.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/mapper/FuncionarioMapper.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/repository/DentistaRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/config/CorsConfig.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/service/FuncionarioService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/controller/FuncionarioController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/paciente/mapper/PacienteMapper.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/service/UsuarioService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/model/Consulta.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/listaespera/service/ListaEsperaService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/service/ConsultaService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/mapper/ProcedimentoMapperSpring.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/dto/ProntuarioUpsertDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/mapper/DentistaMapper.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/model/Funcionario.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dashboard/dto/DashboardResumoDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/dto/DentistaDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/repository/ProntuarioRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/ClinicaOdont/ClinicaOdontApplication.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/repository/ProcedimentoRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/consulta/dto/ConsultaDTO.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/funcionario/repository/FuncionarioRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/financeiro/controller/FinanceiroController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dashboard/service/DashboardService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/procedimento/mapper/ProcedimentoMapper.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/auth/controller/AuthController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/auth/dto/LoginResponse.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/model/Usuario.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/prontuario/service/ProntuarioService.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/usuario/controller/UsuarioController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/controller/DentistaController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dashboard/controller/DashboardController.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/listaespera/model/ListaEspera.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/dentista/model/Dentista.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/listaespera/repository/ListaEsperaRepository.java
+/home/npd/Área de Trabalho/Thiago/ClinicaOdontologica/ClinicaOdont/src/main/java/com/sistemaClinica/listaespera/model/StatusListaEspera.java
