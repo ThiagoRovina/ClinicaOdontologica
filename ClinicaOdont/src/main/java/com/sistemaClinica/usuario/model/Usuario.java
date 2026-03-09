@@ -18,6 +18,9 @@ public class Usuario {
     @Column(name = "nm_email", unique = true, nullable = false)
     private String nmEmail;
 
+    @Column(name = "nm_usuario")
+    private String nmUsuario;
+
     @Column(name = "nm_senha", nullable = false)
     private String nmSenha;
 
@@ -26,8 +29,9 @@ public class Usuario {
 
     public Usuario() {}
 
-    public Usuario(String nmEmail, String nmSenha, String dsRole) {
+    public Usuario(String nmEmail, String nmUsuario, String nmSenha, String dsRole) {
         this.nmEmail = nmEmail;
+        this.nmUsuario = nmUsuario;
         this.nmSenha = nmSenha;
         this.dsRole = dsRole;
     }

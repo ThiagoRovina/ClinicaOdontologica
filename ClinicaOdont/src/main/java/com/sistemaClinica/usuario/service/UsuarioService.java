@@ -26,6 +26,10 @@ public class UsuarioService {
             throw new IllegalArgumentException("Este email já está em uso.");
         }
 
+        if (novoUsuario.getNmUsuario() == null || novoUsuario.getNmUsuario().isBlank()) {
+            novoUsuario.setNmUsuario(extrairNomePadrao(novoUsuario.getNmEmail()));
+        }
+
         novoUsuario.setNmSenha(passwordEncoder.encode(novoUsuario.getNmSenha()));
 
         // Valida a role; se não informada ou inválida, usa ROLE_RECEPCIONISTA como
@@ -36,5 +40,18 @@ public class UsuarioService {
         }
 
         return usuarioRepository.save(novoUsuario);
+    }
+
+    public Usuario buscarPorEmail(String nmEmail) {
+        return usuarioRepository.findByNmEmail(nmEmail).orElse(null);
+    }
+
+    private String extrairNomePadrao(String email) {
+        if (email == null || email.isBlank()) {
+            return "";
+        }
+
+        int arroba = email.indexOf('@');
+        return arroba > 0 ? email.substring(0, arroba) : email;
     }
 }

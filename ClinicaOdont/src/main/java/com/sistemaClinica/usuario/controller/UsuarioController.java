@@ -1,5 +1,7 @@
 package com.sistemaClinica.usuario.controller;
 
+import com.sistemaClinica.funcionario.repository.FuncionarioRepository;
+import com.sistemaClinica.usuario.dto.UsuarioLogadoResponse;
 import com.sistemaClinica.usuario.model.Usuario;
 import com.sistemaClinica.usuario.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private FuncionarioRepository funcionarioRepository;
+
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarUsuario(@RequestBody Usuario novoUsuario) {
         try {
@@ -26,11 +31,29 @@ public class UsuarioController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDetails> getUsuarioLogado(Authentication authentication) {
+    public ResponseEntity<UsuarioLogadoResponse> getUsuarioLogado(Authentication authentication) {
         if (authentication == null) {
-            return ResponseEntity.status(401).build(); // Não autorizado
+            return ResponseEntity.status(401).build();
         }
+
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userDetails);
+        Usuario usuario = usuarioService.buscarPorEmail(userDetails.getUsername());
+        String nome = userDetails.getUsername();
+
+        if (usuario != null && usuario.getNmUsuario() != null && !usuario.getNmUsuario().isBlank()) {
+            nome = usuario.getNmUsuario();
+        } else {
+            nome = funcionarioRepository.findByEmail(userDetails.getUsername())
+                    .map(funcionario -> funcionario.getNmFuncionario())
+                    .orElse(userDetails.getUsername());
+        }
+
+        UsuarioLogadoResponse response = new UsuarioLogadoResponse(
+                userDetails.getUsername(),
+                nome,
+                userDetails.getAuthorities().stream().map(a -> a.getAuthority()).toList()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

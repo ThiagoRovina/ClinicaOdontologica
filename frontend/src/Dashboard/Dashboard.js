@@ -6,6 +6,7 @@ import './Dashboard.css';
 
 function Dashboard() {
     const { user, hasRole } = useAuth();
+    const displayName = user?.nome || user?.username;
 
     const isGerente = hasRole('ROLE_GERENTE');
     const isDentista = hasRole('ROLE_DENTISTA');
@@ -17,7 +18,7 @@ function Dashboard() {
                 <Col>
                     <h1 className="display-4">Bem-vindo ao OdontoSys</h1>
                     <p className="lead">Sistema de Gestão para Clínica Odontológica</p>
-                    {user && <p className="text-muted">Olá, {user.username}!</p>}
+                    {user && <p className="text-muted">Olá, {displayName}!</p>}
                 </Col>
             </Row>
 
