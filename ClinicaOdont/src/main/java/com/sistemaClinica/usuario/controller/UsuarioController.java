@@ -1,7 +1,6 @@
 package com.sistemaClinica.usuario.controller;
 
 import com.sistemaClinica.funcionario.repository.FuncionarioRepository;
-import com.sistemaClinica.usuario.dto.UsuarioLogadoResponse;
 import com.sistemaClinica.usuario.model.Usuario;
 import com.sistemaClinica.usuario.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -31,7 +32,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UsuarioLogadoResponse> getUsuarioLogado(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> getUsuarioLogado(Authentication authentication) {
         if (authentication == null) {
             return ResponseEntity.status(401).build();
         }
@@ -48,10 +49,10 @@ public class UsuarioController {
                     .orElse(userDetails.getUsername());
         }
 
-        UsuarioLogadoResponse response = new UsuarioLogadoResponse(
-                userDetails.getUsername(),
-                nome,
-                userDetails.getAuthorities().stream().map(a -> a.getAuthority()).toList()
+        Map<String, Object> response = Map.of(
+                "username", userDetails.getUsername(),
+                "nome", nome,
+                "authorities", userDetails.getAuthorities().stream().map(a -> a.getAuthority()).toList()
         );
 
         return ResponseEntity.ok(response);
