@@ -5,8 +5,10 @@ import com.sistemaClinica.consulta.mapper.ConsultaMapper;
 import com.sistemaClinica.consulta.model.Consulta;
 import com.sistemaClinica.consulta.model.StatusConsulta;
 import com.sistemaClinica.consulta.repository.ConsultaRepository;
+import com.sistemaClinica.listaespera.service.ListaEsperaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +23,9 @@ public class ConsultaService {
 
     @Autowired
     private ConsultaMapper consultaMapper;
+
+    @Autowired
+    private ListaEsperaService listaEsperaService;
 
     public List<ConsultaDTO> listarTodas() {
         return consultaRepository.findAll().stream()
@@ -42,11 +47,15 @@ public class ConsultaService {
         return consultaMapper.toDto(consultaRepository.save(consulta));
     }
 
+    @Transactional
     public ConsultaDTO cancelar(String id) {
         Consulta consulta = consultaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
         consulta.setStatus(StatusConsulta.CANCELADA);
-        return consultaMapper.toDto(consultaRepository.save(consulta));
+        Consulta consultaCancelada = consultaRepository.save(consulta);
+
+        listaEsperaService.tentarEncaixarNoHorarioCancelado(consultaCancelada.getDataHora(), consultaCancelada.getDentista());
+        return consultaMapper.toDto(consultaCancelada);
     }
 
     public ConsultaDTO finalizar(String id) {
