@@ -17,6 +17,7 @@ public class DataInitializer {
             if (usuarioRepository.findByNmEmail(email).isEmpty()) {
                 Usuario admin = new Usuario();
                 admin.setNmEmail(email);
+                admin.setNmUsuario("Thiago");
                 admin.setNmSenha(passwordEncoder.encode("thirrasgo26"));
                 admin.setDsRole("ROLE_GERENTE");
                 usuarioRepository.save(admin);

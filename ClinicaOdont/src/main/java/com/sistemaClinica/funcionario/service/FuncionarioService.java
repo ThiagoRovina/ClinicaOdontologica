@@ -60,6 +60,7 @@ public class FuncionarioService {
     public FuncionarioDTO cadastrarFuncionarioEUsuario(FuncionarioCadastroDTO dto) {
         Usuario novoUsuario = new Usuario();
         novoUsuario.setNmEmail(dto.getEmail());
+        novoUsuario.setNmUsuario(dto.getNmFuncionario());
         novoUsuario.setNmSenha(dto.getSenha());
         
         // Mapeamento de Cargo para Papel (Role)

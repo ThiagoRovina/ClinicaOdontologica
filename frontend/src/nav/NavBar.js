@@ -7,6 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 
 function NavBar() {
     const { isAuthenticated, user, hasRole, logout } = useAuth();
+    const displayName = user?.nome || user?.username;
 
     const isGerente = hasRole('ROLE_GERENTE');
     const isDentista = hasRole('ROLE_DENTISTA');
@@ -50,7 +51,7 @@ function NavBar() {
                                     <Nav.Link as={Link} to="/financeiro">Financeiro</Nav.Link>
                                 )}
 
-                                <NavDropdown title={user.username} id="basic-nav-dropdown">
+                                <NavDropdown title={displayName} id="basic-nav-dropdown">
                                     <NavDropdown.Item onClick={logout}>Sair</NavDropdown.Item>
                                 </NavDropdown>
                             </>
