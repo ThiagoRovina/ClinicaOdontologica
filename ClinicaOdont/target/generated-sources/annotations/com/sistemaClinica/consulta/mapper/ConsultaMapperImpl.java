@@ -10,8 +10,8 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-26T11:38:48-0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.9 (JetBrains s.r.o.)"
+    date = "2026-03-16T09:19:39-0300",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Ubuntu)"
 )
 public class ConsultaMapperImpl implements ConsultaMapper {
 
