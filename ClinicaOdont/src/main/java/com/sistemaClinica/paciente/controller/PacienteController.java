@@ -2,6 +2,7 @@ package com.sistemaClinica.paciente.controller;
 
 import com.sistemaClinica.paciente.dto.PacienteDTO;
 import com.sistemaClinica.paciente.service.PacienteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pacientes")
-@CrossOrigin(origins = "http://localhost:3000")
 public class PacienteController {
 
     @Autowired
@@ -22,24 +22,23 @@ public class PacienteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PacienteDTO> buscarPorId(@PathVariable String id) {
-        PacienteDTO pacienteDTO = pacienteService.buscarPorId(id);
-        return pacienteDTO != null ? ResponseEntity.ok(pacienteDTO) : ResponseEntity.notFound().build();
+    public ResponseEntity<PacienteDTO> buscarPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(pacienteService.buscarPorId(id));
     }
 
     @PostMapping
-    public PacienteDTO criar(@RequestBody PacienteDTO pacienteDTO) {
-        return pacienteService.salvar(pacienteDTO);
+    public ResponseEntity<PacienteDTO> criar(@Valid @RequestBody PacienteDTO pacienteDTO) {
+        return ResponseEntity.ok(pacienteService.salvar(pacienteDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PacienteDTO> atualizar(@PathVariable String id, @RequestBody PacienteDTO pacienteDTO) {
+    public ResponseEntity<PacienteDTO> atualizar(@PathVariable Integer id, @Valid @RequestBody PacienteDTO pacienteDTO) {
         pacienteDTO.setIdPaciente(id);
         return ResponseEntity.ok(pacienteService.salvar(pacienteDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable String id) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         pacienteService.deletar(id);
         return ResponseEntity.noContent().build();
     }

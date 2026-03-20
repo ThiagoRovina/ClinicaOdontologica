@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Alert, Container } from 'react-bootstrap';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import api from '../api';
 
 const FuncionarioCadastro = () => {
     const navigate = useNavigate();
@@ -26,7 +24,7 @@ const FuncionarioCadastro = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/funcionarios/tipos`)
+        api.get('/api/funcionarios/tipos')
             .then(response => {
                 setTiposFuncionario(response.data);
             })
@@ -38,7 +36,7 @@ const FuncionarioCadastro = () => {
     useEffect(() => {
         if (isEditMode) {
             setLoading(true);
-            axios.get(`${API_BASE_URL}/funcionarios/${id}`)
+            api.get(`/api/funcionarios/${id}`)
                 .then(response => {
                     setFuncionario(prev => ({ ...prev, ...response.data }));
                     setLoading(false);
@@ -70,16 +68,15 @@ const FuncionarioCadastro = () => {
         try {
             if (isEditMode) {
                 // A lógica de edição não altera a senha aqui, seria em outra tela
-                await axios.put(`${API_BASE_URL}/funcionarios/${id}`, funcionario);
+                await api.put(`/api/funcionarios/${id}`, funcionario);
                 setSuccess("Funcionário atualizado com sucesso!");
             } else {
-                // Usa o novo endpoint para cadastrar funcionário e usuário
-                await axios.post(`${API_BASE_URL}/funcionarios/cadastrar`, funcionario);
+                await api.post('/api/funcionarios/cadastrar', funcionario);
                 setSuccess("Funcionário e Usuário cadastrados com sucesso!");
             }
             setTimeout(() => navigate('/funcionarios'), 1500);
         } catch (err) {
-            const errorMsg = err.response?.data || "Erro ao salvar funcionário. Verifique os dados e tente novamente.";
+            const errorMsg = err.response?.data?.message || "Erro ao salvar funcionário. Verifique os dados e tente novamente.";
             setError(errorMsg);
         } finally {
             setLoading(false);

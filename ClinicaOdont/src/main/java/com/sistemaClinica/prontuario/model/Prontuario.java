@@ -15,8 +15,9 @@ import java.time.LocalDate;
 public class Prontuario {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_prontuario")
-    private String idProntuario;
+    private Integer idProntuario;
 
     @ManyToOne
     @JoinColumn(name = "id_paciente", nullable = false)

@@ -9,6 +9,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ConsultaRepository extends JpaRepository<Consulta, String> {
+public interface ConsultaRepository extends JpaRepository<Consulta, Integer> {
     List<Consulta> findByDataHoraBetweenAndStatus(LocalDateTime start, LocalDateTime end, StatusConsulta status);
+    long countByDataHoraBetween(LocalDateTime start, LocalDateTime end);
+    long countByStatus(StatusConsulta status);
+    long countByDataHoraBetweenAndStatus(LocalDateTime start, LocalDateTime end, StatusConsulta status);
+    List<Consulta> findByDataHoraBetweenOrderByDataHoraAsc(LocalDateTime start, LocalDateTime end);
+    List<Consulta> findByDentistaIdDentistaAndDataHoraBetweenOrderByDataHoraAsc(Integer dentistaId, LocalDateTime start, LocalDateTime end);
+    boolean existsByDentistaIdDentistaAndDataHoraAndStatusNot(Integer dentistaId, LocalDateTime dataHora, StatusConsulta status);
 }

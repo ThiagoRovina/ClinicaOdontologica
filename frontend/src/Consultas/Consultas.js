@@ -1,26 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Container, Card, Button, Row, Col, Spinner } from 'react-bootstrap';
+import { Container, Card, Button, Row, Col, Spinner, Alert } from 'react-bootstrap';
 import './CalendarStyles.css';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import api from '../api';
+import PageHeader from '../components/PageHeader';
 
 const Consultas = () => {
     const navigate = useNavigate();
     const [consultas, setConsultas] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/consultas`)
+        api.get('/api/consultas')
             .then(response => {
                 setConsultas(response.data);
                 setLoading(false);
             })
             .catch(error => {
                 console.error("Erro ao buscar consultas", error);
+                setError("Nao foi possivel carregar o calendario de consultas.");
                 setLoading(false);
             });
     }, []);
@@ -49,11 +50,21 @@ const Consultas = () => {
     }
 
     return (
-        <Container className="mt-5">
-            <h2 className="text-center mb-4">Calendário de Consultas</h2>
+        <Container className="page-shell">
+            <PageHeader
+                eyebrow="Agenda clinica"
+                title="Calendario de consultas"
+                subtitle="Acompanhe rapidamente o status da agenda e abra os atendimentos do dia."
+                actions={
+                    <Button variant="dark" className="rounded-pill px-4" onClick={() => navigate('/consultas/hoje')}>
+                        Ver agenda de hoje
+                    </Button>
+                }
+            />
+            {error && <Alert variant="danger">{error}</Alert>}
             <Row className="justify-content-md-center">
                 <Col md={8}>
-                    <Card>
+                    <Card className="surface-card">
                         <Card.Body>
                             <Calendar
                                 tileClassName={getTileClassName}
@@ -68,7 +79,7 @@ const Consultas = () => {
                                     <div className="d-flex align-items-center"><span style={{height: '1rem', width: '1rem'}} className="bg-danger-light rounded-circle me-2"></span>Cancelada</div>
                                 </Col>
                                 <Col xs={12} md={4} className="text-center text-md-end">
-                                    <Button variant="primary" onClick={() => navigate('/consultas/hoje')}>
+                                    <Button variant="dark" onClick={() => navigate('/consultas/hoje')}>
                                         Agendamentos de Hoje
                                     </Button>
                                 </Col>

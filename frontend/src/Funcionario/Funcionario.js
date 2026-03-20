@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { Table, Button, Alert, Spinner } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Table, Button, Alert, Spinner, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import api from '../api';
+import ConfirmActionModal from '../components/ConfirmActionModal';
+import ListToolbar from '../components/ListToolbar';
+import PageHeader from '../components/PageHeader';
+import PaginationBar from '../components/PaginationBar';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const ITEMS_PER_PAGE = 5;
 
 const Funcionario = () => {
     const navigate = useNavigate(); // Hook para navegação
@@ -11,11 +15,16 @@ const Funcionario = () => {
     const [funcionarios, setFuncionarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [search, setSearch] = useState('');
+    const [cargo, setCargo] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [funcionarioParaExcluir, setFuncionarioParaExcluir] = useState(null);
+    const [feedback, setFeedback] = useState(null);
 
     const fetchFuncionarios = useCallback(async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/funcionarios`);
+            const response = await api.get('/api/funcionarios');
             setFuncionarios(response.data);
             setError(null);
         } catch (err) {
@@ -30,10 +39,30 @@ const Funcionario = () => {
         fetchFuncionarios();
     }, [fetchFuncionarios]);
 
-    const handleDelete = async (id) => {
+    const filteredFuncionarios = useMemo(() => {
+        return funcionarios.filter((funcionario) => {
+            const matchesSearch = [funcionario.nmFuncionario, funcionario.email, String(funcionario.nuMatricula)]
+                .filter(Boolean)
+                .some((value) => value.toLowerCase().includes(search.toLowerCase()));
+            const matchesCargo = !cargo || funcionario.cargo === cargo;
+            return matchesSearch && matchesCargo;
+        });
+    }, [funcionarios, search, cargo]);
+
+    const cargos = [...new Set(funcionarios.map((funcionario) => funcionario.cargo).filter(Boolean))];
+    const totalPages = Math.max(1, Math.ceil(filteredFuncionarios.length / ITEMS_PER_PAGE));
+    const paginatedFuncionarios = filteredFuncionarios.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, cargo]);
+
+    const handleDelete = async () => {
         try {
-            await axios.delete(`${API_BASE_URL}/funcionarios/${id}`);
+            await api.delete(`/api/funcionarios/${funcionarioParaExcluir.idFuncionario}`);
             fetchFuncionarios(); // Recarrega a lista após a exclusão
+            setFuncionarioParaExcluir(null);
+            setFeedback({ type: 'success', message: 'Funcionario removido com sucesso.' });
         } catch (err) {
             console.error("Erro ao deletar funcionário:", err);
             setError("Não foi possível deletar o funcionário. Tente novamente.");
@@ -49,27 +78,47 @@ const Funcionario = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <h2>Gerenciamento de Funcionários</h2>
-            <Button variant="primary" className="mb-3" onClick={handleAddFuncionario}>Adicionar Funcionário</Button>
+        <div className="page-shell">
+            <PageHeader
+                eyebrow="Gestao interna"
+                title="Gerenciamento de funcionarios"
+                subtitle="Organize acessos, cargos e informacoes da equipe administrativa e operacional."
+                actions={<Button variant="dark" className="rounded-pill px-4" onClick={handleAddFuncionario}>Adicionar funcionario</Button>}
+            />
 
             {loading && (
-                <div className="text-center">
+                <div className="loading-shell">
                     <Spinner animation="border" role="status">
                         <span className="visually-hidden">Carregando...</span>
                     </Spinner>
-                    <p>Carregando funcionários...</p>
                 </div>
             )}
 
+            {feedback && <Alert variant={feedback.type}>{feedback.message}</Alert>}
             {error && <Alert variant="danger">{error}</Alert>}
 
-            {!loading && !error && funcionarios.length === 0 && (
+            {!loading && (
+                <ListToolbar
+                    searchValue={search}
+                    onSearchChange={setSearch}
+                    searchPlaceholder="Busque por nome, email ou matricula"
+                    filterLabel="Cargo"
+                    filterValue={cargo}
+                    onFilterChange={setCargo}
+                    filterOptions={[
+                        { value: '', label: 'Todos os cargos' },
+                        ...cargos.map((item) => ({ value: item, label: item }))
+                    ]}
+                />
+            )}
+
+            {!loading && !error && filteredFuncionarios.length === 0 && (
                 <Alert variant="info">Nenhum funcionário encontrado.</Alert>
             )}
 
-            {!loading && !error && funcionarios.length > 0 && (
-                <Table striped bordered hover>
+            {!loading && !error && filteredFuncionarios.length > 0 && (
+                <div className="table-shell">
+                <Table hover responsive className="align-middle mb-0">
                     <thead>
                         <tr>
                             <th>Nome</th>
@@ -80,21 +129,31 @@ const Funcionario = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {funcionarios.map(funcionario => (
+                        {paginatedFuncionarios.map(funcionario => (
                             <tr key={funcionario.idFuncionario}>
                                 <td>{funcionario.nmFuncionario}</td>
-                                <td>{funcionario.nuMatricula}</td>
+                                <td><Badge bg="light" text="dark">{funcionario.nuMatricula}</Badge></td>
                                 <td>{funcionario.cargo}</td>
                                 <td>{funcionario.email}</td>
                                 <td>
                                     <Button variant="info" size="sm" className="me-2" onClick={() => handleEditFuncionario(funcionario.idFuncionario)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => handleDelete(funcionario.idFuncionario)}>Excluir</Button>
+                                    <Button variant="outline-danger" size="sm" onClick={() => setFuncionarioParaExcluir(funcionario)}>Excluir</Button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>
+                </div>
             )}
+            <PaginationBar currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            <ConfirmActionModal
+                show={!!funcionarioParaExcluir}
+                title="Excluir funcionario"
+                body={`Deseja realmente excluir ${funcionarioParaExcluir?.nmFuncionario || 'este funcionario'}?`}
+                onCancel={() => setFuncionarioParaExcluir(null)}
+                onConfirm={handleDelete}
+                confirmLabel="Excluir funcionario"
+            />
         </div>
     );
 };

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert, Card } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import api from '../api';
+import { useAuth } from '../auth/AuthContext';
 
 const TelaLogin = () => {
+    const navigate = useNavigate();
+    const { refreshUser } = useAuth();
     const [nmEmail, setNmEmail] = useState('');
     const [nmSenha, setNmSenha] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const [searchParams] = useSearchParams();
 
@@ -15,7 +20,33 @@ const TelaLogin = () => {
         }
     }, [searchParams]);
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append('nmEmail', nmEmail);
+            formData.append('nmSenha', nmSenha);
+
+            await api.post('/telaLogin/login', formData, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            await refreshUser();
+            navigate('/');
+        } catch (err) {
+            setError('Email ou senha invalidos. Por favor, tente novamente.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
+
         <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '80vh' }}>
             <Card style={{ width: '25rem' }}>
                 <Card.Body>
@@ -23,8 +54,7 @@ const TelaLogin = () => {
                     
                     {error && <Alert variant="danger">{error}</Alert>}
 
-                    {/* A action agora aponta para a URL completa do backend */}
-                    <Form method="POST" action="http://localhost:8080/telaLogin/login">
+                    <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
@@ -50,8 +80,8 @@ const TelaLogin = () => {
                         </Form.Group>
 
                         <div className="d-grid">
-                            <Button variant="primary" type="submit">
-                                Entrar
+                            <Button variant="primary" type="submit" disabled={loading}>
+                                {loading ? 'Entrando...' : 'Entrar'}
                             </Button>
                         </div>
                     </Form>

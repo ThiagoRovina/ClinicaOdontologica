@@ -1,49 +1,62 @@
 import React from "react";
-import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
+import { Navbar, Nav, Container, NavDropdown, Badge } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./navStyle.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 function NavBar() {
-    const { isAuthenticated, user, hasRole } = useAuth();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { isAuthenticated, user, hasRole, logout } = useAuth();
 
     const isGerente = hasRole('ROLE_GERENTE');
     const isDentista = hasRole('ROLE_DENTISTA');
-    const isRecepcionista = hasRole('ROLE_RECEPCIONISTA');
+    const isAdministrativo = hasRole('ROLE_ADMINISTRATIVO');
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/telaLogin');
+    };
 
     return (
-        <Navbar expand="lg" className="navbar-custom">
+        <Navbar expand="lg" className="navbar-custom sticky-top">
             <Container fluid>
-                <Navbar.Brand as={Link} to="/" className="text-white ms-5">OdontoSys</Navbar.Brand>
+                <Navbar.Brand as={Link} to="/" className="text-white ms-3">OdontoSys</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="ms-auto">
                         {isAuthenticated ? (
                             <>
-                                <Nav.Link as={Link} to="/">Home</Nav.Link>
+                                <Nav.Link as={Link} to="/" active={location.pathname === '/'}>Home</Nav.Link>
 
-                                {(isRecepcionista || isGerente) && (
-                                    <Nav.Link as={Link} to="/pacientes">Pacientes</Nav.Link>
+                                {(isAdministrativo || isGerente) && (
+                                    <Nav.Link as={Link} to="/pacientes" active={location.pathname.startsWith('/pacientes')}>Pacientes</Nav.Link>
                                 )}
 
                                 {isGerente && (
-                                    <Nav.Link as={Link} to="/dentistas">Dentistas</Nav.Link>
+                                    <Nav.Link as={Link} to="/dentistas" active={location.pathname.startsWith('/dentistas')}>Dentistas</Nav.Link>
                                 )}
                                 {isGerente && (
-                                    <Nav.Link as={Link} to="/funcionarios">Funcionários</Nav.Link>
+                                    <Nav.Link as={Link} to="/funcionarios" active={location.pathname.startsWith('/funcionarios')}>Funcionarios</Nav.Link>
+                                )}
+                                {isGerente && (
+                                    <Nav.Link as={Link} to="/procedimentos" active={location.pathname.startsWith('/procedimentos')}>Procedimentos</Nav.Link>
                                 )}
 
-                                {(isRecepcionista || isGerente) && (
-                                    <Nav.Link as={Link} to="/agendamento">Agendar</Nav.Link>
+                                {(isAdministrativo || isGerente) && (
+                                    <Nav.Link as={Link} to="/agendamento" active={location.pathname.startsWith('/agendamento')}>Agenda</Nav.Link>
                                 )}
 
                                 {(isDentista || isGerente) && (
-                                    <Nav.Link as={Link} to="/consultas">Consultas</Nav.Link>
+                                    <Nav.Link as={Link} to="/consultas" active={location.pathname.startsWith('/consultas')}>Consultas</Nav.Link>
+                                )}
+                                {isGerente && (
+                                    <Nav.Link as={Link} to="/relatorios" active={location.pathname.startsWith('/relatorios')}>Relatorios</Nav.Link>
                                 )}
 
-                                <NavDropdown title={user.username} id="basic-nav-dropdown">
-                                    <NavDropdown.Item href="/logout">Sair</NavDropdown.Item>
+                                <NavDropdown title={<span>{user.email} <Badge bg="light" text="dark">online</Badge></span>} id="basic-nav-dropdown" align="end">
+                                    <NavDropdown.Item onClick={handleLogout}>Sair</NavDropdown.Item>
                                 </NavDropdown>
                             </>
                         ) : (

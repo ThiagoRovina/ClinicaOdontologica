@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Row, Col, Form, Button, Alert, Spinner, Table, Card } from 'react-bootstrap';
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import { Container, Row, Col, Form, Button, Alert, Spinner, Table, Card, Badge } from 'react-bootstrap';
+import api from '../api';
+import PageHeader from '../components/PageHeader';
 
 const AgendamentoFront = () => {
     const [pacientes, setPacientes] = useState([]);
@@ -10,6 +9,9 @@ const AgendamentoFront = () => {
     const [consultas, setConsultas] = useState([]);
     const [loading, setLoading] = useState({ pacientes: true, dentistas: true, consultas: true });
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+    const [filtroDentista, setFiltroDentista] = useState('');
+    const [filtroData, setFiltroData] = useState(new Date().toISOString().slice(0, 10));
 
     const [novaConsulta, setNovaConsulta] = useState({
         pacienteId: '',
@@ -20,19 +22,23 @@ const AgendamentoFront = () => {
     const fetchConsultas = useCallback(async () => {
         try {
             setLoading(prev => ({ ...prev, consultas: true }));
-            const response = await axios.get(`${API_BASE_URL}/consultas`);
+            const params = { data: filtroData };
+            if (filtroDentista) {
+                params.dentistaId = filtroDentista;
+            }
+            const response = await api.get('/api/consultas', { params });
             setConsultas(response.data);
         } catch (err) {
             setError("Não foi possível carregar as consultas.");
         } finally {
             setLoading(prev => ({ ...prev, consultas: false }));
         }
-    }, []);
+    }, [filtroData, filtroDentista]);
 
     useEffect(() => {
         const fetchPacientes = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/pacientes`);
+                const response = await api.get('/api/pacientes');
                 setPacientes(response.data);
             } catch (err) {
                 setError("Não foi possível carregar os pacientes.");
@@ -43,7 +49,7 @@ const AgendamentoFront = () => {
 
         const fetchDentistas = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/dentistas`);
+                const response = await api.get('/api/dentistas');
                 setDentistas(response.data);
             } catch (err) {
                 setError("Não foi possível carregar os dentistas.");
@@ -73,31 +79,39 @@ const AgendamentoFront = () => {
         };
 
         try {
-            await axios.post(`${API_BASE_URL}/consultas`, consultaParaSalvar);
+            await api.post('/api/consultas', consultaParaSalvar);
             setNovaConsulta({ pacienteId: '', dentistaId: '', dataHora: '' });
+            setSuccess('Consulta agendada com sucesso.');
             fetchConsultas();
         } catch (err) {
-            setError("Erro ao agendar consulta. Verifique os dados.");
+            setError(err.response?.data?.message || "Erro ao agendar consulta. Verifique os dados.");
         }
     };
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`${API_BASE_URL}/consultas/${id}`);
+            await api.delete(`/api/consultas/${id}`);
+            setSuccess('Consulta cancelada com sucesso.');
             fetchConsultas();
         } catch (err) {
-            setError("Erro ao cancelar a consulta.");
+            setError(err.response?.data?.message || "Erro ao cancelar a consulta.");
         }
     };
 
     return (
-        <Container className="mt-5">
-            <h2>Agendamento de Consultas</h2>
+        <Container className="page-shell">
+            <PageHeader
+                eyebrow="Agenda inteligente"
+                title="Agendamento de consultas"
+                subtitle="Filtre por dentista e data, visualize a agenda diaria e evite conflitos de horario automaticamente."
+            />
             <Row>
                 <Col md={4}>
-                    <Card>
+                    <Card className="surface-card">
                         <Card.Body>
                             <Card.Title>Nova Consulta</Card.Title>
+                            {success && <Alert variant="success">{success}</Alert>}
+                            {error && <Alert variant="danger">{error}</Alert>}
                             <Form onSubmit={handleSubmit}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Paciente</Form.Label>
@@ -123,17 +137,39 @@ const AgendamentoFront = () => {
                     </Card>
                 </Col>
                 <Col md={8}>
-                    <h3>Próximas Consultas</h3>
-                    {error && <Alert variant="danger">{error}</Alert>}
+                    <Card className="surface-card">
+                        <Card.Body>
+                            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                                <div>
+                                    <h3 className="mb-1">Agenda do dia</h3>
+                                    <span className="section-subtitle">Filtre por dentista para visualizar disponibilidade e atendimentos.</span>
+                                </div>
+                                <Badge bg="light" text="dark">{consultas.length} consultas</Badge>
+                            </div>
+                            <Row className="g-3 mb-3">
+                                <Col md={6}>
+                                    <Form.Label>Data</Form.Label>
+                                    <Form.Control type="date" value={filtroData} onChange={(e) => setFiltroData(e.target.value)} />
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Label>Dentista</Form.Label>
+                                    <Form.Select value={filtroDentista} onChange={(e) => setFiltroDentista(e.target.value)}>
+                                        <option value="">Todos os dentistas</option>
+                                        {dentistas.map((d) => <option key={d.idDentista} value={d.idDentista}>{d.nome}</option>)}
+                                    </Form.Select>
+                                </Col>
+                            </Row>
                     {loading.consultas ? (
-                        <div className="text-center"><Spinner animation="border" /></div>
+                        <div className="loading-shell"><Spinner animation="border" /></div>
                     ) : (
-                        <Table striped bordered hover>
+                        <div className="table-shell">
+                        <Table hover responsive className="align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th>Paciente</th>
                                     <th>Dentista</th>
                                     <th>Data e Hora</th>
+                                    <th>Status</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
@@ -143,6 +179,7 @@ const AgendamentoFront = () => {
                                         <td>{c.paciente.nome}</td>
                                         <td>{c.dentista.nome}</td>
                                         <td>{new Date(c.dataHora).toLocaleString('pt-BR')}</td>
+                                        <td><Badge bg={c.status === 'AGENDADA' ? 'primary' : c.status === 'FINALIZADA' ? 'success' : 'danger'}>{c.status}</Badge></td>
                                         <td>
                                             <Button variant="danger" size="sm" onClick={() => handleDelete(c.idConsulta)}>Cancelar</Button>
                                         </td>
@@ -150,7 +187,10 @@ const AgendamentoFront = () => {
                                 ))}
                             </tbody>
                         </Table>
+                        </div>
                     )}
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
         </Container>

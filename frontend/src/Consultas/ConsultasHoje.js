@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Table, Button, Spinner, Alert } from 'react-bootstrap';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import api from '../api';
+import PageHeader from '../components/PageHeader';
 
 const ConsultasHoje = () => {
     const navigate = useNavigate();
@@ -13,7 +12,7 @@ const ConsultasHoje = () => {
 
     useEffect(() => {
         // Chama o novo endpoint específico para as consultas de hoje
-        axios.get(`${API_BASE_URL}/consultas/hoje`)
+        api.get('/api/consultas/hoje')
             .then(response => {
                 setConsultasHoje(response.data);
                 setLoading(false);
@@ -27,32 +26,38 @@ const ConsultasHoje = () => {
 
     const handleFinalizar = async (id) => {
         try {
-            await axios.patch(`${API_BASE_URL}/consultas/${id}/finalizar`);
+            await api.patch(`/api/consultas/${id}/finalizar`);
             setConsultasHoje(prev => prev.filter(c => c.idConsulta !== id));
         } catch (err) {
-            setError("Erro ao finalizar consulta.");
+            setError(err.response?.data?.message || "Erro ao finalizar consulta.");
         }
     };
 
     const handleCancelar = async (id) => {
         try {
-            await axios.patch(`${API_BASE_URL}/consultas/${id}/cancelar`);
+            await api.patch(`/api/consultas/${id}/cancelar`);
             setConsultasHoje(prev => prev.filter(c => c.idConsulta !== id));
         } catch (err) {
-            setError("Erro ao cancelar consulta.");
+            setError(err.response?.data?.message || "Erro ao cancelar consulta.");
         }
     };
 
     return (
-        <Container className="mt-5">
-            <h2 className="text-center mb-4">Agendamentos de Hoje</h2>
+        <Container className="page-shell">
+            <PageHeader
+                eyebrow="Operacao diaria"
+                title="Agendamentos de hoje"
+                subtitle="Finalize ou cancele atendimentos rapidamente conforme o fluxo do dia."
+                actions={<Button variant="outline-dark" onClick={() => navigate('/consultas')}>Voltar ao calendario</Button>}
+            />
             
             {error && <Alert variant="danger">{error}</Alert>}
 
             {loading ? (
                 <div className="text-center"><Spinner animation="border" /></div>
             ) : (
-                <Table striped bordered hover responsive>
+                <div className="table-shell">
+                <Table hover responsive className="align-middle mb-0">
                     <thead>
                         <tr>
                             <th>Horário</th>
@@ -79,10 +84,8 @@ const ConsultasHoje = () => {
                         )}
                     </tbody>
                 </Table>
+                </div>
             )}
-            <div className="mt-4 text-center">
-                <Button variant="secondary" onClick={() => navigate('/consultas')}>Voltar ao Calendário</Button>
-            </div>
         </Container>
     );
 };

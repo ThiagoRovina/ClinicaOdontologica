@@ -21,8 +21,11 @@ public class UsuarioService {
             throw new IllegalArgumentException("Este email já está em uso.");
         }
         novoUsuario.setNmSenha(passwordEncoder.encode(novoUsuario.getNmSenha()));
-        novoUsuario.setDsRole("ROLE_USER");
+        if (novoUsuario.getDsRole() == null || novoUsuario.getDsRole().isBlank()) {
+            novoUsuario.setDsRole("ROLE_USER");
+        }
 
         return usuarioRepository.save(novoUsuario);
     }
+
 }
