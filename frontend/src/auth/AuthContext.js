@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        await api.post('/logout');
+        await api.post('/api/auth/logout');
         setUser(null);
     };
 
