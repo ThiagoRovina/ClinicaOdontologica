@@ -26,20 +26,12 @@ const TelaLogin = () => {
         setLoading(true);
 
         try {
-            const formData = new URLSearchParams();
-            formData.append('nmEmail', nmEmail);
-            formData.append('nmSenha', nmSenha);
-
-            await api.post('/telaLogin/login', formData, {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            });
+            await api.post('/api/auth/login', { nmEmail, nmSenha });
 
             await refreshUser();
             navigate('/');
         } catch (err) {
-            setError('Email ou senha invalidos. Por favor, tente novamente.');
+            setError(err.response?.data?.message || 'Email ou senha invalidos. Por favor, tente novamente.');
         } finally {
             setLoading(false);
         }
