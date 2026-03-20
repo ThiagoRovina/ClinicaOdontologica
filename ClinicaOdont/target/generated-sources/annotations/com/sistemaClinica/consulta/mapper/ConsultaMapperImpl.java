@@ -2,6 +2,7 @@ package com.sistemaClinica.consulta.mapper;
 
 import com.sistemaClinica.consulta.dto.ConsultaDTO;
 import com.sistemaClinica.consulta.model.Consulta;
+import com.sistemaClinica.consulta.model.StatusConsulta;
 import com.sistemaClinica.dentista.dto.DentistaDTO;
 import com.sistemaClinica.dentista.model.Dentista;
 import com.sistemaClinica.paciente.dto.PacienteDTO;
@@ -11,8 +12,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-11-04T00:01:12-0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 23.0.1 (Oracle Corporation)"
+    date = "2026-03-19T12:23:06-0300",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.7 (Ubuntu)"
 )
 @Component
 public class ConsultaMapperImpl implements ConsultaMapper {
@@ -29,6 +30,9 @@ public class ConsultaMapperImpl implements ConsultaMapper {
         consultaDTO.setPaciente( pacienteToPacienteDTO( consulta.getPaciente() ) );
         consultaDTO.setDentista( dentistaToDentistaDTO( consulta.getDentista() ) );
         consultaDTO.setDataHora( consulta.getDataHora() );
+        if ( consulta.getStatus() != null ) {
+            consultaDTO.setStatus( consulta.getStatus().name() );
+        }
         consultaDTO.setObservacoes( consulta.getObservacoes() );
 
         return consultaDTO;
@@ -46,6 +50,9 @@ public class ConsultaMapperImpl implements ConsultaMapper {
         consulta.setPaciente( pacienteDTOToPaciente( consultaDTO.getPaciente() ) );
         consulta.setDentista( dentistaDTOToDentista( consultaDTO.getDentista() ) );
         consulta.setDataHora( consultaDTO.getDataHora() );
+        if ( consultaDTO.getStatus() != null ) {
+            consulta.setStatus( Enum.valueOf( StatusConsulta.class, consultaDTO.getStatus() ) );
+        }
         consulta.setObservacoes( consultaDTO.getObservacoes() );
 
         return consulta;

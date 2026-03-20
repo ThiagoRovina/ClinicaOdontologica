@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Alert, Container } from 'react-bootstrap';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import api from '../api';
 
 const PacienteCadastro = () => {
     const navigate = useNavigate();
@@ -24,7 +22,7 @@ const PacienteCadastro = () => {
     useEffect(() => {
         if (id) {
             setLoading(true);
-            axios.get(`${API_BASE_URL}/pacientes/${id}`)
+            api.get(`/api/pacientes/${id}`)
                 .then(response => {
                     setPaciente(response.data);
                     setLoading(false);
@@ -46,15 +44,15 @@ const PacienteCadastro = () => {
         setLoading(true);
         try {
             if (paciente.idPaciente) {
-                await axios.put(`${API_BASE_URL}/pacientes/${paciente.idPaciente}`, paciente);
+                await api.put(`/api/pacientes/${paciente.idPaciente}`, paciente);
                 setSuccess("Paciente atualizado com sucesso!");
             } else {
-                await axios.post(`${API_BASE_URL}/pacientes`, paciente);
+                await api.post('/api/pacientes', paciente);
                 setSuccess("Paciente cadastrado com sucesso!");
             }
             setTimeout(() => navigate('/pacientes'), 1500);
         } catch (err) {
-            setError("Erro ao salvar paciente.");
+            setError(err.response?.data?.message || "Erro ao salvar paciente.");
         } finally {
             setLoading(false);
         }

@@ -4,6 +4,7 @@ import com.sistemaClinica.funcionario.dto.FuncionarioCadastroDTO;
 import com.sistemaClinica.funcionario.dto.FuncionarioDTO;
 import com.sistemaClinica.funcionario.model.TipoFuncionario;
 import com.sistemaClinica.funcionario.service.FuncionarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/funcionarios")
-@CrossOrigin(origins = "http://localhost:3000")
 public class FuncionarioController {
 
     @Autowired
@@ -29,29 +29,23 @@ public class FuncionarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FuncionarioDTO> buscarPorId(@PathVariable String id) {
-        FuncionarioDTO funcionarioDTO = funcionarioService.buscarPorId(id);
-        return funcionarioDTO != null ? ResponseEntity.ok(funcionarioDTO) : ResponseEntity.notFound().build();
+    public ResponseEntity<FuncionarioDTO> buscarPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(funcionarioService.buscarPorId(id));
     }
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<?> cadastrarCompleto(@RequestBody FuncionarioCadastroDTO dto) {
-        try {
-            FuncionarioDTO funcionarioSalvo = funcionarioService.cadastrarFuncionarioEUsuario(dto);
-            return ResponseEntity.ok(funcionarioSalvo);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<FuncionarioDTO> cadastrarCompleto(@Valid @RequestBody FuncionarioCadastroDTO dto) {
+        return ResponseEntity.ok(funcionarioService.cadastrarFuncionarioEUsuario(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FuncionarioDTO> atualizar(@PathVariable String id, @RequestBody FuncionarioDTO funcionarioDTO) {
+    public ResponseEntity<FuncionarioDTO> atualizar(@PathVariable Integer id, @Valid @RequestBody FuncionarioDTO funcionarioDTO) {
         funcionarioDTO.setIdFuncionario(id);
         return ResponseEntity.ok(funcionarioService.salvar(funcionarioDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable String id) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         funcionarioService.deletar(id);
         return ResponseEntity.noContent().build();
     }

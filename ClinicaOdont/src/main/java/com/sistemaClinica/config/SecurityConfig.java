@@ -1,73 +1,113 @@
 package com.sistemaClinica.config;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import com.sistemaClinica.usuario.service.JpaUserDetailsService;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.sistemaClinica.usuario.service.JpaUserDetailsService;
-
-import java.util.Arrays;
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JpaUserDetailsService jpaUserDetailsService;
+    private final List<String> allowedOrigins;
 
-    public SecurityConfig(JpaUserDetailsService jpaUserDetailsService) {
+    public SecurityConfig(
+            JpaUserDetailsService jpaUserDetailsService,
+            @Value("${app.cors.allowed-origins:http://localhost:3000}") String allowedOrigins
+    ) {
         this.jpaUserDetailsService = jpaUserDetailsService;
+        this.allowedOrigins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .toList();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .userDetailsService(jpaUserDetailsService)
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/imagens/**").permitAll()
-                        .requestMatchers("/", "/telaLogin", "/telaLogin/salvar").permitAll()
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/favicon.ico",
+                                "/manifest.json",
+                                "/robots.txt",
+                                "/logo192.png",
+                                "/logo512.png",
+                                "/static/**",
+                                "/telaLogin",
+                                "/registrar",
+                                "/Home",
+                                "/pacientes/**",
+                                "/dentistas/**",
+                                "/funcionarios/**",
+                                "/agendamento/**",
+                                "/procedimentos/**",
+                                "/relatorios/**",
+                                "/consultas/**"
+                        ).permitAll()
+                        .requestMatchers("/telaLogin/login", "/api/usuarios/registrar").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/me").authenticated()
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/telaLogin")
                         .usernameParameter("nmEmail")
                         .passwordParameter("nmSenha")
                         .loginProcessingUrl("/telaLogin/login")
-                        .defaultSuccessUrl("http://localhost:3000/Home", true)
+                        .successHandler((request, response, authentication) -> response.setStatus(HttpStatus.OK.value()))
+                        .failureHandler((request, response, exception) -> response.sendError(HttpStatus.UNAUTHORIZED.value(), "Credenciais invalidas"))
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("/telaLogin")
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> response.setStatus(HttpStatus.NO_CONTENT.value()))
                         .permitAll()
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpStatus.UNAUTHORIZED.value(), "Nao autenticado"))
                 );
 
         return http.build();
     }
 
+
+
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

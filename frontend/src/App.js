@@ -12,11 +12,31 @@ import Consultas from "./Consultas/Consultas";
 import ConsultasHoje from "./Consultas/ConsultasHoje";
 import TelaLogin from "./login/TelaLogin";
 import TelaCadastro from "./login/TelaCadastro";
-import { AuthProvider } from './auth/AuthContext';
-import axios from 'axios'; // Importa o axios
+import { AuthProvider, useAuth } from './auth/AuthContext';
+import Home from "./Home";
+import AccessDenied from "./components/AccessDenied";
+import Procedimento from "./Procedimento/Procedimento";
+import ProcedimentoCadastro from "./Procedimento/ProcedimentoCadastro";
+import ProntuarioPage from "./Prontuario/ProntuarioPage";
+import Relatorios from "./Relatorios/Relatorios";
 
-// Configuração global do Axios para enviar cookies com cada requisição
-axios.defaults.withCredentials = true;
+function ProtectedRoute({ children, roles }) {
+    const { loading, isAuthenticated, hasRole } = useAuth();
+
+    if (loading) {
+        return null;
+    }
+
+    if (!isAuthenticated) {
+        return <TelaLogin />;
+    }
+
+    if (roles && !roles.some((role) => hasRole(role))) {
+        return <AccessDenied />;
+    }
+
+    return children;
+}
 
 function App() {
     return (
@@ -28,25 +48,30 @@ function App() {
                         <Route path="/telaLogin" element={<TelaLogin />} />
                         <Route path="/registrar" element={<TelaCadastro />} />
 
-                        <Route path="/" element={<h2>Home</h2>} />
-                        <Route path="/Home" element={<h2>Home</h2>} />
-                        
-                        <Route path="/pacientes" element={<Paciente />} />
-                        <Route path="/pacientes/novo" element={<PacienteCadastro />} />
-                        <Route path="/pacientes/editar/:id" element={<PacienteCadastro />} />
+                        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                        <Route path="/Home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
 
-                        <Route path="/dentistas" element={<Dentista />} />
-                        <Route path="/dentistas/novo" element={<DentistaCadastro />} />
-                        <Route path="/dentistas/editar/:id" element={<DentistaCadastro />} />
+                        <Route path="/pacientes" element={<ProtectedRoute roles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE']}><Paciente /></ProtectedRoute>} />
+                        <Route path="/pacientes/novo" element={<ProtectedRoute roles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE']}><PacienteCadastro /></ProtectedRoute>} />
+                        <Route path="/pacientes/editar/:id" element={<ProtectedRoute roles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE']}><PacienteCadastro /></ProtectedRoute>} />
+                        <Route path="/pacientes/:id/prontuario" element={<ProtectedRoute roles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE', 'ROLE_DENTISTA']}><ProntuarioPage /></ProtectedRoute>} />
 
-                        <Route path="/funcionarios" element={<Funcionario />} />
-                        <Route path="/funcionarios/novo" element={<FuncionarioCadastro />} />
-                        <Route path="/funcionarios/editar/:id" element={<FuncionarioCadastro />} />
-                        
-                        <Route path="/agendamento" element={<AgendamentoFront />} />
+                        <Route path="/dentistas" element={<ProtectedRoute roles={['ROLE_GERENTE']}><Dentista /></ProtectedRoute>} />
+                        <Route path="/dentistas/novo" element={<ProtectedRoute roles={['ROLE_GERENTE']}><DentistaCadastro /></ProtectedRoute>} />
+                        <Route path="/dentistas/editar/:id" element={<ProtectedRoute roles={['ROLE_GERENTE']}><DentistaCadastro /></ProtectedRoute>} />
 
-                        <Route path="/consultas" element={<Consultas />} />
-                        <Route path="/consultas/hoje" element={<ConsultasHoje />} />
+                        <Route path="/funcionarios" element={<ProtectedRoute roles={['ROLE_GERENTE']}><Funcionario /></ProtectedRoute>} />
+                        <Route path="/funcionarios/novo" element={<ProtectedRoute roles={['ROLE_GERENTE']}><FuncionarioCadastro /></ProtectedRoute>} />
+                        <Route path="/funcionarios/editar/:id" element={<ProtectedRoute roles={['ROLE_GERENTE']}><FuncionarioCadastro /></ProtectedRoute>} />
+
+                        <Route path="/agendamento" element={<ProtectedRoute roles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE']}><AgendamentoFront /></ProtectedRoute>} />
+                        <Route path="/procedimentos" element={<ProtectedRoute roles={['ROLE_GERENTE']}><Procedimento /></ProtectedRoute>} />
+                        <Route path="/procedimentos/novo" element={<ProtectedRoute roles={['ROLE_GERENTE']}><ProcedimentoCadastro /></ProtectedRoute>} />
+                        <Route path="/procedimentos/editar/:id" element={<ProtectedRoute roles={['ROLE_GERENTE']}><ProcedimentoCadastro /></ProtectedRoute>} />
+                        <Route path="/relatorios" element={<ProtectedRoute roles={['ROLE_GERENTE']}><Relatorios /></ProtectedRoute>} />
+
+                        <Route path="/consultas" element={<ProtectedRoute roles={['ROLE_DENTISTA', 'ROLE_GERENTE']}><Consultas /></ProtectedRoute>} />
+                        <Route path="/consultas/hoje" element={<ProtectedRoute roles={['ROLE_DENTISTA', 'ROLE_GERENTE']}><ConsultasHoje /></ProtectedRoute>} />
                     </Routes>
                 </div>
             </AuthProvider>

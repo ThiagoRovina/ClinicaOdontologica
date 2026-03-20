@@ -4,6 +4,7 @@ import com.sistemaClinica.paciente.dto.PacienteDTO;
 import com.sistemaClinica.paciente.mapper.PacienteMapper;
 import com.sistemaClinica.paciente.model.Paciente;
 import com.sistemaClinica.paciente.repository.PacienteRepository;
+import com.sistemaClinica.shared.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +26,10 @@ public class PacienteService {
                 .collect(Collectors.toList());
     }
 
-    public PacienteDTO buscarPorId(String id) {
+    public PacienteDTO buscarPorId(Integer id) {
         return pacienteRepository.findById(id)
                 .map(pacienteMapper::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente nao encontrado"));
     }
 
     public PacienteDTO salvar(PacienteDTO pacienteDTO) {
@@ -36,7 +37,10 @@ public class PacienteService {
         return pacienteMapper.toDto(pacienteRepository.save(paciente));
     }
 
-    public void deletar(String id) {
+    public void deletar(Integer id) {
+        if (!pacienteRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Paciente nao encontrado");
+        }
         pacienteRepository.deleteById(id);
     }
 }

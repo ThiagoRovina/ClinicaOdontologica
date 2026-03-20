@@ -11,9 +11,9 @@ import lombok.Setter;
 public class Dentista {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_dentista")
-    private String idDentista;
+    private Integer idDentista;
 
     @Column(name = "nm_dentista", nullable = false)
     private String nome;

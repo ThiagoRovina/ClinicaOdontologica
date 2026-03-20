@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form, Alert, Container } from 'react-bootstrap';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import api from '../api';
 
 const DentistaCadastro = () => {
     const navigate = useNavigate();
@@ -23,7 +21,7 @@ const DentistaCadastro = () => {
     useEffect(() => {
         if (id) {
             setLoading(true);
-            axios.get(`${API_BASE_URL}/dentistas/${id}`)
+            api.get(`/api/dentistas/${id}`)
                 .then(response => {
                     setDentista(response.data);
                     setLoading(false);
@@ -45,15 +43,15 @@ const DentistaCadastro = () => {
         setLoading(true);
         try {
             if (dentista.idDentista) {
-                await axios.put(`${API_BASE_URL}/dentistas/${dentista.idDentista}`, dentista);
+                await api.put(`/api/dentistas/${dentista.idDentista}`, dentista);
                 setSuccess("Dentista atualizado com sucesso!");
             } else {
-                await axios.post(`${API_BASE_URL}/dentistas`, dentista);
+                await api.post('/api/dentistas', dentista);
                 setSuccess("Dentista cadastrado com sucesso!");
             }
             setTimeout(() => navigate('/dentistas'), 1500);
         } catch (err) {
-            setError("Erro ao salvar dentista.");
+            setError(err.response?.data?.message || "Erro ao salvar dentista.");
         } finally {
             setLoading(false);
         }

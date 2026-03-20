@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Alert, Card } from 'react-bootstrap';
-import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import api from '../api';
 
 const TelaCadastro = () => {
     const navigate = useNavigate();
@@ -24,13 +22,13 @@ const TelaCadastro = () => {
         setSuccess(null);
 
         try {
-            await axios.post(`${API_BASE_URL}/usuarios/registrar`, usuario);
+            await api.post('/api/usuarios/registrar', usuario);
             setSuccess("Usuário cadastrado com sucesso! Você será redirecionado para o login.");
-            setTimeout(() => navigate('/telaLogin'), 2000); // Redireciona após 2 segundos
+            setTimeout(() => navigate('/telaLogin'), 2000);
         } catch (err) {
             console.error("Erro ao registrar usuário:", err);
-            if (err.response && err.response.data) {
-                setError(err.response.data); // Mostra a mensagem de erro do backend (ex: "email já em uso")
+            if (err.response?.data?.message) {
+                setError(err.response.data.message);
             } else {
                 setError("Erro ao registrar usuário. Tente novamente.");
             }

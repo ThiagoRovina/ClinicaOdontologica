@@ -6,9 +6,11 @@ import com.sistemaClinica.funcionario.mapper.FuncionarioMapper;
 import com.sistemaClinica.funcionario.model.Funcionario;
 import com.sistemaClinica.funcionario.model.TipoFuncionario;
 import com.sistemaClinica.funcionario.repository.FuncionarioRepository;
+import com.sistemaClinica.shared.ResourceNotFoundException;
 import com.sistemaClinica.usuario.model.Usuario;
 import com.sistemaClinica.usuario.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,10 +35,11 @@ public class FuncionarioService {
                 .collect(Collectors.toList());
     }
 
-    public FuncionarioDTO buscarPorId(String id) {
+    @PreAuthorize("hasAnyRole('GERENTE', 'ADMINISTRATIVO') or authentication.name == @funcionarioRepository.findById(#id).orElse(null)?.email")
+    public FuncionarioDTO buscarPorId(Integer id) {
         return funcionarioRepository.findById(id)
                 .map(funcionarioMapper::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Funcionario nao encontrado"));
     }
 
     @Transactional
@@ -50,7 +53,7 @@ public class FuncionarioService {
             case ADMINISTRATIVO -> "ROLE_ADMINISTRATIVO";
             case DENTISTA -> "ROLE_DENTISTA";
             case GERENTE -> "ROLE_GERENTE";
-            default -> "ROLE_USER"; // Uma role padrão para outros cargos
+            default -> "ROLE_USER";
         };
         novoUsuario.setDsRole(role);
 
@@ -73,7 +76,10 @@ public class FuncionarioService {
         return funcionarioMapper.toDto(funcionarioRepository.save(funcionario));
     }
 
-    public void deletar(String id) {
+    public void deletar(Integer id) {
+        if (!funcionarioRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Funcionario nao encontrado");
+        }
         funcionarioRepository.deleteById(id);
     }
 }
