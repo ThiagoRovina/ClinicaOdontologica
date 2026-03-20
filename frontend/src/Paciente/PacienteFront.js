@@ -23,10 +23,44 @@ const RadioButton = ({ id, name, label, onChange, defaultChecked = false }) => (
 export default function App() {
     const [showMedDetails, setShowMedDetails] = useState(false);
     const [showAllergyDetails, setShowAllergyDetails] = useState(false);
+    const [cpf, setCpf] = useState('');
+
+    const somenteDigitos = (value) => value.replace(/\D/g, '');
+
+    const formatarCpf = (value) => {
+        const digits = somenteDigitos(value).slice(0, 11);
+        if (digits.length <= 3) return digits;
+        if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+        if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+        return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
+    };
+
+    const cpfValido = (value) => {
+        const digits = somenteDigitos(value);
+        if (digits.length !== 11) return false;
+        if (/^(\d)\1{10}$/.test(digits)) return false;
+
+        const calc = (base, pesoInicial) => {
+            let soma = 0;
+            for (let i = 0; i < base.length; i++) {
+                soma += Number(base[i]) * (pesoInicial - i);
+            }
+            const resto = soma % 11;
+            return resto < 2 ? 0 : 11 - resto;
+        };
+
+        const d1 = calc(digits.slice(0, 9), 10);
+        const d2 = calc(`${digits.slice(0, 9)}${d1}`, 11);
+        return digits === `${digits.slice(0, 9)}${d1}${d2}`;
+    };
 
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        if (!cpfValido(cpf)) {
+            alert('CPF inválido. Informe um CPF válido.');
+            return;
+        }
         alert('Paciente cadastrado com sucesso! (Simulação)');
     };
 
@@ -55,7 +89,18 @@ export default function App() {
                             </div>
                             <div>
                                 <label htmlFor="cpf" className="block text-sm font-medium text-gray-600 mb-1">CPF</label>
-                                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition" />
+                                <input
+                                    type="text"
+                                    id="cpf"
+                                    name="cpf"
+                                    placeholder="000.000.000-00"
+                                    value={cpf}
+                                    onChange={(e) => setCpf(formatarCpf(e.target.value))}
+                                    maxLength={14}
+                                    pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
+                                    required
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
                             </div>
                             <div>
                                 <label htmlFor="rg" className="block text-sm font-medium text-gray-600 mb-1">RG</label>

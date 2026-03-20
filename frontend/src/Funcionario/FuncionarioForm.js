@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:8080/api';
+import { API_BASE_URL } from '../config/api';
 
 const FuncionarioForm = ({ show, handleClose, funcionarioParaEditar, onSaveSuccess }) => {
     const [funcionario, setFuncionario] = useState({

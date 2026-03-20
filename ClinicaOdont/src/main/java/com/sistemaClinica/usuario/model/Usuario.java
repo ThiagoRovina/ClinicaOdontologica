@@ -23,6 +23,9 @@ public class Usuario {
     @NotBlank(message = "Email e obrigatorio")
     private String nmEmail;
 
+    @Column(name = "nm_usuario")
+    private String nmUsuario;
+
     @Column(name = "nm_senha", nullable = false)
     @NotBlank(message = "Senha e obrigatoria")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -33,8 +36,9 @@ public class Usuario {
 
     public Usuario() {}
 
-    public Usuario(String nmEmail, String nmSenha, String dsRole) {
+    public Usuario(String nmEmail, String nmUsuario, String nmSenha, String dsRole) {
         this.nmEmail = nmEmail;
+        this.nmUsuario = nmUsuario;
         this.nmSenha = nmSenha;
         this.dsRole = dsRole;
     }

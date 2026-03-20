@@ -22,4 +22,5 @@ public class FuncionarioDTO {
     @NotBlank(message = "Email e obrigatorio")
     private String email;
     private String telefone;
+    private String idDentista;
 }
