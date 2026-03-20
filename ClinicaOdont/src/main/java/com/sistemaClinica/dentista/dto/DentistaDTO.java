@@ -16,5 +16,5 @@ public class DentistaDTO {
     @Email(message = "Email invalido")
     private String email;
     private String telefone;
-    private String idFuncionario;
+    private Integer idFuncionario;
 }

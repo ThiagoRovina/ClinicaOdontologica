@@ -7,9 +7,9 @@ import java.time.LocalDate;
 @Data
 public class ProntuarioUpsertDTO {
     private String titulo;
-    private String idPaciente;
-    private String idDentista;
-    private String idProcedimento;
+    private Integer idPaciente;
+    private Integer idDentista;
+    private Integer idProcedimento;
     private LocalDate dataRealizacao;
     private String observacoes;
 }
