@@ -67,14 +67,14 @@ public class FinanceiroService {
         lancamento.setStatus(dto.getStatus());
         lancamento.setObservacoes(dto.getObservacoes());
 
-        if (dto.getIdPaciente() != null && !dto.getIdPaciente().isBlank()) {
+        if (dto.getIdPaciente() != null) {
             lancamento.setPaciente(pacienteRepository.findById(dto.getIdPaciente())
                     .orElseThrow(() -> new IllegalArgumentException("Paciente nao encontrado: " + dto.getIdPaciente())));
         } else {
             lancamento.setPaciente(null);
         }
 
-        if (dto.getIdConsulta() != null && !dto.getIdConsulta().isBlank()) {
+        if (dto.getIdConsulta() != null) {
             lancamento.setConsulta(consultaRepository.findById(dto.getIdConsulta())
                     .orElseThrow(() -> new IllegalArgumentException("Consulta nao encontrada: " + dto.getIdConsulta())));
         } else {

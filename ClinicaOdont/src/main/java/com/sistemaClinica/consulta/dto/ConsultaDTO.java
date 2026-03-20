@@ -1,6 +1,7 @@
 package com.sistemaClinica.consulta.dto;
 
 import com.sistemaClinica.dentista.dto.DentistaDTO;
+import com.sistemaClinica.consulta.model.StatusConsulta;
 import com.sistemaClinica.paciente.dto.PacienteDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -16,6 +17,6 @@ public class ConsultaDTO {
     private DentistaDTO dentista;
     @NotNull(message = "Data e hora da consulta sao obrigatorias")
     private LocalDateTime dataHora;
-    private String status;
+    private StatusConsulta status;
     private String observacoes;
 }

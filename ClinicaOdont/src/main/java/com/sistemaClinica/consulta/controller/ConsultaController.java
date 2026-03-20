@@ -44,8 +44,8 @@ public class ConsultaController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ConsultaDTO> cancelarViaDelete(@PathVariable String id) {
+    @DeleteMapping("/{id}/cancelar")
+    public ResponseEntity<ConsultaDTO> cancelarViaDelete(@PathVariable Integer id) {
         // Compatibilidade com o frontend (usa DELETE para cancelar a consulta).
         return ResponseEntity.ok(consultaService.cancelar(id));
     }
