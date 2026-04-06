@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 public class Consulta {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_consulta")
-    private String idConsulta;
+    private Integer idConsulta;
 
     @ManyToOne
     @JoinColumn(name = "id_paciente", nullable = false)

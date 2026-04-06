@@ -15,7 +15,7 @@ public class LancamentoFinanceiroDTO {
     private BigDecimal valor;
     private LocalDate data;
     private StatusLancamento status;
-    private String idPaciente;
-    private String idConsulta;
+    private Integer idPaciente;
+    private Integer idConsulta;
     private String observacoes;
 }

@@ -5,10 +5,9 @@ import com.sistemaClinica.consulta.mapper.ConsultaMapper;
 import com.sistemaClinica.consulta.model.Consulta;
 import com.sistemaClinica.consulta.model.StatusConsulta;
 import com.sistemaClinica.consulta.repository.ConsultaRepository;
-import com.sistemaClinica.listaespera.service.ListaEsperaService;
+import com.sistemaClinica.shared.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,13 +23,21 @@ public class ConsultaService {
     @Autowired
     private ConsultaMapper consultaMapper;
 
-    @Autowired
-    private ListaEsperaService listaEsperaService;
-
     public List<ConsultaDTO> listarTodas() {
         return consultaRepository.findAll().stream()
                 .map(consultaMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public List<ConsultaDTO> listarPorPeriodoEDentista(LocalDate data, Integer dentistaId) {
+        LocalDateTime inicio = data.atStartOfDay();
+        LocalDateTime fim = data.atTime(23, 59, 59);
+
+        List<Consulta> consultas = dentistaId != null
+                ? consultaRepository.findByDentistaIdDentistaAndDataHoraBetweenOrderByDataHoraAsc(dentistaId, inicio, fim)
+                : consultaRepository.findByDataHoraBetweenOrderByDataHoraAsc(inicio, fim);
+
+        return consultas.stream().map(consultaMapper::toDto).collect(Collectors.toList());
     }
 
     public List<ConsultaDTO> listarAgendadasParaHoje() {
@@ -43,24 +50,39 @@ public class ConsultaService {
     }
 
     public ConsultaDTO salvar(ConsultaDTO consultaDTO) {
+        if (consultaDTO.getDentista() == null || consultaDTO.getDentista().getIdDentista() == null) {
+            throw new IllegalArgumentException("Dentista e obrigatorio");
+        }
+
+        if (consultaRepository.existsByDentistaIdDentistaAndDataHoraAndStatusNot(
+                consultaDTO.getDentista().getIdDentista(),
+                consultaDTO.getDataHora(),
+                StatusConsulta.CANCELADA
+        )) {
+            throw new IllegalArgumentException("Ja existe uma consulta ativa para este dentista neste horario");
+        }
+
         Consulta consulta = consultaMapper.toEntity(consultaDTO);
         return consultaMapper.toDto(consultaRepository.save(consulta));
     }
 
-    @Transactional
-    public ConsultaDTO cancelar(String id) {
-        Consulta consulta = consultaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
-        consulta.setStatus(StatusConsulta.CANCELADA);
-        Consulta consultaCancelada = consultaRepository.save(consulta);
-
-        listaEsperaService.tentarEncaixarNoHorarioCancelado(consultaCancelada.getDataHora(), consultaCancelada.getDentista());
-        return consultaMapper.toDto(consultaCancelada);
+    public void deletar(Integer id) {
+        if (!consultaRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Consulta nao encontrada");
+        }
+        consultaRepository.deleteById(id);
     }
 
-    public ConsultaDTO finalizar(String id) {
+    public ConsultaDTO cancelar(Integer id) {
         Consulta consulta = consultaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Consulta nao encontrada"));
+        consulta.setStatus(StatusConsulta.CANCELADA);
+        return consultaMapper.toDto(consultaRepository.save(consulta));
+    }
+
+    public ConsultaDTO finalizar(Integer id) {
+        Consulta consulta = consultaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Consulta nao encontrada"));
         consulta.setStatus(StatusConsulta.FINALIZADA);
         return consultaMapper.toDto(consultaRepository.save(consulta));
     }

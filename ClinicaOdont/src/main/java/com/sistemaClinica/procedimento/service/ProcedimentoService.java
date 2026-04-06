@@ -1,13 +1,15 @@
 package com.sistemaClinica.procedimento.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.sistemaClinica.procedimento.dto.ProcedimentoDTO;
 import com.sistemaClinica.procedimento.mapper.ProcedimentoMapper;
 import com.sistemaClinica.procedimento.model.Procedimento;
 import com.sistemaClinica.procedimento.repository.ProcedimentoRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.sistemaClinica.shared.ResourceNotFoundException;
 
 @Service
 public class ProcedimentoService {
@@ -26,18 +28,21 @@ public class ProcedimentoService {
                 .collect(Collectors.toList());
     }
 
-    public ProcedimentoDTO buscarPorId(String id) {
+    public ProcedimentoDTO buscarPorId(Integer id) {
         return procedimentoRepository.findById(id)
                 .map(procedimentoMapper::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Procedimento nao encontrado"));
     }
 
-    public ProcedimentoDTO salvar(ProcedimentoDTO dto) {
-        Procedimento procedimento = procedimentoMapper.toEntity(dto);
+    public ProcedimentoDTO salvar(ProcedimentoDTO procedimentoDTO) {
+        Procedimento procedimento = procedimentoMapper.toEntity(procedimentoDTO);
         return procedimentoMapper.toDto(procedimentoRepository.save(procedimento));
     }
 
-    public void deletar(String id) {
+    public void deletar(Integer id) {
+        if (!procedimentoRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Procedimento nao encontrado");
+        }
         procedimentoRepository.deleteById(id);
     }
 }

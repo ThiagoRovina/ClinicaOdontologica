@@ -1,11 +1,21 @@
 package com.sistemaClinica.procedimento.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.sistemaClinica.procedimento.dto.ProcedimentoDTO;
 import com.sistemaClinica.procedimento.service.ProcedimentoService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/procedimentos")
@@ -23,24 +33,23 @@ public class ProcedimentoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProcedimentoDTO> buscarPorId(@PathVariable String id) {
-        ProcedimentoDTO dto = procedimentoService.buscarPorId(id);
-        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
+    public ResponseEntity<ProcedimentoDTO> buscarPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(procedimentoService.buscarPorId(id));
     }
 
     @PostMapping
-    public ProcedimentoDTO criar(@RequestBody ProcedimentoDTO dto) {
-        return procedimentoService.salvar(dto);
+    public ResponseEntity<ProcedimentoDTO> criar(@Valid @RequestBody ProcedimentoDTO procedimentoDTO) {
+        return ResponseEntity.ok(procedimentoService.salvar(procedimentoDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProcedimentoDTO> atualizar(@PathVariable String id, @RequestBody ProcedimentoDTO dto) {
-        dto.setIdProcedimento(id);
-        return ResponseEntity.ok(procedimentoService.salvar(dto));
+    public ResponseEntity<ProcedimentoDTO> atualizar(@PathVariable Integer id, @Valid @RequestBody ProcedimentoDTO procedimentoDTO) {
+        procedimentoDTO.setIdProcedimento(id);
+        return ResponseEntity.ok(procedimentoService.salvar(procedimentoDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable String id) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         procedimentoService.deletar(id);
         return ResponseEntity.noContent().build();
     }

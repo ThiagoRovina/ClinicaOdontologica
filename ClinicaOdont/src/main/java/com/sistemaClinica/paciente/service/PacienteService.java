@@ -4,7 +4,7 @@ import com.sistemaClinica.paciente.dto.PacienteDTO;
 import com.sistemaClinica.paciente.mapper.PacienteMapper;
 import com.sistemaClinica.paciente.model.Paciente;
 import com.sistemaClinica.paciente.repository.PacienteRepository;
-import com.sistemaClinica.paciente.util.CpfUtils;
+import com.sistemaClinica.shared.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,44 +26,21 @@ public class PacienteService {
                 .collect(Collectors.toList());
     }
 
-    public PacienteDTO buscarPorId(String id) {
+    public PacienteDTO buscarPorId(Integer id) {
         return pacienteRepository.findById(id)
                 .map(pacienteMapper::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente nao encontrado"));
     }
 
     public PacienteDTO salvar(PacienteDTO pacienteDTO) {
-        String cpfNormalizado = CpfUtils.manterApenasDigitos(pacienteDTO.getCpf());
-        if (!CpfUtils.isCpfValido(cpfNormalizado)) {
-            throw new IllegalArgumentException("CPF inválido.");
-        }
-
-        String cpfFormatado = CpfUtils.formatarCpf(cpfNormalizado);
-        validarCpfDuplicado(pacienteDTO.getIdPaciente(), cpfFormatado);
-
         Paciente paciente = pacienteMapper.toEntity(pacienteDTO);
-        paciente.setCpf(cpfFormatado);
         return pacienteMapper.toDto(pacienteRepository.save(paciente));
     }
 
-    public void deletar(String id) {
-        pacienteRepository.deleteById(id);
-    }
-
-    private void validarCpfDuplicado(String idPaciente, String cpfFormatado) {
-        if (idPaciente == null || idPaciente.isBlank()) {
-            if (pacienteRepository.existsByCpf(cpfFormatado)) {
-                throw new IllegalArgumentException("CPF já cadastrado.");
-            }
-            return;
+    public void deletar(Integer id) {
+        if (!pacienteRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Paciente nao encontrado");
         }
-
-
-
-        pacienteRepository.findByCpf(cpfFormatado).ifPresent(pacienteExistente -> {
-            if (!idPaciente.equals(pacienteExistente.getIdPaciente())) {
-                throw new IllegalArgumentException("CPF já cadastrado para outro paciente.");
-            }
-        });
+        pacienteRepository.deleteById(id);
     }
 }

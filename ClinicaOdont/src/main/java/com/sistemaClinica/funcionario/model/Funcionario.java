@@ -1,6 +1,7 @@
 package com.sistemaClinica.funcionario.model;
 
 import jakarta.persistence.*;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,9 +13,9 @@ import java.time.LocalDate;
 @Table(name = "FUNCIONARIOS")
 public class Funcionario {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name= "id_funcionario")
-    public String idFuncionario;
+    public Integer idFuncionario;
 
     @Column(name= "nm_funcionario", nullable = false)
     public String nmFuncionario;
@@ -23,6 +24,7 @@ public class Funcionario {
     public int nuMatricula;
 
     @Column(name = "ds_cargo", nullable = false)
+    @Enumerated(EnumType.STRING)
     public TipoFuncionario cargo;
 
     @Column(name = "dt_admissao", nullable = false)
