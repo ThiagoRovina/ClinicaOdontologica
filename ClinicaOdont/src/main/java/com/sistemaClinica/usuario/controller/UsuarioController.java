@@ -1,14 +1,17 @@
 package com.sistemaClinica.usuario.controller;
 
-import com.sistemaClinica.funcionario.repository.FuncionarioRepository;
 import com.sistemaClinica.usuario.model.Usuario;
 import com.sistemaClinica.usuario.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -18,43 +21,29 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @Autowired
-    private FuncionarioRepository funcionarioRepository;
-
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarUsuario(@RequestBody Usuario novoUsuario) {
-        try {
-            Usuario usuarioSalvo = usuarioService.registrar(novoUsuario);
-            return ResponseEntity.ok(usuarioSalvo);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Usuario> registrarUsuario(@Valid @RequestBody Usuario novoUsuario) {
+        Usuario usuarioSalvo = usuarioService.registrar(novoUsuario);
+        return ResponseEntity.ok(usuarioSalvo);
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Map<String, Object>> getUsuarioLogado(Authentication authentication) {
-        if (authentication == null) {
-            return ResponseEntity.status(401).build();
+    public ResponseEntity<?> getUsuarioLogado(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Usuario usuario = usuarioService.buscarPorEmail(userDetails.getUsername());
-        String nome = userDetails.getUsername();
 
-        if (usuario != null && usuario.getNmUsuario() != null && !usuario.getNmUsuario().isBlank()) {
-            nome = usuario.getNmUsuario();
-        } else {
-            nome = funcionarioRepository.findByEmail(userDetails.getUsername())
-                    .map(funcionario -> funcionario.getNmFuncionario())
-                    .orElse(userDetails.getUsername());
-        }
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
-        Map<String, Object> response = Map.of(
-                "username", userDetails.getUsername(),
-                "nome", nome,
-                "authorities", userDetails.getAuthorities().stream().map(a -> a.getAuthority()).toList()
+        Map<String, Object> userInfo = Map.of(
+            "email", userDetails.getUsername(),
+            "roles", roles
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userInfo);
     }
 }

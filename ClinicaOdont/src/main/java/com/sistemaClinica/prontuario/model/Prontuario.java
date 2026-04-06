@@ -1,6 +1,5 @@
 package com.sistemaClinica.prontuario.model;
 
-import com.sistemaClinica.dentista.model.Dentista;
 import com.sistemaClinica.paciente.model.Paciente;
 import com.sistemaClinica.procedimento.model.Procedimento;
 import jakarta.persistence.*;
@@ -16,28 +15,21 @@ import java.time.LocalDate;
 public class Prontuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_prontuario")
-    private String idProntuario;
-
-    @Column(name = "ds_titulo")
-    private String titulo;
+    private Integer idProntuario;
 
     @ManyToOne
     @JoinColumn(name = "id_paciente", nullable = false)
     private Paciente paciente;
 
     @ManyToOne
-    @JoinColumn(name = "id_dentista")
-    private Dentista dentista;
-
-    @ManyToOne
-    @JoinColumn(name = "id_procedimento")
+    @JoinColumn(name = "id_procedimento", nullable = false)
     private Procedimento procedimento;
 
     @Column(name = "dt_realizacao", nullable = false)
     private LocalDate dataRealizacao;
 
-    @Column(name = "ds_observacoes", length = 2000)
+    @Column(name = "ds_observacoes", length = 1000)
     private String observacoes;
 }

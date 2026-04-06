@@ -25,7 +25,6 @@ public class JpaUserDetailsService implements UserDetailsService {
         Usuario usuario = usuarioRepository.findByNmEmail(nmEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + nmEmail));
 
-        // Cria a lista de permissões (roles) a partir do campo dsRole
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(usuario.getDsRole());
 
         return new User(usuario.getNmEmail(), usuario.getNmSenha(), Collections.singletonList(authority));

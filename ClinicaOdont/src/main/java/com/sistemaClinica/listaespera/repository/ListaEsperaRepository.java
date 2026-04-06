@@ -17,8 +17,8 @@ public interface ListaEsperaRepository extends JpaRepository<ListaEspera, String
     List<ListaEspera> findByStatusOrderByDataSolicitacaoAsc(StatusListaEspera status);
 
     boolean existsByPaciente_IdPacienteAndDentista_IdDentistaAndDataPreferidaAndStatus(
-            String idPaciente,
-            String idDentista,
+            Integer idPaciente,
+            Integer idDentista,
             LocalDate dataPreferida,
             StatusListaEspera status
     );
@@ -32,7 +32,7 @@ public interface ListaEsperaRepository extends JpaRepository<ListaEspera, String
                and (le.horarioFimPreferido is null or le.horarioFimPreferido >= :horario))
             order by le.dataSolicitacao asc
             """)
-    List<ListaEspera> buscarCandidatosParaEncaixe(@Param("idDentista") String idDentista,
+    List<ListaEspera> buscarCandidatosParaEncaixe(@Param("idDentista") Integer idDentista,
                                                   @Param("data") LocalDate data,
                                                   @Param("horario") LocalTime horario);
 }

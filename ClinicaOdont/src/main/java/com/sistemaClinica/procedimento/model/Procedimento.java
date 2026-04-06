@@ -1,6 +1,11 @@
 package com.sistemaClinica.procedimento.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,9 +18,9 @@ import java.math.BigDecimal;
 public class Procedimento {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_procedimento")
-    private String idProcedimento;
+    private Integer idProcedimento;
 
     @Column(name = "nm_procedimento", nullable = false)
     private String nome;
