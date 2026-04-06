@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
-import { Table, Button, Alert, Spinner } from 'react-bootstrap';
+import { Table, Button, Alert, Spinner, Form, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
+import { ConfirmarExclusao, tratarErroBackend } from '../ultilitarios/ultilitarios';
 
 const Paciente = () => {
     const navigate = useNavigate();
@@ -10,6 +11,9 @@ const Paciente = () => {
     const [pacientes, setPacientes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [busca, setBusca] = useState('');
+    const [excluirId, setExcluirId] = useState(null);
+    const [excluindo, setExcluindo] = useState(false);
 
     const fetchPacientes = useCallback(async () => {
         try {
@@ -18,7 +22,6 @@ const Paciente = () => {
             setPacientes(response.data);
             setError(null);
         } catch (err) {
-            console.error("Erro ao buscar pacientes:", err);
             setError("Não foi possível carregar os pacientes.");
         } finally {
             setLoading(false);
@@ -29,28 +32,49 @@ const Paciente = () => {
         fetchPacientes();
     }, [fetchPacientes]);
 
-    const handleDelete = async (id) => {
+    const iniciarExclusao = (id) => {
+        setExcluirId(id);
+    };
+
+    const confirmarExclusao = async () => {
+        if (!excluirId) return;
+        setExcluindo(true);
         try {
-            await axios.delete(`${API_BASE_URL}/pacientes/${id}`);
-            fetchPacientes();
+            await axios.delete(`${API_BASE_URL}/pacientes/${excluirId}`);
+            await fetchPacientes();
         } catch (err) {
-            console.error("Erro ao deletar paciente:", err);
-            setError("Não foi possível deletar o paciente.");
+            setError(tratarErroBackend(err, "Não foi possível deletar o paciente."));
+        } finally {
+            setExcluindo(false);
+            setExcluirId(null);
         }
     };
 
-    const handleAddPaciente = () => {
-        navigate('/pacientes/novo');
-    };
-
-    const handleEditPaciente = (id) => {
-        navigate(`/pacientes/editar/${id}`);
-    };
+    const pacientesFiltrados = useMemo(() => {
+        if (!busca.trim()) return pacientes;
+        const termo = busca.toLowerCase();
+        return pacientes.filter(p =>
+            p.nome?.toLowerCase().includes(termo) ||
+            p.cpf?.includes(termo) ||
+            p.email?.toLowerCase().includes(termo)
+        );
+    }, [pacientes, busca]);
 
     return (
-        <div className="container mt-5">
-            <h2>Gerenciamento de Pacientes</h2>
-            <Button variant="primary" className="mb-3" onClick={handleAddPaciente}>Adicionar Paciente</Button>
+        <div className="container mt-4">
+            <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <h2>Gerenciamento de Pacientes</h2>
+                <div className="d-flex gap-2">
+                    <InputGroup style={{ maxWidth: 280 }}>
+                        <Form.Control
+                            placeholder="Buscar por nome, CPF ou email"
+                            value={busca}
+                            onChange={e => setBusca(e.target.value)}
+                        />
+                    </InputGroup>
+                    <Button variant="primary" onClick={() => navigate('/pacientes/novo')}>Adicionar Paciente</Button>
+                </div>
+            </div>
 
             {loading && (
                 <div className="text-center">
@@ -61,12 +85,14 @@ const Paciente = () => {
 
             {error && <Alert variant="danger">{error}</Alert>}
 
-            {!loading && !error && pacientes.length === 0 && (
-                <Alert variant="info">Nenhum paciente encontrado.</Alert>
+            {!loading && !error && pacientesFiltrados.length === 0 && (
+                <Alert variant="info">
+                    {busca ? 'Nenhum paciente encontrado para a busca.' : 'Nenhum paciente encontrado.'}
+                </Alert>
             )}
 
-            {!loading && !error && pacientes.length > 0 && (
-                <Table striped bordered hover>
+            {!loading && !error && pacientesFiltrados.length > 0 && (
+                <Table striped bordered hover responsive>
                     <thead>
                         <tr>
                             <th>Nome</th>
@@ -77,22 +103,31 @@ const Paciente = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {pacientes.map(paciente => (
+                        {pacientesFiltrados.map(paciente => (
                             <tr key={paciente.idPaciente}>
                                 <td>{paciente.nome}</td>
                                 <td>{paciente.cpf}</td>
                                 <td>{paciente.email}</td>
                                 <td>{paciente.telefone}</td>
                                 <td>
-                                    <Button variant="success" size="sm" className="me-2" onClick={() => navigate(`/pacientes/${paciente.idPaciente}/prontuario`)}>📋 Prontuário</Button>
-                                    <Button variant="info" size="sm" className="me-2" onClick={() => handleEditPaciente(paciente.idPaciente)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => handleDelete(paciente.idPaciente)}>Excluir</Button>
+                                    <Button variant="outline-primary" size="sm" className="me-1" onClick={() => navigate(`/pacientes/${paciente.idPaciente}/prontuario`)}>Prontuário</Button>
+                                    <Button variant="outline-info" size="sm" className="me-1" onClick={() => navigate(`/pacientes/editar/${paciente.idPaciente}`)}>Editar</Button>
+                                    <Button variant="outline-danger" size="sm" onClick={() => iniciarExclusao(paciente.idPaciente)}>Excluir</Button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>
             )}
+
+            <ConfirmarExclusao
+                show={!!excluirId}
+                titulo="Excluir Paciente"
+                mensagem="Tem certeza que deseja excluir este paciente? Esta ação não pode ser desfeita."
+                onConfirm={confirmarExclusao}
+                onCancel={() => setExcluirId(null)}
+                loading={excluindo}
+            />
         </div>
     );
 };

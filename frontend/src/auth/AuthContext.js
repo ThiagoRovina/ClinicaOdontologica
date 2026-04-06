@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
-import { API_BASE_URL, AUTH_LOGIN_URL, AUTH_LOGOUT_URL } from '../config/api';
+import { API_BASE_URL, AUTH_LOGIN_URL, AUTH_LOGOUT_URL, markAuthChecking, unmarkAuthChecking } from '../config/api';
 
 const AuthContext = createContext(null);
 
@@ -15,18 +15,28 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     const refreshUser = useCallback(async () => {
+        markAuthChecking(); // Impede o interceptor de agir
         try {
             const response = await axios.get(`${API_BASE_URL}/usuarios/me`, { withCredentials: true });
-            setUser(normalizeUser(response.data));
             return normalizeUser(response.data);
         } catch (_) {
-            setUser(null);
             return null;
+        } finally {
+            unmarkAuthChecking();
         }
     }, []);
 
     useEffect(() => {
-        refreshUser().finally(() => setLoading(false));
+        let isCancelled = false;
+        const init = async () => {
+            const currentUser = await refreshUser();
+            if (!isCancelled) {
+                setUser(currentUser);
+                setLoading(false);
+            }
+        };
+        init();
+        return () => { isCancelled = true; };
     }, [refreshUser]);
 
     const hasRole = (role) => {
@@ -39,8 +49,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     const login = async (nmEmail, nmSenha) => {
-        await axios.post(AUTH_LOGIN_URL, { nmEmail, nmSenha }, { withCredentials: true });
-        await refreshUser();
+        markAuthChecking();
+        try {
+            await axios.post(AUTH_LOGIN_URL, { nmEmail, nmSenha }, { withCredentials: true });
+            const currentUser = await refreshUser();
+            setUser(currentUser);
+        } finally {
+            unmarkAuthChecking();
+        }
     };
 
     const logout = async () => {

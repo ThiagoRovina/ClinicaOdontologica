@@ -1,44 +1,83 @@
 .dashboard-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.dashboard-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+/* KPI Cards */
+.dashboard-kpi {
     border: none;
     border-radius: 10px;
+    background: #FFFFFF;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+.dashboard-kpi:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
 }
 
-.dashboard-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: #0d6efd;
+.dashboard-kpi__label {
+    font-size: 13px;
+    margin-bottom: 2px;
 }
 
-.card-title {
-    font-weight: 600;
-    color: #333;
+.dashboard-kpi__valor {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
-.card-text {
-    color: #666;
-    margin-bottom: 1.5rem;
+.dashboard-kpi__icone {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(99, 102, 241, 0.1);
 }
 
-.btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-    padding: 0.5rem 1.5rem;
-    font-weight: 500;
-    border-radius: 5px;
+/* Dashboard link cards */
+.dashboard-link-card {
+    border-radius: 10px;
+    border: none;
+    background: #FFFFFF;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
+.dashboard-link-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+}
+
+.dashboard-link-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+/* Responsividade */
+@media (max-width: 576px) {
+    .dashboard-kpi__valor {
+        font-size: 1.3rem;
+    }
+
+    .dashboard-kpi__icone {
+        width: 36px;
+        height: 36px;
+    }
+
+    .dashboard-link-card .d-flex {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px !important;
+    }
+
+    .dashboard-link-icon {
+        margin: 0 auto;
+    }
 }

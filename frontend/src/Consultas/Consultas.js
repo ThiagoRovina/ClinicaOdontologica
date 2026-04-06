@@ -11,6 +11,7 @@ const Consultas = () => {
     const navigate = useNavigate();
     const [consultas, setConsultas] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
     useEffect(() => {
         axios.get(`${API_BASE_URL}/consultas`)
@@ -18,8 +19,7 @@ const Consultas = () => {
                 setConsultas(response.data);
                 setLoading(false);
             })
-            .catch(error => {
-                console.error("Erro ao buscar consultas", error);
+            .catch(() => {
                 setLoading(false);
             });
     }, []);
@@ -48,7 +48,7 @@ const Consultas = () => {
     }
 
     return (
-        <Container className="mt-5">
+        <Container className="mt-4">
             <h2 className="text-center mb-4">Calendário de Consultas</h2>
             <Row className="justify-content-md-center">
                 <Col md={8}>
@@ -57,16 +57,18 @@ const Consultas = () => {
                             <Calendar
                                 tileClassName={getTileClassName}
                                 className="w-100 border-0"
+                                value={selectedDate}
+                                onChange={setSelectedDate}
                             />
                         </Card.Body>
                         <Card.Footer>
                             <Row className="align-items-center">
-                                <Col xs={12} md={8} className="d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0">
-                                    <div className="d-flex align-items-center me-3"><span style={{height: '1rem', width: '1rem'}} className="bg-success-light rounded-circle me-2"></span>Agendada</div>
-                                    <div className="d-flex align-items-center me-3"><span style={{height: '1rem', width: '1rem'}} className="bg-success rounded-circle me-2"></span>Finalizada</div>
-                                    <div className="d-flex align-items-center"><span style={{height: '1rem', width: '1rem'}} className="bg-danger-light rounded-circle me-2"></span>Cancelada</div>
+                                <Col xs={12} md={7} className="d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0 flex-wrap gap-3">
+                                    <div className="d-flex align-items-center"><span className="legend-dot legend-dot--agendada"></span>Agendada</div>
+                                    <div className="d-flex align-items-center"><span className="legend-dot legend-dot--finalizada"></span>Finalizada</div>
+                                    <div className="d-flex align-items-center"><span className="legend-dot legend-dot--cancelada"></span>Cancelada</div>
                                 </Col>
-                                <Col xs={12} md={4} className="text-center text-md-end">
+                                <Col xs={12} md={5} className="text-center text-md-end">
                                     <Button variant="primary" onClick={() => navigate('/consultas/hoje')}>
                                         Agendamentos de Hoje
                                     </Button>
@@ -79,13 +81,5 @@ const Consultas = () => {
         </Container>
     );
 };
-
-// Adicionando as cores do Bootstrap como classes CSS para a legenda
-const style = document.createElement('style');
-style.innerHTML = `
-    .bg-success-light { background-color: #a7f3d0; }
-    .bg-danger-light { background-color: #fca5a5; }
-`;
-document.head.appendChild(style);
 
 export default Consultas;
