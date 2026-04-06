@@ -3,6 +3,7 @@ import { Button, Form, Alert, Container } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
+import { aplicarMascaraTelefone, tratarErroBackend } from '../ultilitarios/ultilitarios';
 
 const somenteDigitos = (value) => value.replace(/\D/g, '');
 
@@ -54,27 +55,36 @@ const PacienteCadastro = () => {
             setLoading(true);
             axios.get(`${API_BASE_URL}/pacientes/${id}`)
                 .then(response => {
-                    setPaciente({ ...response.data, cpf: formatarCpf(response.data.cpf || '') });
+                    setPaciente({ ...response.data, cpf: formatarCpf(response.data.cpf || ''), telefone: response.data.telefone || '' });
                     setLoading(false);
                 })
-                .catch(err => {
+                .catch(() => {
                     setError("Não foi possível carregar os dados do paciente.");
                     setLoading(false);
                 });
         }
     }, [id]);
 
+    // Auto-dismiss do alerta de sucesso
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setPaciente(prev => ({
             ...prev,
-            [name]: name === 'cpf' ? formatarCpf(value) : value
+            [name]: name === 'cpf' ? formatarCpf(value) : name === 'telefone' ? aplicarMascaraTelefone(value) : value
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
         if (!cpfValido(paciente.cpf)) {
             setError("CPF inválido. Informe um CPF válido.");
             return;
@@ -91,18 +101,18 @@ const PacienteCadastro = () => {
             }
             setTimeout(() => navigate('/pacientes'), 1500);
         } catch (err) {
-            setError(err.response?.data || "Erro ao salvar paciente.");
+            setError(tratarErroBackend(err, "Erro ao salvar paciente. Verifique os dados e tente novamente."));
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Container className="mt-5">
+        <Container className="mt-4">
             <h2>{id ? "Editar Paciente" : "Adicionar Paciente"}</h2>
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
-            
+
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                     <Form.Label>Nome Completo</Form.Label>
@@ -131,19 +141,29 @@ const PacienteCadastro = () => {
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label>Telefone</Form.Label>
-                    <Form.Control type="text" name="telefone" value={paciente.telefone} onChange={handleChange} required />
+                    <Form.Control
+                        type="text"
+                        name="telefone"
+                        value={paciente.telefone}
+                        onChange={handleChange}
+                        placeholder="(11) 99999-9999"
+                        maxLength={15}
+                        required
+                    />
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Label>Endereço</Form.Label>
                     <Form.Control type="text" name="endereco" value={paciente.endereco} onChange={handleChange} />
                 </Form.Group>
 
-                <Button variant="primary" type="submit" disabled={loading}>
-                    {loading ? 'Salvando...' : 'Salvar'}
-                </Button>
-                <Button variant="secondary" onClick={() => navigate('/pacientes')} className="ms-2">
-                    Cancelar
-                </Button>
+                <div className="d-flex gap-2">
+                    <Button variant="primary" type="submit" disabled={loading}>
+                        {loading ? 'Salvando...' : 'Salvar'}
+                    </Button>
+                    <Button variant="secondary" onClick={() => navigate('/pacientes')} disabled={loading}>
+                        Cancelar
+                    </Button>
+                </div>
             </Form>
         </Container>
     );

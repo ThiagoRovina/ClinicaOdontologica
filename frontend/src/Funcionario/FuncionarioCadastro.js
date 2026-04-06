@@ -3,6 +3,7 @@ import { Button, Form, Alert, Container } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
+import { tratarErroBackend } from '../ultilitarios/ultilitarios';
 
 const FuncionarioCadastro = () => {
     const navigate = useNavigate();
@@ -23,6 +24,14 @@ const FuncionarioCadastro = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // Auto-dismiss do alerta de sucesso
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
 
     useEffect(() => {
         axios.get(`${API_BASE_URL}/funcionarios/tipos`)
@@ -86,8 +95,7 @@ const FuncionarioCadastro = () => {
                 }
             }
         } catch (err) {
-            const errorMsg = err.response?.data || "Erro ao salvar funcionário. Verifique os dados e tente novamente.";
-            setError(errorMsg);
+            setError(tratarErroBackend(err, "Erro ao salvar funcionário. Verifique os dados e tente novamente."));
         } finally {
             setLoading(false);
         }

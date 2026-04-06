@@ -1,1 +1,55 @@
+# ============================================
+# BACKEND - Java/Spring Boot
+# ============================================
+ClinicaOdont/target/
+ClinicaOdont/*.class
+ClinicaOdont/*.jar
+ClinicaOdont/*.war
+ClinicaOdont/*.ear
+ClinicaOdont/*.log
+ClinicaOdont/.mvn/wrapper/maven-wrapper.jar
+
+# ============================================
+# FRONTEND - React
+# ============================================
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+
+# ============================================
+# IDE
+# ============================================
 .idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# ============================================
+# OS
+# ============================================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ============================================
+# SECRET FILES - NUNCA COMITAR
+# ============================================
+*.pem
+*.key
+*.p12
+*.jks
+.env
+.env.*
+!.env.example
+secrets/
+.credentials

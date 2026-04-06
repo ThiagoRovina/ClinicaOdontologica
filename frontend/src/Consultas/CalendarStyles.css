@@ -18,3 +18,16 @@
     background-color: #2563eb !important; /* Azul forte para o dia ativo */
     color: white !important;
 }
+
+/* Legenda do calendário */
+.legend-dot {
+    height: 0.75rem;
+    width: 0.75rem;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.legend-dot--agendada { background-color: #a7f3d0; }
+.legend-dot--finalizada { background-color: #16a34a; }
+.legend-dot--cancelada { background-color: #fca5a5; }

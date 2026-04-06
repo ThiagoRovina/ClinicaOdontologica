@@ -1,0 +1,188 @@
+.odontograma {
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.odonto-label {
+    text-align: center;
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.odonto-selector {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.odonto-selector__label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.odento-selector__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.odento-selector__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    background: #FFFFFF;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: #374151;
+}
+
+.odento-selector__btn:hover {
+    border-color: #9CA3AF;
+    background: #F3F4F6;
+}
+
+.odento-selector__btn.active {
+    border-color: var(--cor);
+    background: color-mix(in srgb, var(--cor) 12%, white);
+    color: #111827;
+}
+
+.odento-selector__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.odonto-arcada {
+    margin-bottom: 12px;
+}
+
+.odonto-arcada__title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9CA3AF;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.odonto-arcada__row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+}
+
+.odonto-mid-line {
+    width: 2px;
+    background: #E5E7EB;
+    align-self: stretch;
+    margin: 0 8px;
+    border-radius: 1px;
+}
+
+.odonto-dente {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.odonto-dente__num {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6B7280;
+}
+
+.odonto-dente__svg {
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    background: white;
+    transition: box-shadow 0.15s;
+}
+
+.odonto-dente__svg:hover {
+    box-shadow: 0 0 0 1px #93C5FD;
+}
+
+.odonto-dente__svg polygon.odonto-face {
+    cursor: pointer;
+}
+
+.odonto-dente__svg polygon.odonto-face:hover {
+    filter: brightness(0.92);
+}
+
+.dente-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.dente-legend__item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #6B7280;
+}
+
+.dente-legend__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+    .odonto-arcada__row {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .odonto-dente__svg {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    .odontograma {
+        padding: 12px;
+    }
+
+    .odonto-arcada__row {
+        gap: 4px;
+    }
+
+    .odonto-dente__svg {
+        width: 50px;
+        height: 50px;
+    }
+
+    .odonto-dente__num {
+        font-size: 8px;
+    }
+
+    .odento-selector__btn {
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+}

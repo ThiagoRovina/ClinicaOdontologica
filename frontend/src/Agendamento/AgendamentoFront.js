@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Row, Col, Form, Button, Alert, Spinner, Table, Card } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Alert, Spinner, Card, Table, Badge } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
+import { ConfirmarExclusao, tratarErroBackend } from '../ultilitarios/ultilitarios';
 
 const AgendamentoFront = () => {
     const [pacientes, setPacientes] = useState([]);
@@ -15,6 +16,9 @@ const AgendamentoFront = () => {
         listaEspera: true
     });
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+    const [agendando, setAgendando] = useState(false);
+    const [removendoLista, setRemovendoLista] = useState(false);
 
     const [novaConsulta, setNovaConsulta] = useState({
         pacienteId: '',
@@ -31,11 +35,15 @@ const AgendamentoFront = () => {
         observacoes: ''
     });
 
+    const [excluirConsultaId, setExcluirConsultaId] = useState(null);
+    const [excluindoConsulta, setExcluindoConsulta] = useState(false);
+
     const fetchConsultas = useCallback(async () => {
         try {
             setLoading(prev => ({ ...prev, consultas: true }));
             const response = await axios.get(`${API_BASE_URL}/consultas`);
             setConsultas(response.data);
+            setError(null);
         } catch (err) {
             setError('Não foi possível carregar as consultas.');
         } finally {
@@ -48,6 +56,7 @@ const AgendamentoFront = () => {
             setLoading(prev => ({ ...prev, listaEspera: true }));
             const response = await axios.get(`${API_BASE_URL}/lista-espera/ativas`);
             setListaEspera(response.data);
+            setError(null);
         } catch (err) {
             setError('Não foi possível carregar a lista de espera.');
         } finally {
@@ -60,7 +69,7 @@ const AgendamentoFront = () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}/pacientes`);
                 setPacientes(response.data);
-            } catch (err) {
+            } catch {
                 setError('Não foi possível carregar os pacientes.');
             } finally {
                 setLoading(prev => ({ ...prev, pacientes: false }));
@@ -71,7 +80,7 @@ const AgendamentoFront = () => {
             try {
                 const response = await axios.get(`${API_BASE_URL}/dentistas`);
                 setDentistas(response.data);
-            } catch (err) {
+            } catch {
                 setError('Não foi possível carregar os dentistas.');
             } finally {
                 setLoading(prev => ({ ...prev, dentistas: false }));
@@ -83,6 +92,20 @@ const AgendamentoFront = () => {
         fetchConsultas();
         fetchListaEspera();
     }, [fetchConsultas, fetchListaEspera]);
+
+    // Auto-dismiss alertas
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(null), 8000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
 
     const handleConsultaChange = (e) => {
         const { name, value } = e.target;
@@ -97,6 +120,8 @@ const AgendamentoFront = () => {
     const handleSubmitConsulta = async (e) => {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
+        setAgendando(true);
 
         const consultaParaSalvar = {
             paciente: { idPaciente: novaConsulta.pacienteId },
@@ -107,15 +132,19 @@ const AgendamentoFront = () => {
         try {
             await axios.post(`${API_BASE_URL}/consultas`, consultaParaSalvar);
             setNovaConsulta({ pacienteId: '', dentistaId: '', dataHora: '' });
+            setSuccess('Consulta agendada com sucesso!');
             fetchConsultas();
         } catch (err) {
-            setError('Erro ao agendar consulta. Verifique os dados.');
+            setError(tratarErroBackend(err, 'Erro ao agendar consulta. Verifique os dados.'));
+        } finally {
+            setAgendando(false);
         }
     };
 
     const handleSubmitListaEspera = async (e) => {
         e.preventDefault();
         setError(null);
+        setSuccess(null);
 
         const listaParaSalvar = {
             paciente: { idPaciente: novaEntradaLista.pacienteId },
@@ -136,41 +165,54 @@ const AgendamentoFront = () => {
                 horarioFimPreferido: '',
                 observacoes: ''
             });
+            setSuccess('Paciente adicionado à lista de espera.');
             fetchListaEspera();
         } catch (err) {
-            setError('Erro ao incluir paciente na lista de espera.');
+            setError(tratarErroBackend(err, 'Erro ao incluir paciente na lista de espera.'));
         }
     };
 
-    const handleCancelarConsulta = async (id) => {
+    const confirmarExclusaoConsulta = async () => {
+        if (!excluirConsultaId) return;
+        setExcluindoConsulta(true);
         try {
-            await axios.delete(`${API_BASE_URL}/consultas/${id}`);
+            await axios.delete(`${API_BASE_URL}/consultas/${excluirConsultaId}`);
+            setSuccess('Consulta cancelada.');
             fetchConsultas();
             fetchListaEspera();
         } catch (err) {
-            setError('Erro ao cancelar a consulta.');
+            setError(tratarErroBackend(err, 'Erro ao cancelar a consulta.'));
+        } finally {
+            setExcluindoConsulta(false);
+            setExcluirConsultaId(null);
         }
     };
 
     const handleCancelarListaEspera = async (id) => {
+        setRemovendoLista(true);
         try {
             await axios.patch(`${API_BASE_URL}/lista-espera/${id}/cancelar`);
+            setSuccess('Removido da lista de espera.');
             fetchListaEspera();
         } catch (err) {
-            setError('Erro ao remover paciente da lista de espera.');
+            setError(tratarErroBackend(err, 'Erro ao remover paciente da lista de espera.'));
+        } finally {
+            setRemovendoLista(false);
         }
     };
 
     return (
-        <Container className="mt-5">
-            <h2>Agendamento de Consultas</h2>
+        <Container className="mt-4">
+            <h2 className="mb-3">Agendamento de Consultas</h2>
             {error && <Alert variant="danger">{error}</Alert>}
+            {success && <Alert variant="success">{success}</Alert>}
+
             <Row>
                 <Col md={4}>
-                    <Card className="mb-4">
+                    <Card className="mb-4 shadow-sm">
                         <Card.Body>
                             <Card.Title>Nova Consulta</Card.Title>
-                            <Form onSubmit={handleSubmitConsulta}>
+                            <Form onSubmit={handleSubmitConsulta} className="mt-3">
                                 <Form.Group className="mb-3">
                                     <Form.Label>Paciente</Form.Label>
                                     <Form.Select name="pacienteId" value={novaConsulta.pacienteId} onChange={handleConsultaChange} required>
@@ -189,15 +231,17 @@ const AgendamentoFront = () => {
                                     <Form.Label>Data e Hora</Form.Label>
                                     <Form.Control type="datetime-local" name="dataHora" value={novaConsulta.dataHora} onChange={handleConsultaChange} required />
                                 </Form.Group>
-                                <Button variant="primary" type="submit">Agendar</Button>
+                                <Button variant="primary" type="submit" disabled={agendando}>
+                                    {agendando ? 'Agendando...' : 'Agendar'}
+                                </Button>
                             </Form>
                         </Card.Body>
                     </Card>
 
-                    <Card>
+                    <Card className="shadow-sm">
                         <Card.Body>
                             <Card.Title>Adicionar à Lista de Espera</Card.Title>
-                            <Form onSubmit={handleSubmitListaEspera}>
+                            <Form onSubmit={handleSubmitListaEspera} className="mt-3">
                                 <Form.Group className="mb-3">
                                     <Form.Label>Paciente</Form.Label>
                                     <Form.Select name="pacienteId" value={novaEntradaLista.pacienteId} onChange={handleListaChange} required>
@@ -219,13 +263,13 @@ const AgendamentoFront = () => {
                                 <Row>
                                     <Col>
                                         <Form.Group className="mb-3">
-                                            <Form.Label>Início Preferido</Form.Label>
+                                            <Form.Label>Início</Form.Label>
                                             <Form.Control type="time" name="horarioInicioPreferido" value={novaEntradaLista.horarioInicioPreferido} onChange={handleListaChange} />
                                         </Form.Group>
                                     </Col>
                                     <Col>
                                         <Form.Group className="mb-3">
-                                            <Form.Label>Fim Preferido</Form.Label>
+                                            <Form.Label>Fim</Form.Label>
                                             <Form.Control type="time" name="horarioFimPreferido" value={novaEntradaLista.horarioFimPreferido} onChange={handleListaChange} />
                                         </Form.Group>
                                     </Col>
@@ -241,11 +285,11 @@ const AgendamentoFront = () => {
                 </Col>
 
                 <Col md={8}>
-                    <h3>Consultas</h3>
+                    <h3 className="mb-3">Consultas Agendadas</h3>
                     {loading.consultas ? (
                         <div className="text-center"><Spinner animation="border" /></div>
                     ) : (
-                        <Table striped bordered hover>
+                        <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
                                     <th>Paciente</th>
@@ -256,15 +300,19 @@ const AgendamentoFront = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {consultas.map(c => (
+                                {consultas.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5" className="text-center text-muted">Nenhuma consulta agendada.</td>
+                                    </tr>
+                                ) : consultas.map(c => (
                                     <tr key={c.idConsulta}>
                                         <td>{c.paciente.nome}</td>
                                         <td>{c.dentista.nome}</td>
                                         <td>{new Date(c.dataHora).toLocaleString('pt-BR')}</td>
-                                        <td>{c.status}</td>
+                                        <td><StatusBadge status={c.status} /></td>
                                         <td>
                                             {c.status === 'AGENDADA' && (
-                                                <Button variant="danger" size="sm" onClick={() => handleCancelarConsulta(c.idConsulta)}>
+                                                <Button variant="outline-danger" size="sm" onClick={() => setExcluirConsultaId(c.idConsulta)}>
                                                     Cancelar
                                                 </Button>
                                             )}
@@ -275,11 +323,11 @@ const AgendamentoFront = () => {
                         </Table>
                     )}
 
-                    <h3 className="mt-5">Lista de Espera Ativa</h3>
+                    <h3 className="mt-5 mb-3">Lista de Espera</h3>
                     {loading.listaEspera ? (
                         <div className="text-center"><Spinner animation="border" /></div>
                     ) : (
-                        <Table striped bordered hover>
+                        <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
                                     <th>Paciente</th>
@@ -299,14 +347,14 @@ const AgendamentoFront = () => {
                                             {item.horarioInicioPreferido || '--:--'} até {item.horarioFimPreferido || '--:--'}
                                         </td>
                                         <td>
-                                            <Button variant="outline-danger" size="sm" onClick={() => handleCancelarListaEspera(item.idListaEspera)}>
-                                                Remover
+                                            <Button variant="outline-danger" size="sm" onClick={() => handleCancelarListaEspera(item.idListaEspera)} disabled={removendoLista}>
+                                                {removendoLista ? 'Removendo...' : 'Remover'}
                                             </Button>
                                         </td>
                                     </tr>
                                 )) : (
                                     <tr>
-                                        <td colSpan="5" className="text-center">Nenhum paciente aguardando no momento.</td>
+                                        <td colSpan="5" className="text-center text-muted">Nenhum paciente aguardando no momento.</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -314,8 +362,35 @@ const AgendamentoFront = () => {
                     )}
                 </Col>
             </Row>
+
+            <ConfirmarExclusao
+                show={!!excluirConsultaId}
+                titulo="Cancelar Consulta"
+                mensagem="Tem certeza que deseja cancelar esta consulta? Esta ação não pode ser desfeita."
+                onConfirm={confirmarExclusaoConsulta}
+                onCancel={() => setExcluirConsultaId(null)}
+                loading={excluindoConsulta}
+            />
         </Container>
     );
 };
+
+function StatusBadge({ status }) {
+    const map = {
+        'AGENDADA': 'info',
+        'FINALIZADA': 'success',
+        'CANCELADA': 'danger'
+    };
+    const labels = {
+        'AGENDADA': 'Agendada',
+        'FINALIZADA': 'Finalizada',
+        'CANCELADA': 'Cancelada'
+    };
+    return (
+        <span className={`badge bg-${map[status] || 'secondary'}`}>
+            {labels[status] || status}
+        </span>
+    );
+}
 
 export default AgendamentoFront;

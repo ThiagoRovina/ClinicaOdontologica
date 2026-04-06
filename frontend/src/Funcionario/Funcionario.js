@@ -1,15 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
-import { Table, Button, Alert, Spinner } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { Table, Button, Alert, Spinner, Form, InputGroup } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
+import { ConfirmarExclusao, tratarErroBackend } from '../ultilitarios/ultilitarios';
 
 const Funcionario = () => {
-    const navigate = useNavigate(); // Hook para navegação
+    const navigate = useNavigate();
 
     const [funcionarios, setFuncionarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [busca, setBusca] = useState('');
+    const [excluirId, setExcluirId] = useState(null);
+    const [excluindo, setExcluindo] = useState(false);
 
     const fetchFuncionarios = useCallback(async () => {
         try {
@@ -18,7 +22,6 @@ const Funcionario = () => {
             setFuncionarios(response.data);
             setError(null);
         } catch (err) {
-            console.error("Erro ao buscar funcionários:", err);
             setError("Não foi possível carregar os funcionários. Verifique se o backend está rodando e tente novamente.");
         } finally {
             setLoading(false);
@@ -29,31 +32,46 @@ const Funcionario = () => {
         fetchFuncionarios();
     }, [fetchFuncionarios]);
 
-    const handleDelete = async (id) => {
+    const confirmarExclusao = async () => {
+        if (!excluirId) return;
+        setExcluindo(true);
         try {
-            await axios.delete(`${API_BASE_URL}/funcionarios/${id}`);
-            fetchFuncionarios(); // Recarrega a lista após a exclusão
+            await axios.delete(`${API_BASE_URL}/funcionarios/${excluirId}`);
+            await fetchFuncionarios();
         } catch (err) {
-            console.error("Erro ao deletar funcionário:", err);
-            const mensagem = typeof err.response?.data === 'string'
-                ? err.response.data
-                : "Não foi possível deletar o funcionário. Tente novamente.";
-            setError(mensagem);
+            setError(tratarErroBackend(err, "Não foi possível deletar o funcionário."));
+        } finally {
+            setExcluindo(false);
+            setExcluirId(null);
         }
     };
 
-    const handleAddFuncionario = () => {
-        navigate('/funcionarios/novo');
-    };
-
-    const handleEditFuncionario = (id) => {
-        navigate(`/funcionarios/editar/${id}`);
-    };
+    const funcionariosFiltrados = useMemo(() => {
+        if (!busca.trim()) return funcionarios;
+        const termo = busca.toLowerCase();
+        return funcionarios.filter(f =>
+            f.nmFuncionario?.toLowerCase().includes(termo) ||
+            f.nuMatricula?.toString().includes(termo) ||
+            f.cargo?.toLowerCase().includes(termo) ||
+            f.email?.toLowerCase().includes(termo)
+        );
+    }, [funcionarios, busca]);
 
     return (
-        <div className="container mt-5">
-            <h2>Gerenciamento de Funcionários</h2>
-            <Button variant="primary" className="mb-3" onClick={handleAddFuncionario}>Adicionar Funcionário</Button>
+        <div className="container mt-4">
+            <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <h2>Gerenciamento de Funcionários</h2>
+                <div className="d-flex gap-2">
+                    <InputGroup style={{ maxWidth: 280 }}>
+                        <Form.Control
+                            placeholder="Buscar por nome, matrícula ou cargo"
+                            value={busca}
+                            onChange={e => setBusca(e.target.value)}
+                        />
+                    </InputGroup>
+                    <Button variant="primary" onClick={() => navigate('/funcionarios/novo')}>Adicionar Funcionário</Button>
+                </div>
+            </div>
 
             {loading && (
                 <div className="text-center">
@@ -66,12 +84,14 @@ const Funcionario = () => {
 
             {error && <Alert variant="danger">{error}</Alert>}
 
-            {!loading && !error && funcionarios.length === 0 && (
-                <Alert variant="info">Nenhum funcionário encontrado.</Alert>
+            {!loading && !error && funcionariosFiltrados.length === 0 && (
+                <Alert variant="info">
+                    {busca ? 'Nenhum funcionário encontrado para a busca.' : 'Nenhum funcionário encontrado.'}
+                </Alert>
             )}
 
-            {!loading && !error && funcionarios.length > 0 && (
-                <Table striped bordered hover>
+            {!loading && !error && funcionariosFiltrados.length > 0 && (
+                <Table striped bordered hover responsive>
                     <thead>
                         <tr>
                             <th>Nome</th>
@@ -82,21 +102,30 @@ const Funcionario = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {funcionarios.map(funcionario => (
+                        {funcionariosFiltrados.map(funcionario => (
                             <tr key={funcionario.idFuncionario}>
                                 <td>{funcionario.nmFuncionario}</td>
                                 <td>{funcionario.nuMatricula}</td>
                                 <td>{funcionario.cargo}</td>
                                 <td>{funcionario.email}</td>
                                 <td>
-                                    <Button variant="info" size="sm" className="me-2" onClick={() => handleEditFuncionario(funcionario.idFuncionario)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => handleDelete(funcionario.idFuncionario)}>Excluir</Button>
+                                    <Button variant="outline-info" size="sm" className="me-1" onClick={() => navigate(`/funcionarios/editar/${funcionario.idFuncionario}`)}>Editar</Button>
+                                    <Button variant="outline-danger" size="sm" onClick={() => setExcluirId(funcionario.idFuncionario)}>Excluir</Button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>
             )}
+
+            <ConfirmarExclusao
+                show={!!excluirId}
+                titulo="Excluir Funcionário"
+                mensagem="Tem certeza que deseja excluir este funcionário? Esta ação não pode ser desfeita."
+                onConfirm={confirmarExclusao}
+                onCancel={() => setExcluirId(null)}
+                loading={excluindo}
+            />
         </div>
     );
 };

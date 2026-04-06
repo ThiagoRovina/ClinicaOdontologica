@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { Alert, Button, Card, Col, Container, Form, Row, Spinner, Table } from 'react-bootstrap';
 import { API_BASE_URL } from '../config/api';
+import { ConfirmarExclusao, formatarMoeda, tratarErroBackend } from '../ultilitarios/ultilitarios';
 
 const emptyForm = {
     idProcedimento: '',
@@ -17,6 +18,9 @@ function Procedimentos() {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [form, setForm] = useState(emptyForm);
+    const [excluirId, setExcluirId] = useState(null);
+    const [excluindo, setExcluindo] = useState(false);
+    const [busca, setBusca] = useState('');
 
     const isEdit = useMemo(() => !!form.idProcedimento, [form.idProcedimento]);
 
@@ -26,8 +30,8 @@ function Procedimentos() {
             const response = await axios.get(`${API_BASE_URL}/procedimentos`);
             setProcedimentos(response.data);
             setError(null);
-        } catch (_) {
-            setError('Nao foi possivel carregar os procedimentos.');
+        } catch {
+            setError('Não foi possível carregar os procedimentos.');
         } finally {
             setLoading(false);
         }
@@ -36,6 +40,20 @@ function Procedimentos() {
     useEffect(() => {
         fetchProcedimentos();
     }, [fetchProcedimentos]);
+
+    // Auto-dismiss alertas
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(null), 8000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -80,26 +98,49 @@ function Procedimentos() {
 
             resetForm();
             await fetchProcedimentos();
-        } catch (_) {
+        } catch {
             setError('Erro ao salvar procedimento. Verifique os campos e tente novamente.');
         } finally {
             setSaving(false);
         }
     };
 
-    const handleDelete = async (id) => {
-        setError(null);
-        setSuccess(null);
+    const confirmarExclusao = async () => {
+        if (!excluirId) return;
+        setExcluindo(true);
         try {
-            await axios.delete(`${API_BASE_URL}/procedimentos/${id}`);
+            await axios.delete(`${API_BASE_URL}/procedimentos/${excluirId}`);
             await fetchProcedimentos();
-        } catch (_) {
-            setError('Nao foi possivel deletar o procedimento.');
+        } catch {
+            setError('Não foi possível deletar o procedimento.');
+        } finally {
+            setExcluindo(false);
+            setExcluirId(null);
         }
     };
 
+    const procedimentosFiltrados = useMemo(() => {
+        if (!busca.trim()) return procedimentos;
+        const termo = busca.toLowerCase();
+        return procedimentos.filter(p =>
+            p.nome?.toLowerCase().includes(termo) ||
+            p.descricao?.toLowerCase().includes(termo)
+        );
+    }, [procedimentos, busca]);
+
     return (
-        <Container className="mt-5">
+        <Container className="mt-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2>Procedimentos</h2>
+                <Form.Control
+                    type="text"
+                    placeholder="Buscar procedimento..."
+                    value={busca}
+                    onChange={e => setBusca(e.target.value)}
+                    style={{ maxWidth: 280 }}
+                />
+            </div>
+
             <Row className="g-4">
                 <Col lg={5}>
                     <Card className="shadow-sm">
@@ -120,7 +161,7 @@ function Procedimentos() {
                                     />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Descricao</Form.Label>
+                                    <Form.Label>Descrição</Form.Label>
                                     <Form.Control
                                         as="textarea"
                                         rows={3}
@@ -130,10 +171,11 @@ function Procedimentos() {
                                     />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Valor</Form.Label>
+                                    <Form.Label>Valor (R$)</Form.Label>
                                     <Form.Control
                                         type="number"
                                         step="0.01"
+                                        min="0"
                                         name="valor"
                                         value={form.valor}
                                         onChange={handleChange}
@@ -147,7 +189,7 @@ function Procedimentos() {
                                     </Button>
                                     {isEdit && (
                                         <Button type="button" variant="secondary" onClick={resetForm} disabled={saving}>
-                                            Cancelar edicao
+                                            Cancelar edição
                                         </Button>
                                     )}
                                 </div>
@@ -167,23 +209,25 @@ function Procedimentos() {
                                     <thead>
                                         <tr>
                                             <th>Nome</th>
+                                            <th>Descrição</th>
                                             <th>Valor</th>
-                                            <th style={{ width: 180 }}>Acoes</th>
+                                            <th style={{ width: 180 }}>Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {procedimentos.length === 0 ? (
+                                        {procedimentosFiltrados.length === 0 ? (
                                             <tr>
-                                                <td colSpan="3" className="text-center text-muted">Nenhum procedimento cadastrado.</td>
+                                                <td colSpan="4" className="text-center text-muted">Nenhum procedimento cadastrado.</td>
                                             </tr>
-                                        ) : procedimentos.map(p => (
+                                        ) : procedimentosFiltrados.map(p => (
                                             <tr key={p.idProcedimento}>
                                                 <td>{p.nome}</td>
-                                                <td>{p.valor}</td>
+                                                <td>{p.descricao}</td>
+                                                <td>{formatarMoeda(p.valor)}</td>
                                                 <td>
                                                     <div className="d-flex gap-2">
-                                                        <Button size="sm" variant="info" onClick={() => startEdit(p)}>Editar</Button>
-                                                        <Button size="sm" variant="danger" onClick={() => handleDelete(p.idProcedimento)}>Excluir</Button>
+                                                        <Button size="sm" variant="outline-info" onClick={() => startEdit(p)}>Editar</Button>
+                                                        <Button size="sm" variant="outline-danger" onClick={() => setExcluirId(p.idProcedimento)}>Excluir</Button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -195,6 +239,15 @@ function Procedimentos() {
                     </Card>
                 </Col>
             </Row>
+
+            <ConfirmarExclusao
+                show={!!excluirId}
+                titulo="Excluir Procedimento"
+                mensagem="Tem certeza que deseja excluir este procedimento? Esta ação não pode ser desfeita."
+                onConfirm={confirmarExclusao}
+                onCancel={() => setExcluirId(null)}
+                loading={excluindo}
+            />
         </Container>
     );
 }

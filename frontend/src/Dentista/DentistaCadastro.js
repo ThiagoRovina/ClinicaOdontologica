@@ -19,6 +19,14 @@ const DentistaCadastro = () => {
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    // Auto-dismiss do alerta de sucesso
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => setSuccess(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
+
     useEffect(() => {
         if (id) {
             setLoading(true);
@@ -52,7 +60,7 @@ const DentistaCadastro = () => {
             }
             setTimeout(() => navigate('/dentistas'), 1500);
         } catch (err) {
-            setError("Erro ao salvar dentista.");
+            setError("Erro ao salvar dentista. Verifique os dados e tente novamente.");
         } finally {
             setLoading(false);
         }
