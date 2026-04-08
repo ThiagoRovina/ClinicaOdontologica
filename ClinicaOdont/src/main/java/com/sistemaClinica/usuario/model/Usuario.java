@@ -1,5 +1,7 @@
 package com.sistemaClinica.usuario.model;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,9 +16,8 @@ import lombok.Setter;
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
-    private Integer idUsuario;
+    private String idUsuario;
 
     @Column(name = "nm_email", unique = true, nullable = false)
     @Email(message = "Email invalido")

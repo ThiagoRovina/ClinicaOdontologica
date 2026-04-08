@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Alert, Container } from 'react-bootstrap';
+import { Button, Form, Alert, Container, Card } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
@@ -19,16 +19,12 @@ const cpfValido = (value) => {
     const digits = somenteDigitos(value);
     if (digits.length !== 11) return false;
     if (/^(\d)\1{10}$/.test(digits)) return false;
-
     const calc = (base, pesoInicial) => {
         let soma = 0;
-        for (let i = 0; i < base.length; i++) {
-            soma += Number(base[i]) * (pesoInicial - i);
-        }
+        for (let i = 0; i < base.length; i++) { soma += Number(base[i]) * (pesoInicial - i); }
         const resto = soma % 11;
         return resto < 2 ? 0 : 11 - resto;
     };
-
     const d1 = calc(digits.slice(0, 9), 10);
     const d2 = calc(`${digits.slice(0, 9)}${d1}`, 11);
     return digits === `${digits.slice(0, 9)}${d1}${d2}`;
@@ -38,14 +34,7 @@ const PacienteCadastro = () => {
     const navigate = useNavigate();
     const { id } = useParams();
 
-    const [paciente, setPaciente] = useState({
-        nome: '',
-        dataNascimento: '',
-        endereco: '',
-        telefone: '',
-        email: '',
-        cpf: ''
-    });
+    const [paciente, setPaciente] = useState({ nome: '', dataNascimento: '', endereco: '', telefone: '', email: '', cpf: '' });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -58,19 +47,12 @@ const PacienteCadastro = () => {
                     setPaciente({ ...response.data, cpf: formatarCpf(response.data.cpf || ''), telefone: response.data.telefone || '' });
                     setLoading(false);
                 })
-                .catch(() => {
-                    setError("Não foi possível carregar os dados do paciente.");
-                    setLoading(false);
-                });
+                .catch(() => { setError('Nao foi possivel carregar os dados do paciente.'); setLoading(false); });
         }
     }, [id]);
 
-    // Auto-dismiss do alerta de sucesso
     useEffect(() => {
-        if (success) {
-            const timer = setTimeout(() => setSuccess(null), 5000);
-            return () => clearTimeout(timer);
-        }
+        if (success) { const timer = setTimeout(() => setSuccess(null), 5000); return () => clearTimeout(timer); }
     }, [success]);
 
     const handleChange = (e) => {
@@ -85,86 +67,78 @@ const PacienteCadastro = () => {
         e.preventDefault();
         setError(null);
         setSuccess(null);
-        if (!cpfValido(paciente.cpf)) {
-            setError("CPF inválido. Informe um CPF válido.");
-            return;
-        }
+        if (!cpfValido(paciente.cpf)) { setError('CPF invalido.'); return; }
 
         setLoading(true);
         try {
             if (paciente.idPaciente) {
                 await axios.put(`${API_BASE_URL}/pacientes/${paciente.idPaciente}`, paciente);
-                setSuccess("Paciente atualizado com sucesso!");
+                setSuccess('Paciente atualizado com sucesso!');
             } else {
                 await axios.post(`${API_BASE_URL}/pacientes`, paciente);
-                setSuccess("Paciente cadastrado com sucesso!");
+                setSuccess('Paciente cadastrado com sucesso!');
             }
             setTimeout(() => navigate('/pacientes'), 1500);
         } catch (err) {
-            setError(tratarErroBackend(err, "Erro ao salvar paciente. Verifique os dados e tente novamente."));
-        } finally {
-            setLoading(false);
-        }
+            setError(tratarErroBackend(err, 'Erro ao salvar paciente.'));
+        } finally { setLoading(false); }
     };
 
     return (
-        <Container className="mt-4">
-            <h2>{id ? "Editar Paciente" : "Adicionar Paciente"}</h2>
+        <Container className="page-shell">
+            <div className="page-header">
+                <div>
+                    <span className="eyebrow">Cadastros</span>
+                    <h1 className="section-title">{id ? 'Editar Paciente' : 'Novo Paciente'}</h1>
+                    <p className="section-subtitle">Preencha os dados pessoais do paciente para cadastro no sistema.</p>
+                </div>
+                <Button variant="outline-secondary" className="rounded-pill" onClick={() => navigate('/pacientes')}>Voltar</Button>
+            </div>
+
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
 
-            <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Nome Completo</Form.Label>
-                    <Form.Control type="text" name="nome" value={paciente.nome} onChange={handleChange} required />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>CPF</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="cpf"
-                        value={paciente.cpf}
-                        onChange={handleChange}
-                        placeholder="000.000.000-00"
-                        maxLength={14}
-                        pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
-                        required
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Data de Nascimento</Form.Label>
-                    <Form.Control type="date" name="dataNascimento" value={paciente.dataNascimento} onChange={handleChange} required />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" name="email" value={paciente.email} onChange={handleChange} />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Telefone</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="telefone"
-                        value={paciente.telefone}
-                        onChange={handleChange}
-                        placeholder="(11) 99999-9999"
-                        maxLength={15}
-                        required
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Endereço</Form.Label>
-                    <Form.Control type="text" name="endereco" value={paciente.endereco} onChange={handleChange} />
-                </Form.Group>
+            <Card className="surface-card">
+                <Card.Body>
+                    <Form onSubmit={handleSubmit}>
+                        <div className="row g-3 mb-4">
+                            <div className="col-md-8">
+                                <Form.Label className="fw-medium small">Nome Completo</Form.Label>
+                                <Form.Control type="text" name="nome" value={paciente.nome} onChange={handleChange} required className="toolbar-input" />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Label className="fw-medium small">CPF</Form.Label>
+                                <Form.Control type="text" name="cpf" value={paciente.cpf} onChange={handleChange} placeholder="000.000.000-00" maxLength={14} required className="toolbar-input" />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Label className="fw-medium small">Data de Nascimento</Form.Label>
+                                <Form.Control type="date" name="dataNascimento" value={paciente.dataNascimento} onChange={handleChange} required className="toolbar-input" />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Label className="fw-medium small">Email</Form.Label>
+                                <Form.Control type="email" name="email" value={paciente.email} onChange={handleChange} className="toolbar-input" />
+                            </div>
+                            <div className="col-md-4">
+                                <Form.Label className="fw-medium small">Telefone</Form.Label>
+                                <Form.Control type="text" name="telefone" value={paciente.telefone} onChange={handleChange} placeholder="(11) 99999-9999" maxLength={15} required className="toolbar-input" />
+                            </div>
+                            <div className="col-12">
+                                <Form.Label className="fw-medium small">Endereco</Form.Label>
+                                <Form.Control type="text" name="endereco" value={paciente.endereco} onChange={handleChange} className="toolbar-input" />
+                            </div>
+                        </div>
 
-                <div className="d-flex gap-2">
-                    <Button variant="primary" type="submit" disabled={loading}>
-                        {loading ? 'Salvando...' : 'Salvar'}
-                    </Button>
-                    <Button variant="secondary" onClick={() => navigate('/pacientes')} disabled={loading}>
-                        Cancelar
-                    </Button>
-                </div>
-            </Form>
+                        <div className="d-flex gap-2 pt-2">
+                            <Button variant="dark" type="submit" className="rounded-pill px-4" disabled={loading}>
+                                {loading ? 'Salvando...' : 'Salvar Paciente'}
+                            </Button>
+                            <Button variant="outline-secondary" onClick={() => navigate('/pacientes')} className="rounded-pill px-4">
+                                Cancelar
+                            </Button>
+                        </div>
+                    </Form>
+                </Card.Body>
+            </Card>
         </Container>
     );
 };
