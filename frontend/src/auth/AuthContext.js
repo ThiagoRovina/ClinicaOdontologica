@@ -6,8 +6,24 @@ const AuthContext = createContext(null);
 
 const normalizeUser = (data) => {
     if (!data || typeof data !== 'object') return null;
-    const authorities = Array.isArray(data.authorities) ? data.authorities : [];
-    return { ...data, authorities };
+    const rawAuthorities = Array.isArray(data.authorities)
+        ? data.authorities
+        : Array.isArray(data.roles)
+            ? data.roles
+            : [];
+
+    const authorities = rawAuthorities
+        .map((authority) => {
+            if (typeof authority === 'string') return authority;
+            return authority?.authority;
+        })
+        .filter(Boolean);
+
+    return {
+        ...data,
+        username: data.username || data.email || '',
+        authorities
+    };
 };
 
 export const AuthProvider = ({ children }) => {

@@ -83,6 +83,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/telaLogin/login", "/api/usuarios/registrar", "/api/auth/login", "/api/auth/logout").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/postgres/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/usuarios/me").authenticated()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()

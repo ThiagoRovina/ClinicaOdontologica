@@ -1,40 +1,53 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Row, Col, Form, Button, Alert, Spinner, Card, Table, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Alert, Card, Spinner, Table } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
 import { ConfirmarExclusao, tratarErroBackend } from '../ultilitarios/ultilitarios';
+import PageHeader from '../components/PageHeader';
+
+const IconCalendar = () => (
+    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+    </svg>
+);
+const IconClock = () => (
+    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+    </svg>
+);
+const IconUser = () => (
+    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/>
+    </svg>
+);
+
+function StatusBadge({ status }) {
+    const labels = {
+        'AGENDADA': 'Agendada',
+        'FINALIZADA': 'Finalizada',
+        'CANCELADA': 'Cancelada'
+    };
+    return (
+        <span className={`status-badge`} style={{
+            background: status === 'AGENDADA' ? '#dbeafe' : status === 'FINALIZADA' ? '#d1fae5' : '#fee2e2',
+            color: status === 'AGENDADA' ? '#1e40af' : status === 'FINALIZADA' ? '#065f46' : '#991b1b'
+        }}>
+            {labels[status] || status}
+        </span>
+    );
+}
 
 const AgendamentoFront = () => {
     const [pacientes, setPacientes] = useState([]);
     const [dentistas, setDentistas] = useState([]);
     const [consultas, setConsultas] = useState([]);
     const [listaEspera, setListaEspera] = useState([]);
-    const [loading, setLoading] = useState({
-        pacientes: true,
-        dentistas: true,
-        consultas: true,
-        listaEspera: true
-    });
+    const [loading, setLoading] = useState({ pacientes: true, dentistas: true, consultas: true, listaEspera: true });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [agendando, setAgendando] = useState(false);
-    const [removendoLista, setRemovendoLista] = useState(false);
-
-    const [novaConsulta, setNovaConsulta] = useState({
-        pacienteId: '',
-        dentistaId: '',
-        dataHora: ''
-    });
-
-    const [novaEntradaLista, setNovaEntradaLista] = useState({
-        pacienteId: '',
-        dentistaId: '',
-        dataPreferida: '',
-        horarioInicioPreferido: '',
-        horarioFimPreferido: '',
-        observacoes: ''
-    });
-
+    const [novaConsulta, setNovaConsulta] = useState({ pacienteId: '', dentistaId: '', dataHora: '' });
+    const [novaEntradaLista, setNovaEntradaLista] = useState({ pacienteId: '', dentistaId: '', dataPreferida: '', horarioInicioPreferido: '', horarioFimPreferido: '', observacoes: '' });
     const [excluirConsultaId, setExcluirConsultaId] = useState(null);
     const [excluindoConsulta, setExcluindoConsulta] = useState(false);
 
@@ -44,8 +57,8 @@ const AgendamentoFront = () => {
             const response = await axios.get(`${API_BASE_URL}/consultas`);
             setConsultas(response.data);
             setError(null);
-        } catch (err) {
-            setError('Não foi possível carregar as consultas.');
+        } catch {
+            setError('Nao foi possivel carregar as consultas.');
         } finally {
             setLoading(prev => ({ ...prev, consultas: false }));
         }
@@ -57,80 +70,51 @@ const AgendamentoFront = () => {
             const response = await axios.get(`${API_BASE_URL}/lista-espera/ativas`);
             setListaEspera(response.data);
             setError(null);
-        } catch (err) {
-            setError('Não foi possível carregar a lista de espera.');
+        } catch {
+            setError('Nao foi possivel carregar a lista de espera.');
         } finally {
             setLoading(prev => ({ ...prev, listaEspera: false }));
         }
     }, []);
 
     useEffect(() => {
-        const fetchPacientes = async () => {
+        const fetch = async (setter, loader, label) => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/pacientes`);
-                setPacientes(response.data);
+                const response = await axios.get(`${API_BASE_URL}/${label}`);
+                setter(response.data);
             } catch {
-                setError('Não foi possível carregar os pacientes.');
+                setError(`Nao foi possivel carregar os ${label}.`);
             } finally {
-                setLoading(prev => ({ ...prev, pacientes: false }));
+                setLoading(prev => ({ ...prev, [loader]: false }));
             }
         };
-
-        const fetchDentistas = async () => {
-            try {
-                const response = await axios.get(`${API_BASE_URL}/dentistas`);
-                setDentistas(response.data);
-            } catch {
-                setError('Não foi possível carregar os dentistas.');
-            } finally {
-                setLoading(prev => ({ ...prev, dentistas: false }));
-            }
-        };
-
-        fetchPacientes();
-        fetchDentistas();
+        fetch(setPacientes, 'pacientes', 'pacientes');
+        fetch(setDentistas, 'dentistas', 'dentistas');
         fetchConsultas();
         fetchListaEspera();
     }, [fetchConsultas, fetchListaEspera]);
 
-    // Auto-dismiss alertas
     useEffect(() => {
-        if (success) {
-            const timer = setTimeout(() => setSuccess(null), 5000);
-            return () => clearTimeout(timer);
-        }
+        if (success) { const t = setTimeout(() => setSuccess(null), 5000); return () => clearTimeout(t); }
     }, [success]);
     useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => setError(null), 8000);
-            return () => clearTimeout(timer);
-        }
+        if (error) { const t = setTimeout(() => setError(null), 8000); return () => clearTimeout(t); }
     }, [error]);
 
-    const handleConsultaChange = (e) => {
-        const { name, value } = e.target;
-        setNovaConsulta(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleListaChange = (e) => {
-        const { name, value } = e.target;
-        setNovaEntradaLista(prev => ({ ...prev, [name]: value }));
-    };
+    const handleConsultaChange = (e) => { setNovaConsulta(prev => ({ ...prev, [e.target.name]: e.target.value })); };
+    const handleListaChange = (e) => { setNovaEntradaLista(prev => ({ ...prev, [e.target.name]: e.target.value })); };
 
     const handleSubmitConsulta = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(null);
         setAgendando(true);
-
-        const consultaParaSalvar = {
-            paciente: { idPaciente: novaConsulta.pacienteId },
-            dentista: { idDentista: novaConsulta.dentistaId },
-            dataHora: novaConsulta.dataHora
-        };
-
         try {
-            await axios.post(`${API_BASE_URL}/consultas`, consultaParaSalvar);
+            await axios.post(`${API_BASE_URL}/consultas`, {
+                paciente: { idPaciente: novaConsulta.pacienteId },
+                dentista: { idDentista: novaConsulta.dentistaId },
+                dataHora: novaConsulta.dataHora
+            });
             setNovaConsulta({ pacienteId: '', dentistaId: '', dataHora: '' });
             setSuccess('Consulta agendada com sucesso!');
             fetchConsultas();
@@ -145,30 +129,20 @@ const AgendamentoFront = () => {
         e.preventDefault();
         setError(null);
         setSuccess(null);
-
-        const listaParaSalvar = {
-            paciente: { idPaciente: novaEntradaLista.pacienteId },
-            dentista: { idDentista: novaEntradaLista.dentistaId },
-            dataPreferida: novaEntradaLista.dataPreferida,
-            horarioInicioPreferido: novaEntradaLista.horarioInicioPreferido || null,
-            horarioFimPreferido: novaEntradaLista.horarioFimPreferido || null,
-            observacoes: novaEntradaLista.observacoes || null
-        };
-
         try {
-            await axios.post(`${API_BASE_URL}/lista-espera`, listaParaSalvar);
-            setNovaEntradaLista({
-                pacienteId: '',
-                dentistaId: '',
-                dataPreferida: '',
-                horarioInicioPreferido: '',
-                horarioFimPreferido: '',
-                observacoes: ''
+            await axios.post(`${API_BASE_URL}/lista-espera`, {
+                paciente: { idPaciente: novaEntradaLista.pacienteId },
+                dentista: { idDentista: novaEntradaLista.dentistaId },
+                dataPreferida: novaEntradaLista.dataPreferida,
+                horarioInicioPreferido: novaEntradaLista.horarioInicioPreferido || null,
+                horarioFimPreferido: novaEntradaLista.horarioFimPreferido || null,
+                observacoes: novaEntradaLista.observacoes || null
             });
-            setSuccess('Paciente adicionado à lista de espera.');
+            setNovaEntradaLista({ pacienteId: '', dentistaId: '', dataPreferida: '', horarioInicioPreferido: '', horarioFimPreferido: '', observacoes: '' });
+            setSuccess('Paciente adicionado a lista de espera.');
             fetchListaEspera();
         } catch (err) {
-            setError(tratarErroBackend(err, 'Erro ao incluir paciente na lista de espera.'));
+            setError(tratarErroBackend(err, 'Erro ao incluir na lista de espera.'));
         }
     };
 
@@ -188,185 +162,188 @@ const AgendamentoFront = () => {
         }
     };
 
-    const handleCancelarListaEspera = async (id) => {
-        setRemovendoLista(true);
-        try {
-            await axios.patch(`${API_BASE_URL}/lista-espera/${id}/cancelar`);
-            setSuccess('Removido da lista de espera.');
-            fetchListaEspera();
-        } catch (err) {
-            setError(tratarErroBackend(err, 'Erro ao remover paciente da lista de espera.'));
-        } finally {
-            setRemovendoLista(false);
-        }
-    };
-
     return (
-        <Container className="mt-4">
-            <h2 className="mb-3">Agendamento de Consultas</h2>
+        <Container className="page-shell">
+            <PageHeader
+                eyebrow="Agenda"
+                title="Consultas e Lista de Espera"
+                subtitle="Agende novos atendimentos ou acompanhe os agendamentos e a fila de espera."
+            />
+
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
 
-            <Row>
-                <Col md={4}>
-                    <Card className="mb-4 shadow-sm">
+            <Row className="g-4">
+                {/* Forms */}
+                <Col lg={4}>
+                    <Card className="surface-card mb-4">
                         <Card.Body>
-                            <Card.Title>Nova Consulta</Card.Title>
+                            <div className="d-flex align-items-center gap-2 mb-3">
+                                <div style={{
+                                    width: 36, height: 36, borderRadius: 10,
+                                    background: 'linear-gradient(135deg, #0f766e, #0c4a6e)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white'
+                                }}>
+                                    <IconCalendar />
+                                </div>
+                                <Card.Title className="mb-0 fw-semibold">Nova Consulta</Card.Title>
+                            </div>
                             <Form onSubmit={handleSubmitConsulta} className="mt-3">
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Paciente</Form.Label>
-                                    <Form.Select name="pacienteId" value={novaConsulta.pacienteId} onChange={handleConsultaChange} required>
+                                    <Form.Label className="fw-medium"><IconUser /> Paciente</Form.Label>
+                                    <Form.Select name="pacienteId" value={novaConsulta.pacienteId} onChange={handleConsultaChange} required className="toolbar-input">
                                         <option value="">Selecione o Paciente</option>
                                         {pacientes.map(p => <option key={p.idPaciente} value={p.idPaciente}>{p.nome}</option>)}
                                     </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Dentista</Form.Label>
-                                    <Form.Select name="dentistaId" value={novaConsulta.dentistaId} onChange={handleConsultaChange} required>
+                                    <Form.Label className="fw-medium">Dentista</Form.Label>
+                                    <Form.Select name="dentistaId" value={novaConsulta.dentistaId} onChange={handleConsultaChange} required className="toolbar-input">
                                         <option value="">Selecione o Dentista</option>
                                         {dentistas.map(d => <option key={d.idDentista} value={d.idDentista}>{d.nome} - {d.especializacao}</option>)}
                                     </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Data e Hora</Form.Label>
-                                    <Form.Control type="datetime-local" name="dataHora" value={novaConsulta.dataHora} onChange={handleConsultaChange} required />
+                                    <Form.Label className="fw-medium"><IconClock /> Data e Hora</Form.Label>
+                                    <Form.Control type="datetime-local" name="dataHora" value={novaConsulta.dataHora} onChange={handleConsultaChange} required className="toolbar-input" />
                                 </Form.Group>
-                                <Button variant="primary" type="submit" disabled={agendando}>
-                                    {agendando ? 'Agendando...' : 'Agendar'}
+                                <Button variant="dark" type="submit" disabled={agendando} className="w-100 rounded-pill">
+                                    {agendando ? <><Spinner as="span" animation="border" size="sm" className="me-2" /> Agendando...</> : 'Agendar Consulta'}
                                 </Button>
                             </Form>
                         </Card.Body>
                     </Card>
 
-                    <Card className="shadow-sm">
+                    <Card className="surface-card">
                         <Card.Body>
-                            <Card.Title>Adicionar à Lista de Espera</Card.Title>
-                            <Form onSubmit={handleSubmitListaEspera} className="mt-3">
+                            <Card.Title className="mb-3 fw-semibold">Lista de Espera</Card.Title>
+                            <Form onSubmit={handleSubmitListaEspera} className="mt-2">
                                 <Form.Group className="mb-3">
                                     <Form.Label>Paciente</Form.Label>
-                                    <Form.Select name="pacienteId" value={novaEntradaLista.pacienteId} onChange={handleListaChange} required>
-                                        <option value="">Selecione o Paciente</option>
+                                    <Form.Select name="pacienteId" value={novaEntradaLista.pacienteId} onChange={handleListaChange} required className="toolbar-input">
+                                        <option value="">Selecione</option>
                                         {pacientes.map(p => <option key={p.idPaciente} value={p.idPaciente}>{p.nome}</option>)}
                                     </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Dentista</Form.Label>
-                                    <Form.Select name="dentistaId" value={novaEntradaLista.dentistaId} onChange={handleListaChange} required>
-                                        <option value="">Selecione o Dentista</option>
-                                        {dentistas.map(d => <option key={d.idDentista} value={d.idDentista}>{d.nome} - {d.especializacao}</option>)}
+                                    <Form.Select name="dentistaId" value={novaEntradaLista.dentistaId} onChange={handleListaChange} required className="toolbar-input">
+                                        <option value="">Selecione</option>
+                                        {dentistas.map(d => <option key={d.idDentista} value={d.idDentista}>{d.nome}</option>)}
                                     </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Data Preferida</Form.Label>
-                                    <Form.Control type="date" name="dataPreferida" value={novaEntradaLista.dataPreferida} onChange={handleListaChange} required />
+                                    <Form.Control type="date" name="dataPreferida" value={novaEntradaLista.dataPreferida} onChange={handleListaChange} required className="toolbar-input" />
                                 </Form.Group>
-                                <Row>
+                                <Row className="g-2 mb-3">
                                     <Col>
-                                        <Form.Group className="mb-3">
-                                            <Form.Label>Início</Form.Label>
-                                            <Form.Control type="time" name="horarioInicioPreferido" value={novaEntradaLista.horarioInicioPreferido} onChange={handleListaChange} />
-                                        </Form.Group>
+                                        <Form.Label className="small text-muted">Inicio</Form.Label>
+                                        <Form.Control type="time" name="horarioInicioPreferido" value={novaEntradaLista.horarioInicioPreferido} onChange={handleListaChange} className="toolbar-input" />
                                     </Col>
                                     <Col>
-                                        <Form.Group className="mb-3">
-                                            <Form.Label>Fim</Form.Label>
-                                            <Form.Control type="time" name="horarioFimPreferido" value={novaEntradaLista.horarioFimPreferido} onChange={handleListaChange} />
-                                        </Form.Group>
+                                        <Form.Label className="small text-muted">Fim</Form.Label>
+                                        <Form.Control type="time" name="horarioFimPreferido" value={novaEntradaLista.horarioFimPreferido} onChange={handleListaChange} className="toolbar-input" />
                                     </Col>
                                 </Row>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Observações</Form.Label>
-                                    <Form.Control as="textarea" rows={2} name="observacoes" value={novaEntradaLista.observacoes} onChange={handleListaChange} />
-                                </Form.Group>
-                                <Button variant="outline-primary" type="submit">Entrar na Lista</Button>
+                                <Button variant="outline-dark" type="submit" className="w-100 rounded-pill">
+                                    Entrar na Lista de Espera
+                                </Button>
                             </Form>
                         </Card.Body>
                     </Card>
                 </Col>
 
-                <Col md={8}>
-                    <h3 className="mb-3">Consultas Agendadas</h3>
-                    {loading.consultas ? (
-                        <div className="text-center"><Spinner animation="border" /></div>
-                    ) : (
-                        <Table striped bordered hover responsive>
-                            <thead>
-                                <tr>
-                                    <th>Paciente</th>
-                                    <th>Dentista</th>
-                                    <th>Data e Hora</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {consultas.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="5" className="text-center text-muted">Nenhuma consulta agendada.</td>
-                                    </tr>
-                                ) : consultas.map(c => (
-                                    <tr key={c.idConsulta}>
-                                        <td>{c.paciente.nome}</td>
-                                        <td>{c.dentista.nome}</td>
-                                        <td>{new Date(c.dataHora).toLocaleString('pt-BR')}</td>
-                                        <td><StatusBadge status={c.status} /></td>
-                                        <td>
-                                            {c.status === 'AGENDADA' && (
-                                                <Button variant="outline-danger" size="sm" onClick={() => setExcluirConsultaId(c.idConsulta)}>
-                                                    Cancelar
-                                                </Button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
-                    )}
+                {/* Tables */}
+                <Col lg={8}>
+                    <Card className="surface-card mb-4">
+                        <Card.Body>
+                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                <h5 className="mb-0 fw-semibold">Consultas Agendadas</h5>
+                                <span className="badge bg-primary rounded-pill">{consultas.filter(c => c.status === 'AGENDADA').length} ativas</span>
+                            </div>
+                            {loading.consultas ? (
+                                <div className="text-center py-4"><Spinner animation="border" /><p className="text-muted small mt-2">Carregando consultas...</p></div>
+                            ) : consultas.length === 0 ? (
+                                <Alert variant="info">Nenhuma consulta agendada.</Alert>
+                            ) : (
+                                <div className="table-shell">
+                                    <Table hover responsive className="mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Paciente</th>
+                                                <th>Dentista</th>
+                                                <th>Data</th>
+                                                <th>Status</th>
+                                                <th style={{ width: 100 }}>Acoes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {consultas.map(c => (
+                                                <tr key={c.idConsulta}>
+                                                    <td className="fw-medium">{c.paciente.nome}</td>
+                                                    <td>{c.dentista.nome}</td>
+                                                    <td className="small text-muted">{new Date(c.dataHora).toLocaleString('pt-BR')}</td>
+                                                    <td><StatusBadge status={c.status} /></td>
+                                                    <td>
+                                                        {c.status === 'AGENDADA' && (
+                                                            <Button variant="outline-danger" size="sm" className="rounded-pill" onClick={() => setExcluirConsultaId(c.idConsulta)}>
+                                                                Cancelar
+                                                            </Button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                </div>
+                            )}
+                        </Card.Body>
+                    </Card>
 
-                    <h3 className="mt-5 mb-3">Lista de Espera</h3>
-                    {loading.listaEspera ? (
-                        <div className="text-center"><Spinner animation="border" /></div>
-                    ) : (
-                        <Table striped bordered hover responsive>
-                            <thead>
-                                <tr>
-                                    <th>Paciente</th>
-                                    <th>Dentista</th>
-                                    <th>Data</th>
-                                    <th>Janela de Horário</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {listaEspera.length > 0 ? listaEspera.map(item => (
-                                    <tr key={item.idListaEspera}>
-                                        <td>{item.paciente.nome}</td>
-                                        <td>{item.dentista.nome}</td>
-                                        <td>{new Date(`${item.dataPreferida}T00:00:00`).toLocaleDateString('pt-BR')}</td>
-                                        <td>
-                                            {item.horarioInicioPreferido || '--:--'} até {item.horarioFimPreferido || '--:--'}
-                                        </td>
-                                        <td>
-                                            <Button variant="outline-danger" size="sm" onClick={() => handleCancelarListaEspera(item.idListaEspera)} disabled={removendoLista}>
-                                                {removendoLista ? 'Removendo...' : 'Remover'}
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                )) : (
-                                    <tr>
-                                        <td colSpan="5" className="text-center text-muted">Nenhum paciente aguardando no momento.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </Table>
-                    )}
+                    <Card className="surface-card">
+                        <Card.Body>
+                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                <h5 className="mb-0 fw-semibold">Lista de Espera</h5>
+                                <span className="badge bg-warning text-dark rounded-pill">{listaEspera.length} aguardando</span>
+                            </div>
+                            {loading.listaEspera ? (
+                                <div className="text-center py-4"><Spinner animation="border" /></div>
+                            ) : listaEspera.length === 0 ? (
+                                <Alert variant="info">Nenhum paciente aguardando no momento.</Alert>
+                            ) : (
+                                <div className="table-shell">
+                                    <Table hover responsive className="mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Paciente</th>
+                                                <th>Dentista</th>
+                                                <th>Data</th>
+                                                <th>Janela</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {listaEspera.map(item => (
+                                                <tr key={item.idListaEspera}>
+                                                    <td className="fw-medium">{item.paciente.nome}</td>
+                                                    <td>{item.dentista.nome}</td>
+                                                    <td>{new Date(`${item.dataPreferida}T00:00:00`).toLocaleDateString('pt-BR')}</td>
+                                                    <td className="small">{item.horarioInicioPreferido || '--:--'} ate {item.horarioFimPreferido || '--:--'}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                </div>
+                            )}
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
 
             <ConfirmarExclusao
                 show={!!excluirConsultaId}
                 titulo="Cancelar Consulta"
-                mensagem="Tem certeza que deseja cancelar esta consulta? Esta ação não pode ser desfeita."
+                mensagem="Tem certeza que deseja cancelar esta consulta? Esta acao nao pode ser desfeita."
                 onConfirm={confirmarExclusaoConsulta}
                 onCancel={() => setExcluirConsultaId(null)}
                 loading={excluindoConsulta}
@@ -374,23 +351,5 @@ const AgendamentoFront = () => {
         </Container>
     );
 };
-
-function StatusBadge({ status }) {
-    const map = {
-        'AGENDADA': 'info',
-        'FINALIZADA': 'success',
-        'CANCELADA': 'danger'
-    };
-    const labels = {
-        'AGENDADA': 'Agendada',
-        'FINALIZADA': 'Finalizada',
-        'CANCELADA': 'Cancelada'
-    };
-    return (
-        <span className={`badge bg-${map[status] || 'secondary'}`}>
-            {labels[status] || status}
-        </span>
-    );
-}
 
 export default AgendamentoFront;

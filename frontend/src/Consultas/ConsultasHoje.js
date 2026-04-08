@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Container, Table, Button, Spinner, Alert } from 'react-bootstrap';
+import { Container, Card, Col, Row, Spinner, Alert, Badge, Button } from 'react-bootstrap';
 import { API_BASE_URL } from '../config/api';
 import { ConfirmarExclusao, tratarErroBackend } from '../ultilitarios/ultilitarios';
 
@@ -11,37 +11,18 @@ const ConsultasHoje = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
-    const [confirmAction, setConfirmAction] = useState(null); // { id, tipo: 'finalizar'|'cancelar', loading }
+    const [confirmAction, setConfirmAction] = useState(null);
 
     useEffect(() => {
         axios.get(`${API_BASE_URL}/consultas/hoje`)
-            .then(response => {
-                setConsultasHoje(response.data);
-                setLoading(false);
-            })
-            .catch(() => {
-                setError("Não foi possível carregar as consultas de hoje.");
-                setLoading(false);
-            });
+            .then(response => { setConsultasHoje(response.data); setLoading(false); })
+            .catch(() => { setError('Nao foi possivel carregar as consultas de hoje.'); setLoading(false); });
     }, []);
 
-    // Auto-dismiss alertas
-    useEffect(() => {
-        if (success) {
-            const timer = setTimeout(() => setSuccess(null), 5000);
-            return () => clearTimeout(timer);
-        }
-    }, [success]);
-    useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => setError(null), 8000);
-            return () => clearTimeout(timer);
-        }
-    }, [error]);
+    useEffect(() => { if (success) { const t = setTimeout(() => setSuccess(null), 5000); return () => clearTimeout(t); } }, [success]);
+    useEffect(() => { if (error) { const t = setTimeout(() => setError(null), 8000); return () => clearTimeout(t); } }, [error]);
 
-    const iniciarAcao = (id, tipo) => {
-        setConfirmAction({ id, tipo, loading: false });
-    };
+    const iniciarAcao = (id, tipo) => { setConfirmAction({ id, tipo, loading: false }); };
 
     const confirmarAcao = async () => {
         if (!confirmAction) return;
@@ -57,61 +38,73 @@ const ConsultasHoje = () => {
             setConsultasHoje(prev => prev.filter(c => c.idConsulta !== confirmAction.id));
         } catch (err) {
             setError(tratarErroBackend(err, `Erro ao ${confirmAction.tipo === 'finalizar' ? 'finalizar' : 'cancelar'} consulta.`));
-        } finally {
-            setConfirmAction(null);
-        }
+        } finally { setConfirmAction(null); }
     };
 
+    if (loading) {
+        return <div className="loading-shell"><Spinner animation="border" /></div>;
+    }
+
     return (
-        <Container className="mt-4">
-            <h2 className="text-center mb-4">Agendamentos de Hoje</h2>
+        <Container className="page-shell">
+            <div className="page-header">
+                <div>
+                    <span className="eyebrow">Hoje</span>
+                    <h1 className="section-title">Agendamentos do Dia</h1>
+                    <p className="section-subtitle">Acompanhe e gerencie as consultas agendadas para hoje.</p>
+                </div>
+                <Button variant="outline-secondary" className="rounded-pill" onClick={() => navigate('/consultas')}>Calendario</Button>
+            </div>
 
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
 
-            {loading ? (
-                <div className="text-center"><Spinner animation="border" /></div>
+            {consultasHoje.length === 0 ? (
+                <Alert variant="info">Nenhum agendamento para hoje.</Alert>
             ) : (
-                <Table striped bordered hover responsive>
-                    <thead>
-                        <tr>
-                            <th>Horário</th>
-                            <th>Paciente</th>
-                            <th>Dentista</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {consultasHoje.length > 0 ? consultasHoje.map(c => (
-                            <tr key={c.idConsulta}>
-                                <td>{new Date(c.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td>
-                                <td>{c.paciente.nome}</td>
-                                <td>{c.dentista.nome}</td>
-                                <td>
-                                    <div className="d-flex gap-2">
-                                        <Button variant="success" size="sm" onClick={() => iniciarAcao(c.idConsulta, 'finalizar')}>Finalizar</Button>
-                                        <Button variant="danger" size="sm" onClick={() => iniciarAcao(c.idConsulta, 'cancelar')}>Cancelar</Button>
+                <Row className="g-4">
+                    {consultasHoje.map(c => (
+                        <Col md={6} key={c.idConsulta}>
+                            <Card className="surface-card" style={{
+                                borderLeft: `4px solid ${c.status === 'AGENDADA' ? '#3b82f6' : '#10b981'}`
+                            }}>
+                                <Card.Body>
+                                    <div className="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h5 className="mb-1 fw-semibold">{c.paciente.nome}</h5>
+                                            <small className="text-muted">{c.dentista.nome}</small>
+                                        </div>
+                                        <Badge bg={c.status === 'AGENDADA' ? 'primary' : 'success'} pill>{c.status}</Badge>
                                     </div>
-                                </td>
-                            </tr>
-                        )) : (
-                            <tr>
-                                <td colSpan="4" className="text-center">Nenhum agendamento para hoje.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </Table>
+                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-muted">
+                                            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                                        </svg>
+                                        <span className="fw-medium">
+                                            {new Date(c.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    </div>
+                                    {c.status === 'AGENDADA' && (
+                                        <div className="d-flex gap-2">
+                                            <Button variant="outline-success" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'finalizar')}>
+                                                Finalizar
+                                            </Button>
+                                            <Button variant="outline-danger" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'cancelar')}>
+                                                Cancelar
+                                            </Button>
+                                        </div>
+                                    )}
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
             )}
-            <div className="mt-4 text-center">
-                <Button variant="secondary" onClick={() => navigate('/consultas')}>Voltar ao Calendário</Button>
-            </div>
 
             <ConfirmarExclusao
                 show={!!confirmAction}
                 titulo={confirmAction?.tipo === 'finalizar' ? 'Finalizar Consulta' : 'Cancelar Consulta'}
-                mensagem={confirmAction?.tipo === 'finalizar'
-                    ? 'Deseja finalizar esta consulta como concluída?'
-                    : 'Tem certeza que deseja cancelar esta consulta?'}
+                mensagem={confirmAction?.tipo === 'finalizar' ? 'Deseja finalizar esta consulta como concluida?' : 'Tem certeza que deseja cancelar esta consulta?'}
                 onConfirm={confirmarAcao}
                 onCancel={() => setConfirmAction(null)}
                 loading={confirmAction?.loading || false}
