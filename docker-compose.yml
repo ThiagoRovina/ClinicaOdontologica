@@ -9,6 +9,13 @@ services:
       - "5432:5432"
     volumes:
       - odontosys_db:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d odontosys"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   api:
     build:
@@ -22,7 +29,15 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/actuator/health 2>/dev/null || wget -qO- http://localhost:8080/api/pacientes 2>/dev/null | grep -q '\\[' && exit 0 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   web:
     build:
@@ -33,7 +48,9 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - api
+      api:
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   odontosys_db:
