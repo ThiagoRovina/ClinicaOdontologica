@@ -34,4 +34,13 @@ public class Paciente {
 
     @Column(name = "nu_cpf", unique = true, nullable = false)
     private String cpf;
+
+    @Column(name = "ds_anamnese", length = 2000)
+    private String anamnese;
+
+    @Column(name = "ds_alergias", length = 500)
+    private String alergias;
+
+    @Column(name = "fl_ativo", nullable = false, columnDefinition = "boolean default true")
+    private boolean ativo = true;
 }

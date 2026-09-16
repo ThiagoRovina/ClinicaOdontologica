@@ -43,8 +43,9 @@ public class ConsultaService {
     public List<ConsultaDTO> listarAgendadasParaHoje() {
         LocalDateTime inicioDoDia = LocalDate.now().atStartOfDay();
         LocalDateTime fimDoDia = LocalDate.now().atTime(23, 59, 59);
-        return consultaRepository.findByDataHoraBetweenAndStatus(inicioDoDia, fimDoDia, StatusConsulta.AGENDADA)
+        return consultaRepository.findByDataHoraBetweenOrderByDataHoraAsc(inicioDoDia, fimDoDia)
                 .stream()
+                .filter(c -> c.getStatus() != StatusConsulta.FINALIZADA && c.getStatus() != StatusConsulta.CANCELADA)
                 .map(consultaMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -84,6 +85,20 @@ public class ConsultaService {
         Consulta consulta = consultaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Consulta nao encontrada"));
         consulta.setStatus(StatusConsulta.FINALIZADA);
+        return consultaMapper.toDto(consultaRepository.save(consulta));
+    }
+
+    public ConsultaDTO confirmar(Integer id) {
+        Consulta consulta = consultaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Consulta nao encontrada"));
+        consulta.setStatus(StatusConsulta.CONFIRMADA);
+        return consultaMapper.toDto(consultaRepository.save(consulta));
+    }
+
+    public ConsultaDTO checkIn(Integer id) {
+        Consulta consulta = consultaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Consulta nao encontrada"));
+        consulta.setStatus(StatusConsulta.AGUARDANDO_ATENDIMENTO);
         return consultaMapper.toDto(consultaRepository.save(consulta));
     }
 }

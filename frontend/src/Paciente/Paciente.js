@@ -35,6 +35,7 @@ const Paciente = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [busca, setBusca] = useState('');
+    const [filtroAtivo, setFiltroAtivo] = useState('TODOS');
     const [excluirId, setExcluirId] = useState(null);
     const [excluindo, setExcluindo] = useState(false);
 
@@ -68,14 +69,14 @@ const Paciente = () => {
     };
 
     const pacientesFiltrados = useMemo(() => {
-        if (!busca.trim()) return pacientes;
-        const termo = busca.toLowerCase();
-        return pacientes.filter(p =>
-            p.nome?.toLowerCase().includes(termo) ||
-            p.cpf?.includes(termo) ||
-            p.email?.toLowerCase().includes(termo)
-        );
-    }, [pacientes, busca]);
+        return pacientes.filter(p => {
+            if (filtroAtivo === 'ATIVO' && p.ativo === false) return false;
+            if (filtroAtivo === 'INATIVO' && p.ativo !== false) return false;
+            if (!busca.trim()) return true;
+            const termo = busca.toLowerCase();
+            return p.nome?.toLowerCase().includes(termo) || p.cpf?.includes(termo) || p.email?.toLowerCase().includes(termo);
+        });
+    }, [pacientes, busca, filtroAtivo]);
 
     return (
         <Container className="page-shell">
@@ -96,6 +97,14 @@ const Paciente = () => {
                 searchValue={busca}
                 onSearchChange={setBusca}
                 searchPlaceholder="Buscar por nome, CPF ou email"
+                filterLabel="Status"
+                filterValue={filtroAtivo}
+                onFilterChange={setFiltroAtivo}
+                filterOptions={[
+                    { value: 'TODOS', label: 'Todos' },
+                    { value: 'ATIVO', label: 'Ativos' },
+                    { value: 'INATIVO', label: 'Inativos' },
+                ]}
             />
 
             {loading ? (
@@ -116,6 +125,7 @@ const Paciente = () => {
                                 <th>CPF</th>
                                 <th>Email</th>
                                 <th>Telefone</th>
+                                <th>Status</th>
                                 <th style={{ width: 260 }}>Acoes</th>
                             </tr>
                         </thead>
@@ -126,6 +136,14 @@ const Paciente = () => {
                                     <td className="text-muted">{paciente.cpf}</td>
                                     <td>{paciente.email}</td>
                                     <td>{paciente.telefone}</td>
+                                    <td>
+                                        <span className="status-badge" style={{
+                                            background: paciente.ativo !== false ? '#d1fae5' : '#fee2e2',
+                                            color: paciente.ativo !== false ? '#065f46' : '#991b1b'
+                                        }}>
+                                            {paciente.ativo !== false ? 'Ativo' : 'Inativo'}
+                                        </span>
+                                    </td>
                                     <td>
                                         <div className="d-flex gap-2 flex-wrap">
                                             <Button variant="outline-dark" size="sm" className="rounded-pill d-inline-flex align-items-center gap-1" onClick={() => navigate(`/pacientes/${paciente.idPaciente}/prontuario`)}>

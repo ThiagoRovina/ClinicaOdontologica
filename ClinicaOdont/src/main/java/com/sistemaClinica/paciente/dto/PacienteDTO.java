@@ -22,4 +22,8 @@ public class PacienteDTO {
     private String email;
     @NotBlank(message = "CPF e obrigatorio")
     private String cpf;
+
+    private String anamnese;
+    private String alergias;
+    private Boolean ativo = true;
 }

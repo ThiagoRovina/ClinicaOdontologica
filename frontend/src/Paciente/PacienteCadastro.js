@@ -34,7 +34,7 @@ const PacienteCadastro = () => {
     const navigate = useNavigate();
     const { id } = useParams();
 
-    const [paciente, setPaciente] = useState({ nome: '', dataNascimento: '', endereco: '', telefone: '', email: '', cpf: '' });
+    const [paciente, setPaciente] = useState({ nome: '', dataNascimento: '', endereco: '', telefone: '', email: '', cpf: '', anamnese: '', alergias: '', ativo: true });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -44,7 +44,7 @@ const PacienteCadastro = () => {
             setLoading(true);
             axios.get(`${API_BASE_URL}/pacientes/${id}`)
                 .then(response => {
-                    setPaciente({ ...response.data, cpf: formatarCpf(response.data.cpf || ''), telefone: response.data.telefone || '' });
+                    setPaciente({ ...response.data, cpf: formatarCpf(response.data.cpf || ''), telefone: response.data.telefone || '', anamnese: response.data.anamnese || '', alergias: response.data.alergias || '', ativo: response.data.ativo !== false });
                     setLoading(false);
                 })
                 .catch(() => { setError('Nao foi possivel carregar os dados do paciente.'); setLoading(false); });
@@ -56,10 +56,10 @@ const PacienteCadastro = () => {
     }, [success]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setPaciente(prev => ({
             ...prev,
-            [name]: name === 'cpf' ? formatarCpf(value) : name === 'telefone' ? aplicarMascaraTelefone(value) : value
+            [name]: type === 'checkbox' ? checked : name === 'cpf' ? formatarCpf(value) : name === 'telefone' ? aplicarMascaraTelefone(value) : value
         }));
     };
 
@@ -125,6 +125,25 @@ const PacienteCadastro = () => {
                             <div className="col-12">
                                 <Form.Label className="fw-medium small">Endereco</Form.Label>
                                 <Form.Control type="text" name="endereco" value={paciente.endereco} onChange={handleChange} className="toolbar-input" />
+                            </div>
+                            <div className="col-md-6">
+                                <Form.Label className="fw-medium small">Alergias</Form.Label>
+                                <Form.Control type="text" name="alergias" value={paciente.alergias} onChange={handleChange} placeholder="Ex: Penicilina, Latex..." className="toolbar-input" />
+                            </div>
+                            <div className="col-md-6 d-flex align-items-end">
+                                <Form.Check
+                                    type="switch"
+                                    id="paciente-ativo"
+                                    name="ativo"
+                                    label="Paciente ativo"
+                                    checked={paciente.ativo}
+                                    onChange={handleChange}
+                                    className="fw-medium"
+                                />
+                            </div>
+                            <div className="col-12">
+                                <Form.Label className="fw-medium small">Anamnese (historico medico)</Form.Label>
+                                <Form.Control as="textarea" rows={4} name="anamnese" value={paciente.anamnese} onChange={handleChange} placeholder="Historico medico, doencas preexistentes, medicamentos em uso..." className="toolbar-input" />
                             </div>
                         </div>
 

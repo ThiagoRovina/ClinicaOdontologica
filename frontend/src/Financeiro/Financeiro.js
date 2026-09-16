@@ -34,6 +34,7 @@ function Financeiro() {
     const [form, setForm] = useState(emptyForm);
     const [excluirId, setExcluirId] = useState(null);
     const [excluindo, setExcluindo] = useState(false);
+    const [baixandoRecibo, setBaixandoRecibo] = useState(null);
     const [filtroStatus, setFiltroStatus] = useState('TODOS');
     const [filtroTipo, setFiltroTipo] = useState('TODOS');
 
@@ -76,6 +77,25 @@ function Financeiro() {
             resetForm(); await fetchLancamentos();
         } catch (err) { setError(tratarErroBackend(err, 'Erro ao salvar lancamento.')); }
         finally { setSaving(false); }
+    };
+
+    const baixarRecibo = async (idLancamento) => {
+        setBaixandoRecibo(idLancamento);
+        try {
+            const response = await axios.get(`${API_BASE_URL}/financeiro/lancamentos/${idLancamento}/recibo`, { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `recibo-${idLancamento}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch {
+            setError('Nao foi possivel gerar o recibo.');
+        } finally {
+            setBaixandoRecibo(null);
+        }
     };
 
     const confirmarExclusao = async () => {
@@ -253,8 +273,13 @@ function Financeiro() {
                                                     <td className="fw-medium">{formatarMoeda(l.valor)}</td>
                                                     <td><StatusBadge status={l.status} /></td>
                                                     <td>
-                                                        <div className="d-flex gap-2">
+                                                        <div className="d-flex gap-2 flex-wrap">
                                                             <Button size="sm" variant="outline-primary" className="rounded-pill" onClick={() => startEdit(l)}>Editar</Button>
+                                                            {l.tipo === 'RECEITA' && (
+                                                                <Button size="sm" variant="outline-secondary" className="rounded-pill" disabled={baixandoRecibo === l.idLancamento} onClick={() => baixarRecibo(l.idLancamento)}>
+                                                                    {baixandoRecibo === l.idLancamento ? '...' : 'Recibo'}
+                                                                </Button>
+                                                            )}
                                                             <Button size="sm" variant="outline-danger" className="rounded-pill" onClick={() => setExcluirId(l.idLancamento)}>Excluir</Button>
                                                         </div>
                                                     </td>

@@ -28,16 +28,24 @@ const ConsultasHoje = () => {
         if (!confirmAction) return;
         setConfirmAction(prev => ({ ...prev, loading: true }));
         try {
-            if (confirmAction.tipo === 'finalizar') {
-                await axios.patch(`${API_BASE_URL}/consultas/${confirmAction.id}/finalizar`);
-                setSuccess('Consulta finalizada com sucesso.');
-            } else {
-                await axios.patch(`${API_BASE_URL}/consultas/${confirmAction.id}/cancelar`);
-                setSuccess('Consulta cancelada com sucesso.');
-            }
-            setConsultasHoje(prev => prev.filter(c => c.idConsulta !== confirmAction.id));
+            const endpointMap = {
+                finalizar: `/consultas/${confirmAction.id}/finalizar`,
+                cancelar: `/consultas/${confirmAction.id}/cancelar`,
+                confirmar: `/consultas/${confirmAction.id}/confirmar`,
+                checkin: `/consultas/${confirmAction.id}/check-in`,
+            };
+            const msgMap = {
+                finalizar: 'Consulta finalizada com sucesso.',
+                cancelar: 'Consulta cancelada com sucesso.',
+                confirmar: 'Consulta confirmada com sucesso.',
+                checkin: 'Paciente aguardando atendimento.',
+            };
+            await axios.patch(`${API_BASE_URL}${endpointMap[confirmAction.tipo]}`);
+            setSuccess(msgMap[confirmAction.tipo]);
+            const response = await axios.get(`${API_BASE_URL}/consultas/hoje`);
+            setConsultasHoje(response.data);
         } catch (err) {
-            setError(tratarErroBackend(err, `Erro ao ${confirmAction.tipo === 'finalizar' ? 'finalizar' : 'cancelar'} consulta.`));
+            setError(tratarErroBackend(err, 'Erro ao atualizar consulta.'));
         } finally { setConfirmAction(null); }
     };
 
@@ -66,7 +74,12 @@ const ConsultasHoje = () => {
                     {consultasHoje.map(c => (
                         <Col md={6} key={c.idConsulta}>
                             <Card className="surface-card" style={{
-                                borderLeft: `4px solid ${c.status === 'AGENDADA' ? '#3b82f6' : '#10b981'}`
+                                borderLeft: `4px solid ${
+                                    c.status === 'AGENDADA' ? '#3b82f6'
+                                    : c.status === 'CONFIRMADA' ? '#8b5cf6'
+                                    : c.status === 'AGUARDANDO_ATENDIMENTO' ? '#f59e0b'
+                                    : '#10b981'
+                                }`
                             }}>
                                 <Card.Body>
                                     <div className="d-flex justify-content-between align-items-start mb-2">
@@ -74,7 +87,14 @@ const ConsultasHoje = () => {
                                             <h5 className="mb-1 fw-semibold">{c.paciente.nome}</h5>
                                             <small className="text-muted">{c.dentista.nome}</small>
                                         </div>
-                                        <Badge bg={c.status === 'AGENDADA' ? 'primary' : 'success'} pill>{c.status}</Badge>
+                                        <Badge bg={
+                                            c.status === 'AGENDADA' ? 'primary'
+                                            : c.status === 'CONFIRMADA' ? 'secondary'
+                                            : c.status === 'AGUARDANDO_ATENDIMENTO' ? 'warning'
+                                            : 'success'
+                                        } pill>
+                                            {c.status === 'AGUARDANDO_ATENDIMENTO' ? 'AGUARDANDO' : c.status}
+                                        </Badge>
                                     </div>
                                     <div className="d-flex align-items-center gap-2 mb-3">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-muted">
@@ -85,7 +105,27 @@ const ConsultasHoje = () => {
                                         </span>
                                     </div>
                                     {c.status === 'AGENDADA' && (
-                                        <div className="d-flex gap-2">
+                                        <div className="d-flex gap-2 flex-wrap">
+                                            <Button variant="outline-secondary" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'confirmar')}>
+                                                Confirmar
+                                            </Button>
+                                            <Button variant="outline-danger" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'cancelar')}>
+                                                Cancelar
+                                            </Button>
+                                        </div>
+                                    )}
+                                    {c.status === 'CONFIRMADA' && (
+                                        <div className="d-flex gap-2 flex-wrap">
+                                            <Button variant="outline-warning" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'checkin')}>
+                                                Check-in
+                                            </Button>
+                                            <Button variant="outline-danger" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'cancelar')}>
+                                                Cancelar
+                                            </Button>
+                                        </div>
+                                    )}
+                                    {c.status === 'AGUARDANDO_ATENDIMENTO' && (
+                                        <div className="d-flex gap-2 flex-wrap">
                                             <Button variant="outline-success" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'finalizar')}>
                                                 Finalizar
                                             </Button>
@@ -103,8 +143,18 @@ const ConsultasHoje = () => {
 
             <ConfirmarExclusao
                 show={!!confirmAction}
-                titulo={confirmAction?.tipo === 'finalizar' ? 'Finalizar Consulta' : 'Cancelar Consulta'}
-                mensagem={confirmAction?.tipo === 'finalizar' ? 'Deseja finalizar esta consulta como concluida?' : 'Tem certeza que deseja cancelar esta consulta?'}
+                titulo={
+                    confirmAction?.tipo === 'finalizar' ? 'Finalizar Consulta'
+                    : confirmAction?.tipo === 'confirmar' ? 'Confirmar Consulta'
+                    : confirmAction?.tipo === 'checkin' ? 'Check-in do Paciente'
+                    : 'Cancelar Consulta'
+                }
+                mensagem={
+                    confirmAction?.tipo === 'finalizar' ? 'Deseja finalizar esta consulta como concluida?'
+                    : confirmAction?.tipo === 'confirmar' ? 'Confirmar presenca do paciente para esta consulta?'
+                    : confirmAction?.tipo === 'checkin' ? 'Registrar chegada do paciente (Aguardando Atendimento)?'
+                    : 'Tem certeza que deseja cancelar esta consulta?'
+                }
                 onConfirm={confirmarAcao}
                 onCancel={() => setConfirmAction(null)}
                 loading={confirmAction?.loading || false}

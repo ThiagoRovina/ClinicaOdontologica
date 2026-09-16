@@ -19,6 +19,17 @@ const Consultas = () => {
             .catch(() => setLoading(false));
     }, []);
 
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'AGENDADA': return { bg: '#dbeafe', color: '#1e40af' };
+            case 'CONFIRMADA': return { bg: '#ede9fe', color: '#5b21b6' };
+            case 'AGUARDANDO_ATENDIMENTO': return { bg: '#fef3c7', color: '#92400e' };
+            case 'FINALIZADA': return { bg: '#d1fae5', color: '#065f46' };
+            case 'CANCELADA': return { bg: '#fee2e2', color: '#991b1b' };
+            default: return { bg: '#f1f5f9', color: '#475569' };
+        }
+    };
+
     const getTileClassName = ({ date, view }) => {
         if (view === 'month') {
             const diaString = date.toISOString().split('T')[0];
@@ -28,7 +39,7 @@ const Consultas = () => {
             if (temCancelada) return 'dia-cancelada';
             const temFinalizada = consultasNoDia.some(c => c.status === 'FINALIZADA');
             if (temFinalizada) return 'dia-finalizada';
-            const temAgendada = consultasNoDia.some(c => c.status === 'AGENDADA');
+            const temAgendada = consultasNoDia.some(c => ['AGENDADA', 'CONFIRMADA', 'AGUARDANDO_ATENDIMENTO'].includes(c.status));
             if (temAgendada) return 'dia-agendada';
         }
         return null;
@@ -62,8 +73,10 @@ const Consultas = () => {
                             />
                         </Card.Body>
                         <Card.Footer className="bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <div className="d-flex gap-3">
+                            <div className="d-flex gap-3 flex-wrap">
                                 <div className="d-flex align-items-center"><span className="legend-dot legend-dot--agendada"></span>Agendada</div>
+                                <div className="d-flex align-items-center"><span className="legend-dot" style={{background:'#8b5cf6',borderRadius:'50%',width:10,height:10,display:'inline-block',marginRight:6}}></span>Confirmada</div>
+                                <div className="d-flex align-items-center"><span className="legend-dot" style={{background:'#f59e0b',borderRadius:'50%',width:10,height:10,display:'inline-block',marginRight:6}}></span>Aguardando</div>
                                 <div className="d-flex align-items-center"><span className="legend-dot legend-dot--finalizada"></span>Finalizada</div>
                                 <div className="d-flex align-items-center"><span className="legend-dot legend-dot--cancelada"></span>Cancelada</div>
                             </div>
@@ -88,14 +101,17 @@ const Consultas = () => {
                                             borderRadius: 14,
                                             padding: '0.85rem 1rem',
                                             background: '#fff',
-                                            borderLeft: `3px solid ${c.status === 'AGENDADA' ? '#3b82f6' : c.status === 'FINALIZADA' ? '#10b981' : '#ef4444'}`
+                                            borderLeft: `3px solid ${
+                                                c.status === 'AGENDADA' ? '#3b82f6'
+                                                : c.status === 'CONFIRMADA' ? '#8b5cf6'
+                                                : c.status === 'AGUARDANDO_ATENDIMENTO' ? '#f59e0b'
+                                                : c.status === 'FINALIZADA' ? '#10b981'
+                                                : '#ef4444'
+                                            }`
                                         }}>
                                             <div className="d-flex justify-content-between align-items-center mb-1">
                                                 <span className="fw-semibold">{c.paciente.nome}</span>
-                                                <span className="status-badge" style={{
-                                                    background: c.status === 'AGENDADA' ? '#dbeafe' : c.status === 'FINALIZADA' ? '#d1fae5' : '#fee2e2',
-                                                    color: c.status === 'AGENDADA' ? '#1e40af' : c.status === 'FINALIZADA' ? '#065f46' : '#991b1b'
-                                                }}>
+                                                <span className="status-badge" style={getStatusColor(c.status)}>
                                                     {c.status}
                                                 </span>
                                             </div>

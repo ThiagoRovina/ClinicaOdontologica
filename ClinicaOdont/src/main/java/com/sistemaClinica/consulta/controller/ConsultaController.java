@@ -59,4 +59,14 @@ public class ConsultaController {
     public ResponseEntity<ConsultaDTO> finalizarConsulta(@PathVariable Integer id) {
         return ResponseEntity.ok(consultaService.finalizar(id));
     }
+
+    @PatchMapping("/{id}/confirmar")
+    public ResponseEntity<ConsultaDTO> confirmarConsulta(@PathVariable Integer id) {
+        return ResponseEntity.ok(consultaService.confirmar(id));
+    }
+
+    @PatchMapping("/{id}/check-in")
+    public ResponseEntity<ConsultaDTO> checkInConsulta(@PathVariable Integer id) {
+        return ResponseEntity.ok(consultaService.checkIn(id));
+    }
 }
