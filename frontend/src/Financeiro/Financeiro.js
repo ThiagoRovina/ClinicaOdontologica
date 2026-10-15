@@ -37,6 +37,7 @@ function Financeiro() {
     const [baixandoRecibo, setBaixandoRecibo] = useState(null);
     const [filtroStatus, setFiltroStatus] = useState('TODOS');
     const [filtroTipo, setFiltroTipo] = useState('TODOS');
+    const [busca, setBusca] = useState('');
 
     const isEdit = useMemo(() => !!form.idLancamento, [form.idLancamento]);
 
@@ -106,12 +107,14 @@ function Financeiro() {
     };
 
     const lancamentosFiltrados = useMemo(() => {
+        const termo = busca.trim().toLowerCase();
         return lancamentos.filter(l => {
             if (filtroStatus !== 'TODOS' && l.status !== filtroStatus) return false;
             if (filtroTipo !== 'TODOS' && l.tipo !== filtroTipo) return false;
+            if (termo && !l.descricao?.toLowerCase().includes(termo)) return false;
             return true;
         });
-    }, [lancamentos, filtroStatus, filtroTipo]);
+    }, [lancamentos, filtroStatus, filtroTipo, busca]);
 
     const totais = useMemo(() => {
         return lancamentosFiltrados.reduce((acc, l) => {
@@ -165,8 +168,8 @@ function Financeiro() {
             {success && <Alert variant="success">{success}</Alert>}
 
             <ListToolbar
-                searchValue=""
-                onSearchChange={() => {}}
+                searchValue={busca}
+                onSearchChange={setBusca}
                 searchPlaceholder="Filtrar lancamentos"
                 filterLabel="Status"
                 filterValue={filtroStatus}
@@ -267,7 +270,7 @@ function Financeiro() {
                                                 <tr><td colSpan="6" className="text-center text-muted">Nenhum lancamento cadastrado.</td></tr>
                                             ) : lancamentosFiltrados.map(l => (
                                                 <tr key={l.idLancamento}>
-                                                    <td>{l.data}</td>
+                                                    <td>{l.data ? new Date(`${l.data}T00:00:00`).toLocaleDateString('pt-BR') : '-'}</td>
                                                     <td><span className={`status-badge`} style={{ background: l.tipo === 'RECEITA' ? '#d1fae5' : '#fee2e2', color: l.tipo === 'RECEITA' ? '#065f46' : '#991b1b' }}>{l.tipo}</span></td>
                                                     <td>{l.descricao}</td>
                                                     <td className="fw-medium">{formatarMoeda(l.valor)}</td>

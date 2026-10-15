@@ -4,9 +4,12 @@ import com.sistemaClinica.paciente.dto.PacienteDTO;
 import com.sistemaClinica.paciente.mapper.PacienteMapper;
 import com.sistemaClinica.paciente.model.Paciente;
 import com.sistemaClinica.paciente.repository.PacienteRepository;
+import com.sistemaClinica.paciente.util.CpfUtils;
 import com.sistemaClinica.shared.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +36,11 @@ public class PacienteService {
     }
 
     public PacienteDTO salvar(PacienteDTO pacienteDTO) {
+        String cpfNorm = CpfUtils.manterApenasDigitos(pacienteDTO.getCpf());
+        if (!CpfUtils.isCpfValido(cpfNorm)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF invalido");
+        }
+        pacienteDTO.setCpf(cpfNorm);
         Paciente paciente = pacienteMapper.toEntity(pacienteDTO);
         return pacienteMapper.toDto(pacienteRepository.save(paciente));
     }

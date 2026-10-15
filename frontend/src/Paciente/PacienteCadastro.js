@@ -71,11 +71,12 @@ const PacienteCadastro = () => {
 
         setLoading(true);
         try {
-            if (paciente.idPaciente) {
-                await axios.put(`${API_BASE_URL}/pacientes/${paciente.idPaciente}`, paciente);
+            const payload = { ...paciente, cpf: somenteDigitos(paciente.cpf) };
+            if (id) {
+                await axios.put(`${API_BASE_URL}/pacientes/${id}`, payload);
                 setSuccess('Paciente atualizado com sucesso!');
             } else {
-                await axios.post(`${API_BASE_URL}/pacientes`, paciente);
+                await axios.post(`${API_BASE_URL}/pacientes`, payload);
                 setSuccess('Paciente cadastrado com sucesso!');
             }
             setTimeout(() => navigate('/pacientes'), 1500);

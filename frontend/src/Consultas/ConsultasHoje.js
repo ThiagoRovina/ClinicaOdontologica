@@ -44,9 +44,11 @@ const ConsultasHoje = () => {
             setSuccess(msgMap[confirmAction.tipo]);
             const response = await axios.get(`${API_BASE_URL}/consultas/hoje`);
             setConsultasHoje(response.data);
+            setConfirmAction(null);
         } catch (err) {
             setError(tratarErroBackend(err, 'Erro ao atualizar consulta.'));
-        } finally { setConfirmAction(null); }
+            setConfirmAction(prev => ({ ...prev, loading: false }));
+        }
     };
 
     if (loading) {

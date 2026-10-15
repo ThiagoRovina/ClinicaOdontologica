@@ -30,23 +30,30 @@ const Consultas = () => {
         }
     };
 
+    const toLocalDateString = (date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    };
+
     const getTileClassName = ({ date, view }) => {
         if (view === 'month') {
-            const diaString = date.toISOString().split('T')[0];
+            const diaString = toLocalDateString(date);
             const consultasNoDia = consultas.filter(c => c.dataHora.startsWith(diaString));
             if (consultasNoDia.length === 0) return null;
-            const temCancelada = consultasNoDia.some(c => c.status === 'CANCELADA');
-            if (temCancelada) return 'dia-cancelada';
-            const temFinalizada = consultasNoDia.some(c => c.status === 'FINALIZADA');
-            if (temFinalizada) return 'dia-finalizada';
             const temAgendada = consultasNoDia.some(c => ['AGENDADA', 'CONFIRMADA', 'AGUARDANDO_ATENDIMENTO'].includes(c.status));
             if (temAgendada) return 'dia-agendada';
+            const temFinalizada = consultasNoDia.some(c => c.status === 'FINALIZADA');
+            if (temFinalizada) return 'dia-finalizada';
+            const temCancelada = consultasNoDia.some(c => c.status === 'CANCELADA');
+            if (temCancelada) return 'dia-cancelada';
         }
         return null;
     };
 
     const consultasDoDia = selectedDate
-        ? consultas.filter(c => c.dataHora.startsWith(selectedDate.toISOString().split('T')[0]))
+        ? consultas.filter(c => c.dataHora.startsWith(toLocalDateString(selectedDate)))
         : [];
 
     if (loading) {

@@ -4,6 +4,7 @@ import { Alert, Button, Container, Spinner, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
 import { ConfirmarExclusao, tratarErroBackend } from '../ultilitarios/ultilitarios';
+import { useAuth } from '../auth/AuthContext';
 import PageHeader from '../components/PageHeader';
 import ListToolbar from '../components/ListToolbar';
 
@@ -31,6 +32,8 @@ const IconPlus = () => (
 
 const Paciente = () => {
     const navigate = useNavigate();
+    const { hasRole } = useAuth();
+    const canViewProntuario = hasRole('ROLE_DENTISTA') || hasRole('ROLE_GERENTE');
     const [pacientes, setPacientes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -146,9 +149,11 @@ const Paciente = () => {
                                     </td>
                                     <td>
                                         <div className="d-flex gap-2 flex-wrap">
-                                            <Button variant="outline-dark" size="sm" className="rounded-pill d-inline-flex align-items-center gap-1" onClick={() => navigate(`/pacientes/${paciente.idPaciente}/prontuario`)}>
-                                                <IconProntuario /> Prontuario
-                                            </Button>
+                                            {canViewProntuario && (
+                                                <Button variant="outline-dark" size="sm" className="rounded-pill d-inline-flex align-items-center gap-1" onClick={() => navigate(`/pacientes/${paciente.idPaciente}/prontuario`)}>
+                                                    <IconProntuario /> Prontuario
+                                                </Button>
+                                            )}
                                             <Button variant="outline-primary" size="sm" className="rounded-pill d-inline-flex align-items-center gap-1" onClick={() => navigate(`/pacientes/editar/${paciente.idPaciente}`)}>
                                                 <IconEdit /> Editar
                                             </Button>

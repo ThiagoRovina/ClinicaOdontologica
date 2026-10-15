@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         try {
             await axios.post(AUTH_LOGOUT_URL, {}, { withCredentials: true });
-        } catch (_) { }
+        } catch (err) { console.warn('Logout falhou no servidor; sessao local encerrada.', err); }
         setUser(null);
         window.location.assign('/telaLogin');
     };

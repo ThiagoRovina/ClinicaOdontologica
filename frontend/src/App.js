@@ -25,7 +25,7 @@ axios.defaults.withCredentials = true;
 // Wrapper que oculta a NavBar na tela de login
 function Layout({ children }) {
     const location = useLocation();
-    const hideNavbar = location.pathname === '/telaLogin';
+    const hideNavbar = location.pathname.startsWith('/telaLogin');
     return (
         <>
             {!hideNavbar && <NavBar />}

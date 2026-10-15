@@ -150,7 +150,7 @@ const AgendamentoFront = () => {
         if (!excluirConsultaId) return;
         setExcluindoConsulta(true);
         try {
-            await axios.delete(`${API_BASE_URL}/consultas/${excluirConsultaId}`);
+            await axios.patch(`${API_BASE_URL}/consultas/${excluirConsultaId}/cancelar`);
             setSuccess('Consulta cancelada.');
             fetchConsultas();
             fetchListaEspera();
@@ -279,7 +279,7 @@ const AgendamentoFront = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {consultas.map(c => (
+                                            {consultas.filter(c => !['CANCELADA', 'FINALIZADA'].includes(c.status)).map(c => (
                                                 <tr key={c.idConsulta}>
                                                     <td className="fw-medium">{c.paciente.nome}</td>
                                                     <td>{c.dentista.nome}</td>

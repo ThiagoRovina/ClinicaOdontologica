@@ -249,12 +249,12 @@ function DashboardCard({ to, icon, title, description, color }) {
 }
 
 function statusCor(status) {
-    const map = { AGENDADA: 'info', FINALIZADA: 'success', CANCELADA: 'danger' };
+    const map = { AGENDADA: 'info', CONFIRMADA: 'primary', AGUARDANDO_ATENDIMENTO: 'warning', FINALIZADA: 'success', CANCELADA: 'danger' };
     return map[status] || 'secondary';
 }
 
 function statusLabel(status) {
-    const map = { AGENDADA: 'Agendada', FINALIZADA: 'Finalizada', CANCELADA: 'Cancelada' };
+    const map = { AGENDADA: 'Agendada', CONFIRMADA: 'Confirmada', AGUARDANDO_ATENDIMENTO: 'Aguardando', FINALIZADA: 'Finalizada', CANCELADA: 'Cancelada' };
     return map[status] || status;
 }
 

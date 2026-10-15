@@ -105,9 +105,9 @@ function ProntuarioPaciente() {
         try {
             await axios.post(`${API_BASE_URL}/prontuarios`, {
                 titulo: form.titulo,
-                idPaciente: id,
-                idDentista: form.idDentista || null,
-                idProcedimento: form.idProcedimento || null,
+                pacienteId: parseInt(id),
+                dentistaId: form.idDentista ? parseInt(form.idDentista) : null,
+                procedimentoId: form.idProcedimento ? parseInt(form.idProcedimento) : null,
                 dataRealizacao: form.dataRealizacao,
                 observacoes: form.observacoes
             });
@@ -129,12 +129,11 @@ function ProntuarioPaciente() {
             const faces = { ...novo[dente] };
             faces[face] = { tipo, observacao: '' };
             novo[dente] = faces;
+            // Salva automaticamente no backend com o valor correto
+            axios.put(`${API_BASE_URL}/denticao/paciente/${id}`, { denticao: novo }, { withCredentials: true })
+                .catch(() => {}); // falhar silenciosamente se o endpoint não existir
             return novo;
         });
-
-        // Salva automaticamente no backend silenciosamente
-        axios.put(`${API_BASE_URL}/denticao/paciente/${id}`, { denticao: null }, { withCredentials: true })
-            .catch(() => {}); // falhar silenciosamente se o endpoint não existir
     }, [id]);
 
     const handleConfirmarExclusao = async () => {
@@ -327,7 +326,7 @@ function ProntuarioPaciente() {
                                                     <tr key={p.idProntuario}>
                                                         <td>{p.dataRealizacao}</td>
                                                         <td>{p.titulo}</td>
-                                                        <td>{p.dentista?.nome || '-'}</td>
+                                                        <td>{p.dentistaNome || '-'}</td>
                                                         <td>{p.procedimento?.nome || '-'}</td>
                                                         <td>
                                                             <Button size="sm" variant="outline-danger" onClick={() => setExcluirId(p.idProntuario)}>Excluir</Button>
