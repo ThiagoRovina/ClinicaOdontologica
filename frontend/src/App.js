@@ -17,6 +17,7 @@ import Dashboard from "./Dashboard/Dashboard";
 import Procedimentos from "./Procedimento/Procedimentos";
 import Financeiro from "./Financeiro/Financeiro";
 import ProntuarioPaciente from "./Prontuario/ProntuarioPaciente";
+import Relatorios from "./Relatorios/Relatorios";
 import ProtectedRoute from "./auth/ProtectedRoute";
 
 axios.defaults.withCredentials = true;
@@ -121,6 +122,11 @@ function App() {
                         <Route path="/financeiro" element={
                             <ProtectedRoute requiredRoles={['ROLE_GERENTE', 'ROLE_RECEPCIONISTA']}>
                                 <Financeiro />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/relatorios" element={
+                            <ProtectedRoute requiredRoles={['ROLE_GERENTE']}>
+                                <Relatorios />
                             </ProtectedRoute>
                         } />
                     </Routes>

@@ -91,6 +91,13 @@ function NavBar() {
                                     </Nav.Link>
                                 )}
 
+                                {isGerente && (
+                                    <Nav.Link as={Link} to="/relatorios" className="nav-link-with-icon">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 17v-6M12 17v-3M15 17v-9M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                        Relatórios
+                                    </Nav.Link>
+                                )}
+
                                 <NavDropdown
                                     title={
                                         <span className="user-dropdown">

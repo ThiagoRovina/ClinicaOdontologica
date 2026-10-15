@@ -38,6 +38,11 @@ public class FinanceiroService {
         return lancamentos.stream().map(this::toDto).collect(Collectors.toList());
     }
 
+    public List<LancamentoFinanceiroDTO> listarPorPaciente(Integer pacienteId) {
+        return lancamentoRepository.findByPacienteIdPacienteOrderByDataDesc(pacienteId)
+                .stream().map(this::toDto).collect(Collectors.toList());
+    }
+
     public LancamentoFinanceiroDTO buscarPorId(String id) {
         return lancamentoRepository.findById(id).map(this::toDto).orElse(null);
     }

@@ -5,7 +5,10 @@ CREATE TABLE PACIENTES (
     ds_endereco VARCHAR(255),
     nu_telefone VARCHAR(255) NOT NULL,
     ds_email VARCHAR(255) UNIQUE,
-    nu_cpf VARCHAR(255) UNIQUE NOT NULL
+    nu_cpf VARCHAR(255) UNIQUE NOT NULL,
+    ds_anamnese VARCHAR(2000),
+    ds_alergias VARCHAR(500),
+    fl_ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE DENTISTAS (
@@ -55,9 +58,26 @@ CREATE TABLE FUNCIONARIOS (
 CREATE TABLE PRONTUARIOS (
     id_prontuario INTEGER PRIMARY KEY,
     id_paciente INTEGER NOT NULL,
-    id_procedimento INTEGER NOT NULL,
+    nm_titulo VARCHAR(255),
+    id_dentista INTEGER,
+    id_procedimento INTEGER,
     dt_realizacao DATE NOT NULL,
     ds_observacoes VARCHAR(1000),
     FOREIGN KEY (id_paciente) REFERENCES PACIENTES(id_paciente),
+    FOREIGN KEY (id_dentista) REFERENCES DENTISTAS(id_dentista),
     FOREIGN KEY (id_procedimento) REFERENCES PROCEDIMENTOS(id_procedimento)
+);
+
+CREATE TABLE LANCAMENTOS_FINANCEIROS (
+    id_lancamento VARCHAR(36) PRIMARY KEY,
+    tp_lancamento VARCHAR(50) NOT NULL,
+    ds_descricao VARCHAR(500) NOT NULL,
+    vl_valor DECIMAL(19,2) NOT NULL,
+    dt_lancamento DATE NOT NULL,
+    ds_status VARCHAR(50) NOT NULL,
+    id_paciente INTEGER,
+    id_consulta INTEGER,
+    ds_observacoes VARCHAR(2000),
+    FOREIGN KEY (id_paciente) REFERENCES PACIENTES(id_paciente),
+    FOREIGN KEY (id_consulta) REFERENCES CONSULTAS(id_consulta)
 );

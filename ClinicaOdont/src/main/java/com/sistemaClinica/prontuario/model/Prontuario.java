@@ -1,5 +1,6 @@
 package com.sistemaClinica.prontuario.model;
 
+import com.sistemaClinica.dentista.model.Dentista;
 import com.sistemaClinica.paciente.model.Paciente;
 import com.sistemaClinica.procedimento.model.Procedimento;
 import jakarta.persistence.*;
@@ -23,8 +24,15 @@ public class Prontuario {
     @JoinColumn(name = "id_paciente", nullable = false)
     private Paciente paciente;
 
+    @Column(name = "nm_titulo", length = 255)
+    private String titulo;
+
     @ManyToOne
-    @JoinColumn(name = "id_procedimento", nullable = false)
+    @JoinColumn(name = "id_dentista")
+    private Dentista dentista;
+
+    @ManyToOne
+    @JoinColumn(name = "id_procedimento")
     private Procedimento procedimento;
 
     @Column(name = "dt_realizacao", nullable = false)

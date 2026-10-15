@@ -50,6 +50,13 @@ public class ConsultaService {
                 .collect(Collectors.toList());
     }
 
+    public List<ConsultaDTO> listarPorPaciente(Integer pacienteId) {
+        return consultaRepository.findByPacienteIdPacienteOrderByDataHoraDesc(pacienteId)
+                .stream()
+                .map(consultaMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     public ConsultaDTO salvar(ConsultaDTO consultaDTO) {
         if (consultaDTO.getDentista() == null || consultaDTO.getDentista().getIdDentista() == null) {
             throw new IllegalArgumentException("Dentista e obrigatorio");

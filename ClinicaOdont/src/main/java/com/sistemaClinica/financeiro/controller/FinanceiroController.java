@@ -32,6 +32,11 @@ public class FinanceiroController {
         return financeiroService.listar(from, to);
     }
 
+    @GetMapping("/paciente/{pacienteId}")
+    public List<LancamentoFinanceiroDTO> listarPorPaciente(@PathVariable Integer pacienteId) {
+        return financeiroService.listarPorPaciente(pacienteId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<LancamentoFinanceiroDTO> buscarPorId(@PathVariable String id) {
         LancamentoFinanceiroDTO dto = financeiroService.buscarPorId(id);

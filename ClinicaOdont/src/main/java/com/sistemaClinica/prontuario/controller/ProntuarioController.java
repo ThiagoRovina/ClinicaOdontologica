@@ -3,6 +3,7 @@ package com.sistemaClinica.prontuario.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,5 +40,11 @@ public class ProntuarioController {
     @PostMapping
     public ResponseEntity<ProntuarioDTO> criar(@Valid @RequestBody ProntuarioDTO prontuarioDTO) {
         return ResponseEntity.ok(prontuarioService.salvar(prontuarioDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        prontuarioService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }

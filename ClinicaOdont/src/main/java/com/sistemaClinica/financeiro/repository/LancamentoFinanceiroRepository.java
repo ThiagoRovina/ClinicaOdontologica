@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface LancamentoFinanceiroRepository extends JpaRepository<LancamentoFinanceiro, String> {
     List<LancamentoFinanceiro> findByDataBetweenOrderByDataDesc(LocalDate from, LocalDate to);
+    List<LancamentoFinanceiro> findByPacienteIdPacienteOrderByDataDesc(Integer pacienteId);
 }

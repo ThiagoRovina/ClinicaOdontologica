@@ -28,6 +28,11 @@ public class ConsultaController {
         return consultaService.listarTodas();
     }
 
+    @GetMapping("/paciente/{pacienteId}")
+    public List<ConsultaDTO> listarPorPaciente(@PathVariable Integer pacienteId) {
+        return consultaService.listarPorPaciente(pacienteId);
+    }
+
     @GetMapping("/hoje")
     public List<ConsultaDTO> listarAgendadasParaHoje() {
         return consultaService.listarAgendadasParaHoje();

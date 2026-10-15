@@ -29,6 +29,9 @@ function ProntuarioPaciente() {
     const [procedimentoSelecionado, setProcedimentoSelecionado] = useState('CARIE');
     const [salvandoDente, setSalvandoDente] = useState(false);
 
+    const [consultas, setConsultas] = useState([]);
+    const [lancamentos, setLancamentos] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
@@ -42,13 +45,15 @@ function ProntuarioPaciente() {
     const fetchAll = useCallback(async () => {
         try {
             setLoading(true);
-            const [pacienteRes, prontRes, dentRes, procRes, denticaoRes] = await Promise.allSettled([
+            const [pacienteRes, prontRes, dentRes, procRes, denticaoRes, consultasRes, lancamentosRes] = await Promise.allSettled([
                 axios.get(`${API_BASE_URL}/pacientes/${id}`),
                 axios.get(`${API_BASE_URL}/prontuarios/paciente/${id}`),
                 axios.get(`${API_BASE_URL}/dentistas`),
                 axios.get(`${API_BASE_URL}/procedimentos`),
                 // Tenta carregar a dentiçao (endpoint pode não existir ainda)
-                axios.get(`${API_BASE_URL}/denticao/paciente/${id}`).catch(() => ({ data: {} }))
+                axios.get(`${API_BASE_URL}/denticao/paciente/${id}`).catch(() => ({ data: {} })),
+                axios.get(`${API_BASE_URL}/consultas/paciente/${id}`),
+                axios.get(`${API_BASE_URL}/financeiro/lancamentos/paciente/${id}`)
             ]);
 
             if (pacienteRes.status === 'fulfilled') setPaciente(pacienteRes.value.data);
@@ -59,6 +64,8 @@ function ProntuarioPaciente() {
                 // Formato esperado: { denticao: { [numDente]: { [face]: { tipo, observacao } } } }
                 setDenticao(denticaoRes.value.data.denticao || denticaoRes.value.data || {});
             }
+            if (consultasRes.status === 'fulfilled') setConsultas(consultasRes.value.data);
+            if (lancamentosRes.status === 'fulfilled') setLancamentos(lancamentosRes.value.data);
 
             setError(null);
         } catch (err) {
@@ -325,6 +332,67 @@ function ProntuarioPaciente() {
                                                         <td>
                                                             <Button size="sm" variant="outline-danger" onClick={() => setExcluirId(p.idProntuario)}>Excluir</Button>
                                                         </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </Tab>
+
+                    <Tab eventKey="historico" title="Histórico">
+                        <Row className="g-4">
+                            <Col lg={6}>
+                                <Card className="shadow-sm">
+                                    <Card.Header className="bg-white fw-semibold">Consultas</Card.Header>
+                                    <Card.Body>
+                                        <Table responsive hover size="sm" className="mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Data/Hora</th>
+                                                    <th>Dentista</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {consultas.length === 0 ? (
+                                                    <tr><td colSpan="3" className="text-center text-muted">Nenhuma consulta registrada.</td></tr>
+                                                ) : consultas.map(c => (
+                                                    <tr key={c.idConsulta}>
+                                                        <td>{c.dataHora ? new Date(c.dataHora).toLocaleString('pt-BR') : '-'}</td>
+                                                        <td>{c.dentista?.nome || '-'}</td>
+                                                        <td><span className="badge bg-secondary">{c.status}</span></td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                            <Col lg={6}>
+                                <Card className="shadow-sm">
+                                    <Card.Header className="bg-white fw-semibold">Financeiro</Card.Header>
+                                    <Card.Body>
+                                        <Table responsive hover size="sm" className="mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Data</th>
+                                                    <th>Descrição</th>
+                                                    <th>Valor</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {lancamentos.length === 0 ? (
+                                                    <tr><td colSpan="4" className="text-center text-muted">Nenhum lançamento financeiro.</td></tr>
+                                                ) : lancamentos.map(l => (
+                                                    <tr key={l.idLancamento}>
+                                                        <td>{l.data}</td>
+                                                        <td>{l.descricao}</td>
+                                                        <td className="fw-medium">R$ {Number(l.valor || 0).toFixed(2)}</td>
+                                                        <td><span className={`badge ${l.status === 'PAGO' ? 'bg-success' : l.status === 'CANCELADO' ? 'bg-danger' : 'bg-warning text-dark'}`}>{l.status}</span></td>
                                                     </tr>
                                                 ))}
                                             </tbody>

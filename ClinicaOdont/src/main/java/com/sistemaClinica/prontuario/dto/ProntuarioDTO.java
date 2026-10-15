@@ -14,7 +14,11 @@ public class ProntuarioDTO {
     @NotNull(message = "Paciente e obrigatorio")
     private Integer pacienteId;
 
-    @NotNull(message = "Procedimento e obrigatorio")
+    private String titulo;
+
+    private Integer dentistaId;
+    private String dentistaNome;
+
     private Integer procedimentoId;
 
     @NotNull(message = "Data de realizacao e obrigatoria")
