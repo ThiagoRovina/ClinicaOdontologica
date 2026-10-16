@@ -37,7 +37,7 @@ const DentistaCadastro = () => {
                 await axios.post(`${API_BASE_URL}/dentistas`, dentista);
                 setSuccess('Dentista cadastrado com sucesso!');
             }
-            setTimeout(() => navigate('/dentistas'), 1500);
+            setTimeout(() => navigate('/funcionarios'), 1500);
         } catch { setError('Erro ao salvar dentista.'); }
         finally { setLoading(false); }
     };
@@ -50,7 +50,7 @@ const DentistaCadastro = () => {
                     <h1 className="section-title">{id ? 'Editar Dentista' : 'Novo Dentista'}</h1>
                     <p className="section-subtitle">Cadastre os dados profissionais e de contato do dentista.</p>
                 </div>
-                <Button variant="outline-secondary" className="rounded-pill" onClick={() => navigate('/dentistas')}>Voltar</Button>
+                <Button variant="outline-secondary" className="rounded-pill" onClick={() => navigate('/funcionarios')}>Voltar</Button>
             </div>
 
             {error && <Alert variant="danger">{error}</Alert>}
@@ -86,7 +86,7 @@ const DentistaCadastro = () => {
                             <Button variant="dark" type="submit" className="rounded-pill px-4" disabled={loading}>
                                 {loading ? 'Salvando...' : 'Salvar Dentista'}
                             </Button>
-                            <Button variant="outline-secondary" onClick={() => navigate('/dentistas')} className="rounded-pill px-4">
+                            <Button variant="outline-secondary" onClick={() => navigate('/funcionarios')} className="rounded-pill px-4">
                                 Cancelar
                             </Button>
                         </div>

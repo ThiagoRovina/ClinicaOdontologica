@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UsuarioService {
 
@@ -19,6 +21,9 @@ public class UsuarioService {
 
         if (usuarioRepository.findByNmEmail(novoUsuario.getNmEmail()).isPresent()) {
             throw new IllegalArgumentException("Este email já está em uso.");
+        }
+        if (novoUsuario.getIdUsuario() == null || novoUsuario.getIdUsuario().isBlank()) {
+            novoUsuario.setIdUsuario(UUID.randomUUID().toString());
         }
         novoUsuario.setNmSenha(passwordEncoder.encode(novoUsuario.getNmSenha()));
         if (novoUsuario.getDsRole() == null || novoUsuario.getDsRole().isBlank()) {

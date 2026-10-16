@@ -1,6 +1,7 @@
 package com.sistemaClinica.usuario.controller;
 
 import com.sistemaClinica.usuario.model.Usuario;
+import com.sistemaClinica.usuario.repository.UsuarioRepository;
 import com.sistemaClinica.usuario.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @PostMapping("/registrar")
     public ResponseEntity<Usuario> registrarUsuario(@Valid @RequestBody Usuario novoUsuario) {
@@ -39,10 +44,15 @@ public class UsuarioController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        Map<String, Object> userInfo = Map.of(
-            "email", userDetails.getUsername(),
-            "roles", roles
-        );
+        String email = userDetails.getUsername();
+        String nome = usuarioRepository.findByNmEmail(email)
+                .map(Usuario::getNmUsuario)
+                .orElse("");
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("email", email);
+        userInfo.put("nome", nome != null ? nome : "");
+        userInfo.put("roles", roles);
 
         return ResponseEntity.ok(userInfo);
     }

@@ -50,17 +50,17 @@ function App() {
                         } />
 
                         <Route path="/pacientes" element={
-                            <ProtectedRoute requiredRoles={['ROLE_RECEPCIONISTA', 'ROLE_GERENTE']}>
+                            <ProtectedRoute requiredRoles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE']}>
                                 <Paciente />
                             </ProtectedRoute>
                         } />
                         <Route path="/pacientes/novo" element={
-                            <ProtectedRoute requiredRoles={['ROLE_RECEPCIONISTA', 'ROLE_GERENTE']}>
+                            <ProtectedRoute requiredRoles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE']}>
                                 <PacienteCadastro />
                             </ProtectedRoute>
                         } />
                         <Route path="/pacientes/editar/:id" element={
-                            <ProtectedRoute requiredRoles={['ROLE_RECEPCIONISTA', 'ROLE_GERENTE']}>
+                            <ProtectedRoute requiredRoles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE']}>
                                 <PacienteCadastro />
                             </ProtectedRoute>
                         } />
@@ -98,7 +98,7 @@ function App() {
                         } />
 
                         <Route path="/agendamento" element={
-                            <ProtectedRoute requiredRoles={['ROLE_RECEPCIONISTA', 'ROLE_GERENTE']}>
+                            <ProtectedRoute requiredRoles={['ROLE_ADMINISTRATIVO', 'ROLE_GERENTE']}>
                                 <AgendamentoFront />
                             </ProtectedRoute>
                         } />
@@ -120,7 +120,7 @@ function App() {
                             </ProtectedRoute>
                         } />
                         <Route path="/financeiro" element={
-                            <ProtectedRoute requiredRoles={['ROLE_GERENTE', 'ROLE_RECEPCIONISTA']}>
+                            <ProtectedRoute requiredRoles={['ROLE_GERENTE', 'ROLE_ADMINISTRATIVO']}>
                                 <Financeiro />
                             </ProtectedRoute>
                         } />

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Alert, Badge, Button, Card, Col, Container, Form, Nav, Row, Spinner, Tab, Table, Tabs } from 'react-bootstrap';
+import { Alert, Button, Card, Col, Container, Form, Row, Spinner, Tab, Table, Tabs } from 'react-bootstrap';
 import { API_BASE_URL, extrairErro } from '../config/api';
 import { ConfirmarExclusao } from '../ultilitarios/ultilitarios';
 import { Odontograma } from '../components/Odontograma';
@@ -121,17 +121,23 @@ function ProntuarioPaciente() {
         }
     };
 
-    // Handler click no dente
+    // Handler click no dente — tipo=null limpa a face
     const handleMarcarDente = useCallback((dente, face, tipo) => {
         setDenticao(prev => {
             const novo = { ...prev };
-            if (!novo[dente]) novo[dente] = {};
-            const faces = { ...novo[dente] };
-            faces[face] = { tipo, observacao: '' };
-            novo[dente] = faces;
-            // Salva automaticamente no backend com o valor correto
+            if (tipo === null) {
+                if (novo[dente]) {
+                    const faces = { ...novo[dente] };
+                    delete faces[face];
+                    if (Object.keys(faces).length === 0) delete novo[dente];
+                    else novo[dente] = faces;
+                }
+            } else {
+                if (!novo[dente]) novo[dente] = {};
+                novo[dente] = { ...novo[dente], [face]: { tipo, observacao: '' } };
+            }
             axios.put(`${API_BASE_URL}/denticao/paciente/${id}`, { denticao: novo }, { withCredentials: true })
-                .catch(() => {}); // falhar silenciosamente se o endpoint não existir
+                .catch(() => {});
             return novo;
         });
     }, [id]);
@@ -173,72 +179,20 @@ function ProntuarioPaciente() {
             ) : (
                 <Tabs defaultActiveKey="odontograma" className="mb-3" variant="tabs">
                     <Tab eventKey="odontograma" title="Odontograma">
-                        <Row className="g-4">
-                            <Col lg={6}>
-                                <Card className="shadow-sm">
-                                    <Card.Header className="bg-white fw-semibold">
-                                        Odontograma - Dentição Permanente
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <Odontograma
-                                            denticao={denticao}
-                                            onMarcar={handleMarcarDente}
-                                            editavel={true}
-                                            procedimentoSelecionado={procedimentoSelecionado}
-                                            onTrocarProcedimento={setProcedimentoSelecionado}
-                                        />
-                                        <div className="text-muted small mt-3">
-                                            Clique em uma face do dente para marcar. Selecione o tipo de procedimento no painel acima.
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col lg={6}>
-                                <Card className="shadow-sm">
-                                    <Card.Header className="bg-white fw-semibold">
-                                        Resumo da Dentição
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <Table responsive hover size="sm" className="mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Dente</th>
-                                                    <th>Face</th>
-                                                    <th>Procedimento</th>
-                                                    <th>Cor</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {Object.entries(denticao).length === 0 ? (
-                                                    <tr>
-                                                        <td colSpan="4" className="text-center text-muted">
-                                                            Clique nas faces do odontograma para marcar procedimentos.
-                                                        </td>
-                                                    </tr>
-                                                ) : Object.entries(denticao).flatMap(([numDente, faces]) =>
-                                                    Object.entries(faces).map(([face, info]) => (
-                                                        <tr key={`${numDente}-${face}`}>
-                                                            <td className="fw-medium">{numDente}</td>
-                                                            <td>{face}</td>
-                                                            <td>
-                                                                <Badge bg="info">{formatarTipo(info.tipo)}</Badge>
-                                                            </td>
-                                                            <td>
-                                                                <span className="d-inline-block rounded-circle" style={{
-                                                                    width: 16, height: 16,
-                                                                    backgroundColor: obterCorTipo(info.tipo),
-                                                                    border: '1px solid #E5E7EB'
-                                                                }}></span>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </Table>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        </Row>
+                        <Card className="shadow-sm">
+                            <Card.Header className="bg-white fw-semibold">
+                                Odontograma — Dentição Permanente
+                            </Card.Header>
+                            <Card.Body>
+                                <Odontograma
+                                    denticao={denticao}
+                                    onMarcar={handleMarcarDente}
+                                    editavel={true}
+                                    procedimentoSelecionado={procedimentoSelecionado}
+                                    onTrocarProcedimento={setProcedimentoSelecionado}
+                                />
+                            </Card.Body>
+                        </Card>
                     </Tab>
 
                     <Tab eventKey="registros" title="Registros Clínicos">
@@ -416,24 +370,5 @@ function ProntuarioPaciente() {
     );
 }
 
-// Helpers
-function formatarTipo(tipo) {
-    if (!tipo) return '-';
-    return tipo.charAt(0) + tipo.slice(1).toLowerCase().replace(/_/g, ' ');
-}
-
-function obterCorTipo(tipo) {
-    const cores = {
-        'CARIE': '#FF4C4C',
-        'RESTAURACAO': '#16A34A',
-        'EXODONTIA': '#3B82F6',
-        'ENDODONTIA': '#F59E0B',
-        'COROA': '#8B5CF6',
-        'PROTESE': '#EC4899',
-        'IMPLANTE': '#06B6D4',
-        'OUTRO': '#6B7280'
-    };
-    return cores[tipo] || '#E5E7EB';
-}
 
 export default ProntuarioPaciente;

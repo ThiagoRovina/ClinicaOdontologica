@@ -1,5 +1,7 @@
 package com.sistemaClinica.funcionario.service;
 
+import com.sistemaClinica.dentista.model.Dentista;
+import com.sistemaClinica.dentista.repository.DentistaRepository;
 import com.sistemaClinica.funcionario.dto.FuncionarioCadastroDTO;
 import com.sistemaClinica.funcionario.dto.FuncionarioDTO;
 import com.sistemaClinica.funcionario.mapper.FuncionarioMapper;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +31,9 @@ public class FuncionarioService {
 
     @Autowired
     private FuncionarioMapper funcionarioMapper;
+
+    @Autowired
+    private DentistaRepository dentistaRepository;
 
     public List<FuncionarioDTO> listarTodos() {
         return funcionarioRepository.findAll().stream()
@@ -47,6 +53,7 @@ public class FuncionarioService {
         Usuario novoUsuario = new Usuario();
         novoUsuario.setNmEmail(dto.getEmail());
         novoUsuario.setNmSenha(dto.getSenha());
+        novoUsuario.setNmUsuario(dto.getNmFuncionario());
         
         // Mapeamento de Cargo para Papel (Role)
         String role = switch (dto.getCargo()) {
@@ -68,7 +75,21 @@ public class FuncionarioService {
         funcionario.setTelefone(dto.getTelefone());
 
         Funcionario funcionarioSalvo = funcionarioRepository.save(funcionario);
-        return funcionarioMapper.toDto(funcionarioSalvo);
+        FuncionarioDTO funcionarioDTO = funcionarioMapper.toDto(funcionarioSalvo);
+
+        if (dto.getCargo() == TipoFuncionario.DENTISTA) {
+            Dentista dentista = new Dentista();
+            dentista.setNome(dto.getNmFuncionario());
+            dentista.setEspecializacao("A definir");
+            dentista.setCro("TEMP-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+            dentista.setEmail(dto.getEmail());
+            dentista.setTelefone(dto.getTelefone());
+            dentista.setFuncionario(funcionarioSalvo);
+            Dentista dentistaSalvo = dentistaRepository.save(dentista);
+            funcionarioDTO.setIdDentista(String.valueOf(dentistaSalvo.getIdDentista()));
+        }
+
+        return funcionarioDTO;
     }
 
     public FuncionarioDTO salvar(FuncionarioDTO funcionarioDTO) {

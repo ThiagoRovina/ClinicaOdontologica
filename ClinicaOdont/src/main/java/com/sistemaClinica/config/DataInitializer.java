@@ -16,6 +16,7 @@ public class DataInitializer {
             String email = "thiagorovina428@gmail.com";
             if (usuarioRepository.findByNmEmail(email).isEmpty()) {
                 Usuario admin = new Usuario();
+                admin.setIdUsuario(java.util.UUID.randomUUID().toString());
                 admin.setNmEmail(email);
                 admin.setNmUsuario("Thiago");
                 admin.setNmSenha(passwordEncoder.encode("thirrasgo26"));
