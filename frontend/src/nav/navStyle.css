@@ -1,5 +1,6 @@
 .navbar-custom {
-    background: linear-gradient(135deg, rgba(12, 74, 110, 0.96), rgba(15, 118, 110, 0.92));
+    /*background: linear-gradient(135deg, rgba(12, 74, 110, 0.96), rgba(15, 118, 110, 0.92));*/
+    background: #9237ff;
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255,255,255,0.08);
     box-shadow: 0 8px 32px rgba(12, 37, 63, 0.15);
@@ -142,4 +143,57 @@
     .user-dropdown .dropdown-toggle {
         margin: 0.5rem 0;
     }
+}
+
+/* ERP Module Dropdowns */
+.erp-module-dropdown > .dropdown-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.45rem;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 999px !important;
+    font-weight: 500;
+    font-size: 0.88rem;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.erp-module-dropdown > .dropdown-toggle:hover {
+    background-color: rgba(255,255,255,0.12) !important;
+    transform: translateY(-1px);
+}
+
+.erp-module-dropdown > .dropdown-toggle::after {
+    border-top-color: rgba(255,255,255,0.7);
+    margin-left: 0.25rem;
+}
+
+.erp-module-dropdown .dropdown-menu {
+    background: #fff;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(12, 37, 63, 0.18);
+    padding: 0.4rem 0;
+    min-width: 180px;
+}
+
+.erp-module-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #374151;
+    padding: 0.55rem 1.1rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.erp-module-dropdown .dropdown-item:hover {
+    background-color: #f3f0ff;
+    color: #7c3aed;
+}
+
+.erp-module-dropdown .dropdown-divider {
+    margin: 0.3rem 0;
+    border-color: #f0f0f0;
 }
