@@ -24,6 +24,15 @@ const ConsultasHoje = () => {
 
     const iniciarAcao = (id, tipo) => { setConfirmAction({ id, tipo, loading: false }); };
 
+    // Textos e cor do modal por ação
+    const ACOES_MODAL = {
+        confirmar: { titulo: 'Confirmar Consulta', mensagem: 'Confirmar presenca do paciente para esta consulta?', label: 'Confirmar', loadingLabel: 'Confirmando...', variant: 'success' },
+        checkin: { titulo: 'Check-in do Paciente', mensagem: 'Registrar chegada do paciente (Aguardando Atendimento)?', label: 'Registrar chegada', loadingLabel: 'Registrando...', variant: 'warning' },
+        finalizar: { titulo: 'Finalizar Consulta', mensagem: 'Deseja finalizar esta consulta como concluida?', label: 'Finalizar', loadingLabel: 'Finalizando...', variant: 'success' },
+        cancelar: { titulo: 'Cancelar Consulta', mensagem: 'Tem certeza que deseja cancelar esta consulta?', label: 'Cancelar consulta', loadingLabel: 'Cancelando...', variant: 'danger' },
+    };
+    const acaoModal = ACOES_MODAL[confirmAction?.tipo] || ACOES_MODAL.cancelar;
+
     const confirmarAcao = async () => {
         if (!confirmAction) return;
         setConfirmAction(prev => ({ ...prev, loading: true }));
@@ -108,7 +117,7 @@ const ConsultasHoje = () => {
                                     </div>
                                     {c.status === 'AGENDADA' && (
                                         <div className="d-flex gap-2 flex-wrap">
-                                            <Button variant="outline-secondary" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'confirmar')}>
+                                            <Button variant="success" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'confirmar')}>
                                                 Confirmar
                                             </Button>
                                             <Button variant="outline-danger" size="sm" className="rounded-pill flex-fill" onClick={() => iniciarAcao(c.idConsulta, 'cancelar')}>
@@ -145,18 +154,12 @@ const ConsultasHoje = () => {
 
             <ConfirmarExclusao
                 show={!!confirmAction}
-                titulo={
-                    confirmAction?.tipo === 'finalizar' ? 'Finalizar Consulta'
-                    : confirmAction?.tipo === 'confirmar' ? 'Confirmar Consulta'
-                    : confirmAction?.tipo === 'checkin' ? 'Check-in do Paciente'
-                    : 'Cancelar Consulta'
-                }
-                mensagem={
-                    confirmAction?.tipo === 'finalizar' ? 'Deseja finalizar esta consulta como concluida?'
-                    : confirmAction?.tipo === 'confirmar' ? 'Confirmar presenca do paciente para esta consulta?'
-                    : confirmAction?.tipo === 'checkin' ? 'Registrar chegada do paciente (Aguardando Atendimento)?'
-                    : 'Tem certeza que deseja cancelar esta consulta?'
-                }
+                titulo={acaoModal.titulo}
+                mensagem={acaoModal.mensagem}
+                confirmLabel={acaoModal.label}
+                loadingLabel={acaoModal.loadingLabel}
+                variant={acaoModal.variant}
+                cancelLabel="Voltar"
                 onConfirm={confirmarAcao}
                 onCancel={() => setConfirmAction(null)}
                 loading={confirmAction?.loading || false}

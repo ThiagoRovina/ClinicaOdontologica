@@ -1,5 +1,7 @@
 .page-shell {
-    padding: 2rem 0 3rem;
+    /* Só vertical: o shorthand zerava o padding lateral do .container,
+       e as .row (margens negativas) vazavam para fora da tela no celular. */
+    padding-block: 2rem 3rem;
 }
 
 .page-header {
@@ -243,7 +245,8 @@
 }
 
 .card {
-    border-radius: 18px;
+    /* Via variável para que .card-header/.card-footer acompanhem o raio */
+    --bs-card-border-radius: 18px;
     border: 1px solid rgba(22, 50, 79, 0.06);
 }
 

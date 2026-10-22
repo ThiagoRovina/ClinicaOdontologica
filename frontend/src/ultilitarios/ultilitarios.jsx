@@ -4,16 +4,21 @@ import { Modal, Button } from 'react-bootstrap';
 /**
  * Modal de confirmação de exclusão reutilizável
  */
-export const ConfirmarExclusao = ({ show, titulo, mensagem, onConfirm, onCancel, loading = false }) => (
+// Os rótulos/cor são configuráveis para reutilizar o modal em ações que não são exclusão
+// (confirmar, check-in, finalizar...). Os padrões mantêm o comportamento de exclusão.
+export const ConfirmarExclusao = ({
+    show, titulo, mensagem, onConfirm, onCancel, loading = false,
+    confirmLabel = 'Excluir', loadingLabel = 'Excluindo...', cancelLabel = 'Cancelar', variant = 'danger'
+}) => (
     <Modal show={show} onHide={onCancel} centered>
         <Modal.Header closeButton>
             <Modal.Title>{titulo || 'Confirmar Exclusão'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>{mensagem || 'Tem certeza que deseja excluir este item?'}</Modal.Body>
         <Modal.Footer>
-            <Button variant="secondary" onClick={onCancel} disabled={loading}>Cancelar</Button>
-            <Button variant="danger" onClick={onConfirm} disabled={loading}>
-                {loading ? 'Excluindo...' : 'Excluir'}
+            <Button variant="secondary" onClick={onCancel} disabled={loading}>{cancelLabel}</Button>
+            <Button variant={variant} onClick={onConfirm} disabled={loading}>
+                {loading ? loadingLabel : confirmLabel}
             </Button>
         </Modal.Footer>
     </Modal>

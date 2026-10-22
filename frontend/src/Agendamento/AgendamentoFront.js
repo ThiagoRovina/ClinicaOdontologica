@@ -347,6 +347,9 @@ const AgendamentoFront = () => {
                 onConfirm={confirmarExclusaoConsulta}
                 onCancel={() => setExcluirConsultaId(null)}
                 loading={excluindoConsulta}
+                confirmLabel="Cancelar consulta"
+                loadingLabel="Cancelando..."
+                cancelLabel="Voltar"
             />
         </Container>
     );

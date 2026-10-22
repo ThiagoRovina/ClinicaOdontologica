@@ -6,6 +6,11 @@
     box-shadow: 0 8px 32px rgba(12, 37, 63, 0.15);
     padding: 0.6rem 0;
     transition: box-shadow 0.3s ease;
+    /* backdrop-filter cria um contexto de empilhamento: sem position/z-index
+       os dropdowns ficavam presos nele e eram cobertos pelos cards da página
+       (que também criam contextos via transform/animation). */
+    position: relative;
+    z-index: 1030;
 }
 
 .navbar-custom .navbar-brand {
@@ -62,6 +67,27 @@
     transform: translateY(-1px);
 }
 
+.nav-link-with-icon svg,
+.nav-dropdown-title svg {
+    flex-shrink: 0;
+}
+
+/* Conteúdo do título dos dropdowns: só alinha ícone + texto.
+   O padding/pill fica no próprio .dropdown-toggle (antes era duplicado). */
+.nav-dropdown-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+/* Item ativo: destaque sem alterar dimensões nem posição */
+.navbar-custom .nav-link-with-icon.active,
+.navbar-custom .erp-module-dropdown > .dropdown-toggle.active {
+    background-color: rgba(255,255,255,0.2) !important;
+    font-weight: 600;
+    transform: none;
+}
+
 .nav-links {
     list-style: none;
     display: flex;
@@ -88,18 +114,12 @@
     box-shadow: 0 0 0 3px rgba(255,255,255,0.2) !important;
 }
 
-.user-dropdown-wrapper {
-    display: flex;
+.user-dropdown-wrapper > .dropdown-toggle {
+    display: inline-flex !important;
     align-items: center;
-}
-
-.user-dropdown .dropdown-toggle {
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
+    gap: 0.4rem;
     color: white !important;
-    padding: 6px 12px !important;
+    padding: 4px 12px 4px 4px !important;
     border-radius: 12px !important;
     background: rgba(255,255,255,0.1) !important;
     border: 1px solid rgba(255,255,255,0.15) !important;
@@ -108,18 +128,25 @@
     transition: background-color 0.2s ease;
 }
 
-.user-dropdown .dropdown-toggle:hover {
+.user-dropdown-wrapper > .dropdown-toggle:hover {
     background: rgba(255,255,255,0.18) !important;
 }
 
-.user-dropdown .dropdown-toggle::after {
-    margin-left: 0.4rem;
+.user-dropdown-wrapper > .dropdown-toggle::after {
+    border-top-color: rgba(255,255,255,0.7);
+}
+
+.user-dropdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .user-avatar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     width: 30px;
     height: 30px;
     border-radius: 9px;
@@ -135,13 +162,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: center;
-    font-size: 0.78rem;
+    font-size: 0.82rem;
 }
 
-@media (max-width: 991px) {
-    .user-dropdown .dropdown-toggle {
-        margin: 0.5rem 0;
+@media (min-width: 992px) {
+    .user-dropdown-wrapper {
+        margin-left: 0.5rem;
     }
 }
 
@@ -168,7 +194,8 @@
     margin-left: 0.25rem;
 }
 
-.erp-module-dropdown .dropdown-menu {
+.erp-module-dropdown .dropdown-menu,
+.user-dropdown-wrapper .dropdown-menu {
     background: #fff;
     border: none;
     border-radius: 12px;
@@ -177,7 +204,8 @@
     min-width: 180px;
 }
 
-.erp-module-dropdown .dropdown-item {
+.erp-module-dropdown .dropdown-item,
+.user-dropdown-wrapper .dropdown-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -188,7 +216,8 @@
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.erp-module-dropdown .dropdown-item:hover {
+.erp-module-dropdown .dropdown-item:hover,
+.user-dropdown-wrapper .dropdown-item:hover {
     background-color: #f3f0ff;
     color: #7c3aed;
 }
@@ -196,4 +225,28 @@
 .erp-module-dropdown .dropdown-divider {
     margin: 0.3rem 0;
     border-color: #f0f0f0;
+}
+
+.navbar-custom .dropdown-menu[data-bs-popper] {
+    margin-top: 0.4rem;
+}
+
+/* Menu recolhido (abaixo do breakpoint lg do Navbar expand="lg") */
+@media (max-width: 991.98px) {
+    .navbar-custom .navbar-collapse {
+        padding: 0.5rem 0 0.25rem;
+    }
+
+    .navbar-custom .navbar-nav {
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .navbar-custom .navbar-nav .dropdown-menu {
+        margin: 0.25rem 0 0.5rem;
+    }
+
+    .user-dropdown-wrapper {
+        margin-top: 0.5rem;
+    }
 }

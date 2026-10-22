@@ -1,0 +1,50 @@
+/* Cards de resumo do Financeiro (Receitas / Despesas / Saldo) */
+
+.financeiro-resumo-card {
+    border: 1px solid rgba(22, 50, 79, 0.08);
+    border-top: 4px solid transparent;
+    border-radius: 18px;
+    background: var(--surface);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.financeiro-resumo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(22, 50, 79, 0.12) !important;
+}
+
+.financeiro-resumo-card.receita { border-top-color: #10b981; }
+.financeiro-resumo-card.despesa { border-top-color: #ef4444; }
+.financeiro-resumo-card.saldo   { border-top-color: #3b82f6; }
+.financeiro-resumo-card.saldo.border-danger { border-top-color: #ef4444; }
+
+.fin-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.75rem;
+    border-radius: 50%;
+}
+
+.receita .fin-icon { background: #d1fae5; color: #065f46; }
+.despesa .fin-icon { background: #fee2e2; color: #991b1b; }
+.saldo .fin-icon   { background: #dbeafe; color: #1e40af; }
+
+.fin-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+}
+
+.fin-valor {
+    font-weight: 800;
+    color: var(--text);
+}
+
+.saldo.border-danger .fin-valor {
+    color: #b91c1c;
+}

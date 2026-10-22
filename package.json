@@ -10,5 +10,8 @@
     "start": "npm --prefix frontend start",
     "build": "npm --prefix frontend run build",
     "test": "npm --prefix frontend test"
+  },
+  "overrides": {
+    "typescript": "^4.9.5"
   }
 }

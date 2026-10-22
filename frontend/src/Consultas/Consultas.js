@@ -3,7 +3,8 @@ import Calendar from 'react-calendar';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Card, Button, Row, Col, Spinner } from 'react-bootstrap';
-import './ConsultasStyles.css';
+import 'react-calendar/dist/Calendar.css';
+import './CalendarStyles.css';
 import { API_BASE_URL } from '../config/api';
 import PageHeader from '../components/PageHeader';
 
