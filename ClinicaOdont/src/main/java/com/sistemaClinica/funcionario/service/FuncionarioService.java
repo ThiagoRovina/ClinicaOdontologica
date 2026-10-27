@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,8 +79,8 @@ public class FuncionarioService {
         if (dto.getCargo() == TipoFuncionario.DENTISTA) {
             Dentista dentista = new Dentista();
             dentista.setNome(dto.getNmFuncionario());
-            dentista.setEspecializacao("A definir");
-            dentista.setCro("TEMP-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+            dentista.setEspecializacao(dto.getEspecializacao() != null ? dto.getEspecializacao() : "");
+            dentista.setCro(dto.getCro() != null ? dto.getCro() : "");
             dentista.setEmail(dto.getEmail());
             dentista.setTelefone(dto.getTelefone());
             dentista.setFuncionario(funcionarioSalvo);

@@ -22,6 +22,8 @@ public class FuncionarioCadastroDTO {
     @NotBlank(message = "Email e obrigatorio")
     private String email;
     private String telefone;
+    private String especializacao;
+    private String cro;
     @NotBlank(message = "Senha e obrigatoria")
     private String senha;
 }
