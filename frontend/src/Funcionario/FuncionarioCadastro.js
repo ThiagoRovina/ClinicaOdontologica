@@ -10,7 +10,7 @@ const FuncionarioCadastro = () => {
     const { id } = useParams();
     const isEditMode = !!id;
 
-    const [funcionario, setFuncionario] = useState({ nmFuncionario: '', nuMatricula: '', cargo: '', dataAdmissao: '', email: '', telefone: '', senha: '', confirmarSenha: '' });
+    const [funcionario, setFuncionario] = useState({ nmFuncionario: '', nuMatricula: '', cargo: '', dataAdmissao: '', email: '', telefone: '', especializacao: '', cro: '', senha: '', confirmarSenha: '' });
     const [tiposFuncionario, setTiposFuncionario] = useState([]);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
@@ -49,15 +49,9 @@ const FuncionarioCadastro = () => {
                 setSuccess('Funcionario atualizado com sucesso!');
                 setTimeout(() => navigate('/funcionarios'), 1500);
             } else {
-                const response = await axios.post(`${API_BASE_URL}/funcionarios/cadastrar`, funcionario);
-                const idDentista = response?.data?.idDentista;
-                if (funcionario.cargo === 'DENTISTA' && idDentista) {
-                    setSuccess('Funcionario dentista criado. Complete os dados clinicos (CRO e especializacao).');
-                    setTimeout(() => navigate(`/dentistas/editar/${idDentista}`), 1500);
-                } else {
-                    setSuccess('Funcionario e Usuario cadastrados com sucesso!');
-                    setTimeout(() => navigate('/funcionarios'), 1500);
-                }
+                await axios.post(`${API_BASE_URL}/funcionarios/cadastrar`, funcionario);
+                setSuccess('Funcionario e Usuario cadastrados com sucesso!');
+                setTimeout(() => navigate('/funcionarios'), 1500);
             }
         } catch (err) { setError(tratarErroBackend(err, 'Erro ao salvar funcionario.')); }
         finally { setLoading(false); }
@@ -122,6 +116,19 @@ const FuncionarioCadastro = () => {
                                 <Form.Label className="fw-medium small">Telefone</Form.Label>
                                 <Form.Control type="text" name="telefone" value={funcionario.telefone} onChange={handleChange} className="toolbar-input" />
                             </div>
+
+                            {funcionario.cargo === 'DENTISTA' && (
+                                <>
+                                    <div className="col-md-6">
+                                        <Form.Label className="fw-medium small">CRO</Form.Label>
+                                        <Form.Control type="text" name="cro" value={funcionario.cro} onChange={handleChange} required className="toolbar-input" />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <Form.Label className="fw-medium small">Especialização</Form.Label>
+                                        <Form.Control type="text" name="especializacao" value={funcionario.especializacao} onChange={handleChange} required className="toolbar-input" />
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div className="d-flex gap-2 pt-2">
