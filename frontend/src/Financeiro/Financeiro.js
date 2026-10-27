@@ -27,6 +27,8 @@ const emptyForm = { idLancamento: '', tipo: 'RECEITA', descricao: '', valor: '',
 
 function Financeiro() {
     const [lancamentos, setLancamentos] = useState([]);
+    const [pagamentosPendentes, setPagamentosPendentes] = useState([]);
+    const [pagandoId, setPagandoId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
@@ -51,7 +53,28 @@ function Financeiro() {
         finally { setLoading(false); }
     }, []);
 
-    useEffect(() => { fetchLancamentos(); }, [fetchLancamentos]);
+    const fetchPagamentosPendentes = useCallback(async () => {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/financeiro/lancamentos/pendentes-consulta`);
+            setPagamentosPendentes(response.data);
+        } catch { /* silencioso */ }
+    }, []);
+
+    const registrarPagamento = async (id) => {
+        setPagandoId(id);
+        try {
+            await axios.patch(`${API_BASE_URL}/financeiro/lancamentos/${id}/pagar`);
+            setSuccess('Pagamento registrado com sucesso.');
+            fetchPagamentosPendentes();
+            fetchLancamentos();
+        } catch {
+            setError('Erro ao registrar pagamento.');
+        } finally {
+            setPagandoId(null);
+        }
+    };
+
+    useEffect(() => { fetchLancamentos(); fetchPagamentosPendentes(); }, [fetchLancamentos, fetchPagamentosPendentes]);
 
     useEffect(() => { if (success) { const t = setTimeout(() => setSuccess(null), 5000); return () => clearTimeout(t); } }, [success]);
     useEffect(() => { if (error) { const t = setTimeout(() => setError(null), 8000); return () => clearTimeout(t); } }, [error]);
@@ -166,6 +189,46 @@ function Financeiro() {
 
             {error && <Alert variant="danger">{error}</Alert>}
             {success && <Alert variant="success">{success}</Alert>}
+
+            {pagamentosPendentes.length > 0 && (
+                <Card className="surface-card mb-4" style={{ borderLeft: '4px solid #f59e0b' }}>
+                    <Card.Body>
+                        <Card.Title className="fw-semibold mb-3">
+                            Pagamentos Pendentes de Consultas ({pagamentosPendentes.length})
+                        </Card.Title>
+                        <div className="table-shell">
+                            <Table hover responsive className="mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Paciente</th>
+                                        <th>Procedimento</th>
+                                        <th>Valor</th>
+                                        <th>Data</th>
+                                        <th style={{ width: 120 }}>Acao</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pagamentosPendentes.map(l => (
+                                        <tr key={l.idLancamento}>
+                                            <td className="fw-medium">{l.nomePaciente || '-'}</td>
+                                            <td>{l.descricao}</td>
+                                            <td className="fw-medium">{formatarMoeda(l.valor)}</td>
+                                            <td>{l.data ? new Date(`${l.data}T00:00:00`).toLocaleDateString('pt-BR') : '-'}</td>
+                                            <td>
+                                                <Button size="sm" variant="success" className="rounded-pill"
+                                                    disabled={pagandoId === l.idLancamento}
+                                                    onClick={() => registrarPagamento(l.idLancamento)}>
+                                                    {pagandoId === l.idLancamento ? 'Registrando...' : 'Pagar'}
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </div>
+                    </Card.Body>
+                </Card>
+            )}
 
             <ListToolbar
                 searchValue={busca}

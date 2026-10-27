@@ -44,7 +44,7 @@ const ConsultasHoje = () => {
                 checkin: `/consultas/${confirmAction.id}/check-in`,
             };
             const msgMap = {
-                finalizar: 'Consulta finalizada com sucesso.',
+                finalizar: 'Consulta finalizada. Paciente deve ir ao caixa para pagamento.',
                 cancelar: 'Consulta cancelada com sucesso.',
                 confirmar: 'Consulta confirmada com sucesso.',
                 checkin: 'Paciente aguardando atendimento.',

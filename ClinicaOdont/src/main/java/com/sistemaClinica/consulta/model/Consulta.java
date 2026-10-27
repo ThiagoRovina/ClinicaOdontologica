@@ -2,6 +2,7 @@ package com.sistemaClinica.consulta.model;
 
 import com.sistemaClinica.dentista.model.Dentista;
 import com.sistemaClinica.paciente.model.Paciente;
+import com.sistemaClinica.procedimento.model.Procedimento;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,10 @@ public class Consulta {
     @Enumerated(EnumType.STRING)
     @Column(name = "ds_status", nullable = false)
     private StatusConsulta status;
+
+    @ManyToOne
+    @JoinColumn(name = "id_procedimento")
+    private Procedimento procedimento;
 
     @Column(name = "ds_observacoes")
     private String observacoes;

@@ -1,0 +1,2 @@
+{"event":"task_completed","teammate":"","task_id":"1","subject":"Task 1: Backend — aceitar CRO e Especialização no cadastro","description":"Adicionar campos especializacao e cro ao FuncionarioCadastroDTO e usar valores reais no FuncionarioS","timestamp":"2026-10-27T20:13:39Z"}
+{"event":"task_completed","teammate":"","task_id":"2","subject":"Task 2: Frontend — campos condicionais e remoção do redirect","description":"Adicionar campos CRO e Especialização condicionais em FuncionarioCadastro.js e remover redirect pa","timestamp":"2026-10-27T20:14:16Z"}

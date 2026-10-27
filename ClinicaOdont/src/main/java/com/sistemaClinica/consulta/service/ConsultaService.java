@@ -5,9 +5,15 @@ import com.sistemaClinica.consulta.mapper.ConsultaMapper;
 import com.sistemaClinica.consulta.model.Consulta;
 import com.sistemaClinica.consulta.model.StatusConsulta;
 import com.sistemaClinica.consulta.repository.ConsultaRepository;
+import com.sistemaClinica.financeiro.model.LancamentoFinanceiro;
+import com.sistemaClinica.financeiro.model.StatusLancamento;
+import com.sistemaClinica.financeiro.model.TipoLancamento;
+import com.sistemaClinica.financeiro.repository.LancamentoFinanceiroRepository;
+import com.sistemaClinica.procedimento.repository.ProcedimentoRepository;
 import com.sistemaClinica.shared.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +28,12 @@ public class ConsultaService {
 
     @Autowired
     private ConsultaMapper consultaMapper;
+
+    @Autowired
+    private LancamentoFinanceiroRepository lancamentoFinanceiroRepository;
+
+    @Autowired
+    private ProcedimentoRepository procedimentoRepository;
 
     public List<ConsultaDTO> listarTodas() {
         return consultaRepository.findAll().stream()
@@ -57,6 +69,7 @@ public class ConsultaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ConsultaDTO salvar(ConsultaDTO consultaDTO) {
         if (consultaDTO.getDentista() == null || consultaDTO.getDentista().getIdDentista() == null) {
             throw new IllegalArgumentException("Dentista e obrigatorio");
@@ -71,7 +84,23 @@ public class ConsultaService {
         }
 
         Consulta consulta = consultaMapper.toEntity(consultaDTO);
-        return consultaMapper.toDto(consultaRepository.save(consulta));
+        Consulta salva = consultaRepository.save(consulta);
+
+        if (consultaDTO.getProcedimento() != null && consultaDTO.getProcedimento().getIdProcedimento() != null) {
+            procedimentoRepository.findById(consultaDTO.getProcedimento().getIdProcedimento()).ifPresent(proc -> {
+                LancamentoFinanceiro lancamento = new LancamentoFinanceiro();
+                lancamento.setTipo(TipoLancamento.RECEITA);
+                lancamento.setDescricao("Consulta - " + proc.getNome());
+                lancamento.setValor(proc.getValor());
+                lancamento.setData(salva.getDataHora().toLocalDate());
+                lancamento.setStatus(consultaDTO.isPagamentoAntecipado() ? StatusLancamento.PAGO : StatusLancamento.PENDENTE);
+                lancamento.setPaciente(salva.getPaciente());
+                lancamento.setConsulta(salva);
+                lancamentoFinanceiroRepository.save(lancamento);
+            });
+        }
+
+        return consultaMapper.toDto(salva);
     }
 
     public void deletar(Integer id) {

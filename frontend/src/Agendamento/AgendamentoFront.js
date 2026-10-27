@@ -40,13 +40,14 @@ function StatusBadge({ status }) {
 const AgendamentoFront = () => {
     const [pacientes, setPacientes] = useState([]);
     const [dentistas, setDentistas] = useState([]);
+    const [procedimentos, setProcedimentos] = useState([]);
     const [consultas, setConsultas] = useState([]);
     const [listaEspera, setListaEspera] = useState([]);
     const [loading, setLoading] = useState({ pacientes: true, dentistas: true, consultas: true, listaEspera: true });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [agendando, setAgendando] = useState(false);
-    const [novaConsulta, setNovaConsulta] = useState({ pacienteId: '', dentistaId: '', dataHora: '' });
+    const [novaConsulta, setNovaConsulta] = useState({ pacienteId: '', dentistaId: '', dataHora: '', procedimentoId: '', pagamentoAntecipado: false });
     const [novaEntradaLista, setNovaEntradaLista] = useState({ pacienteId: '', dentistaId: '', dataPreferida: '', horarioInicioPreferido: '', horarioFimPreferido: '', observacoes: '' });
     const [excluirConsultaId, setExcluirConsultaId] = useState(null);
     const [excluindoConsulta, setExcluindoConsulta] = useState(false);
@@ -90,6 +91,7 @@ const AgendamentoFront = () => {
         };
         fetch(setPacientes, 'pacientes', 'pacientes');
         fetch(setDentistas, 'dentistas', 'dentistas');
+        fetch(setProcedimentos, 'procedimentos', 'procedimentos');
         fetchConsultas();
         fetchListaEspera();
     }, [fetchConsultas, fetchListaEspera]);
@@ -101,7 +103,10 @@ const AgendamentoFront = () => {
         if (error) { const t = setTimeout(() => setError(null), 8000); return () => clearTimeout(t); }
     }, [error]);
 
-    const handleConsultaChange = (e) => { setNovaConsulta(prev => ({ ...prev, [e.target.name]: e.target.value })); };
+    const handleConsultaChange = (e) => {
+        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        setNovaConsulta(prev => ({ ...prev, [e.target.name]: value }));
+    };
     const handleListaChange = (e) => { setNovaEntradaLista(prev => ({ ...prev, [e.target.name]: e.target.value })); };
 
     const handleSubmitConsulta = async (e) => {
@@ -113,9 +118,11 @@ const AgendamentoFront = () => {
             await axios.post(`${API_BASE_URL}/consultas`, {
                 paciente: { idPaciente: novaConsulta.pacienteId },
                 dentista: { idDentista: novaConsulta.dentistaId },
-                dataHora: novaConsulta.dataHora
+                dataHora: novaConsulta.dataHora,
+                procedimento: novaConsulta.procedimentoId ? { idProcedimento: novaConsulta.procedimentoId } : null,
+                pagamentoAntecipado: novaConsulta.pagamentoAntecipado
             });
-            setNovaConsulta({ pacienteId: '', dentistaId: '', dataHora: '' });
+            setNovaConsulta({ pacienteId: '', dentistaId: '', dataHora: '', procedimentoId: '', pagamentoAntecipado: false });
             setSuccess('Consulta agendada com sucesso!');
             fetchConsultas();
         } catch (err) {
@@ -207,6 +214,29 @@ const AgendamentoFront = () => {
                                     <Form.Label className="fw-medium"><IconClock /> Data e Hora</Form.Label>
                                     <Form.Control type="datetime-local" name="dataHora" value={novaConsulta.dataHora} onChange={handleConsultaChange} required className="toolbar-input" />
                                 </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="fw-medium">Procedimento</Form.Label>
+                                    <Form.Select name="procedimentoId" value={novaConsulta.procedimentoId} onChange={handleConsultaChange} className="toolbar-input">
+                                        <option value="">Selecione (opcional)</option>
+                                        {procedimentos.map(p => (
+                                            <option key={p.idProcedimento} value={p.idProcedimento}>
+                                                {p.nome} — R$ {Number(p.valor).toFixed(2)}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </Form.Group>
+                                {novaConsulta.procedimentoId && (
+                                    <Form.Group className="mb-3">
+                                        <Form.Check
+                                            type="checkbox"
+                                            name="pagamentoAntecipado"
+                                            id="pagamentoAntecipado"
+                                            label="Paciente já pagou"
+                                            checked={novaConsulta.pagamentoAntecipado}
+                                            onChange={handleConsultaChange}
+                                        />
+                                    </Form.Group>
+                                )}
                                 <Button variant="dark" type="submit" disabled={agendando} className="w-100 rounded-pill">
                                     {agendando ? <><Spinner as="span" animation="border" size="sm" className="me-2" /> Agendando...</> : 'Agendar Consulta'}
                                 </Button>

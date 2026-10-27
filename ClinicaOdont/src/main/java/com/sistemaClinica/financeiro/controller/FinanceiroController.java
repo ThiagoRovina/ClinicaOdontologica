@@ -37,6 +37,20 @@ public class FinanceiroController {
         return financeiroService.listarPorPaciente(pacienteId);
     }
 
+    @GetMapping("/pendentes-consulta")
+    public List<LancamentoFinanceiroDTO> listarPendentesPorConsulta() {
+        return financeiroService.listarPendentesPorConsulta();
+    }
+
+    @PatchMapping("/{id}/pagar")
+    public ResponseEntity<?> pagar(@PathVariable String id) {
+        try {
+            return ResponseEntity.ok(financeiroService.pagar(id));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<LancamentoFinanceiroDTO> buscarPorId(@PathVariable String id) {
         LancamentoFinanceiroDTO dto = financeiroService.buscarPorId(id);

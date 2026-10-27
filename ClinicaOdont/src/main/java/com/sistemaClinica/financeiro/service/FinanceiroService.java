@@ -3,6 +3,7 @@ package com.sistemaClinica.financeiro.service;
 import com.sistemaClinica.consulta.repository.ConsultaRepository;
 import com.sistemaClinica.financeiro.dto.LancamentoFinanceiroDTO;
 import com.sistemaClinica.financeiro.model.LancamentoFinanceiro;
+import com.sistemaClinica.financeiro.model.StatusLancamento;
 import com.sistemaClinica.financeiro.repository.LancamentoFinanceiroRepository;
 import com.sistemaClinica.paciente.repository.PacienteRepository;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,18 @@ public class FinanceiroService {
         lancamentoRepository.deleteById(id);
     }
 
+    public LancamentoFinanceiroDTO pagar(String id) {
+        LancamentoFinanceiro lancamento = lancamentoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Lancamento nao encontrado: " + id));
+        lancamento.setStatus(StatusLancamento.PAGO);
+        return toDto(lancamentoRepository.save(lancamento));
+    }
+
+    public List<LancamentoFinanceiroDTO> listarPendentesPorConsulta() {
+        return lancamentoRepository.findByStatusAndConsultaIsNotNull(StatusLancamento.PENDENTE)
+                .stream().map(this::toDto).collect(Collectors.toList());
+    }
+
     private void aplicarDto(LancamentoFinanceiro lancamento, LancamentoFinanceiroDTO dto) {
         lancamento.setTipo(dto.getTipo());
         lancamento.setDescricao(dto.getDescricao());
@@ -97,6 +110,7 @@ public class FinanceiroService {
         dto.setStatus(lancamento.getStatus());
         dto.setObservacoes(lancamento.getObservacoes());
         dto.setIdPaciente(lancamento.getPaciente() != null ? lancamento.getPaciente().getIdPaciente() : null);
+        dto.setNomePaciente(lancamento.getPaciente() != null ? lancamento.getPaciente().getNome() : null);
         dto.setIdConsulta(lancamento.getConsulta() != null ? lancamento.getConsulta().getIdConsulta() : null);
         return dto;
     }
