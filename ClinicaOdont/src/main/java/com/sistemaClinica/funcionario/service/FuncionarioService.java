@@ -77,10 +77,16 @@ public class FuncionarioService {
         FuncionarioDTO funcionarioDTO = funcionarioMapper.toDto(funcionarioSalvo);
 
         if (dto.getCargo() == TipoFuncionario.DENTISTA) {
+            if (dto.getCro() == null || dto.getCro().isBlank()) {
+                throw new IllegalArgumentException("CRO e obrigatorio para dentistas");
+            }
+            if (dto.getEspecializacao() == null || dto.getEspecializacao().isBlank()) {
+                throw new IllegalArgumentException("Especializacao e obrigatoria para dentistas");
+            }
             Dentista dentista = new Dentista();
             dentista.setNome(dto.getNmFuncionario());
-            dentista.setEspecializacao(dto.getEspecializacao() != null ? dto.getEspecializacao() : "");
-            dentista.setCro(dto.getCro() != null ? dto.getCro() : "");
+            dentista.setEspecializacao(dto.getEspecializacao());
+            dentista.setCro(dto.getCro());
             dentista.setEmail(dto.getEmail());
             dentista.setTelefone(dto.getTelefone());
             dentista.setFuncionario(funcionarioSalvo);
