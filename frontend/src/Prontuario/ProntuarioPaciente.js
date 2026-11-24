@@ -27,7 +27,6 @@ function ProntuarioPaciente() {
     // Odontograma state
     const [denticao, setDenticao] = useState({});
     const [procedimentoSelecionado, setProcedimentoSelecionado] = useState('CARIE');
-    const [salvandoDente, setSalvandoDente] = useState(false);
 
     const [consultas, setConsultas] = useState([]);
     const [lancamentos, setLancamentos] = useState([]);
