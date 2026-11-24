@@ -93,16 +93,16 @@
 
 	<build>
 		<!-- The API sources live in odontosys[api], while this Maven project stays at the repository root. -->
-		<sourceDirectory>${project.basedir}/odontosys[api]/src/main/java</sourceDirectory>
-		<testSourceDirectory>${project.basedir}/odontosys[api]/src/test/java</testSourceDirectory>
+		<sourceDirectory>odontosys/src/main/java</sourceDirectory>
+		<testSourceDirectory>odontosys/src/test/java</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>${project.basedir}/odontosys[api]/src/main/resources</directory>
+				<directory>odontosys/src/main/resources</directory>
 			</resource>
 		</resources>
 		<testResources>
 			<testResource>
-				<directory>${project.basedir}/odontosys[api]/src/test/resources</directory>
+				<directory>odontosys/src/test/resources</directory>
 			</testResource>
 		</testResources>
 		<plugins>

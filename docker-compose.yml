@@ -1,8 +1,8 @@
-services:
+﻿services:
   api:
     build:
       context: .
-      dockerfile: "odontosys[api]/Dockerfile"
+      dockerfile: "odontosys/Dockerfile"
     environment:
       APP_CORS_ALLOWED_ORIGINS: http://localhost:3000
     ports:
