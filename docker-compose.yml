@@ -1,0 +1,21 @@
+services:
+  api:
+    build:
+      context: "./odontosys[api]"
+    environment:
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:3000
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        # Empty -> React uses relative /api and nginx proxies to api service.
+        REACT_APP_API_ORIGIN: ""
+    ports:
+      - "3001:80"
+    depends_on:
+      - api
+    restart: unless-stopped
