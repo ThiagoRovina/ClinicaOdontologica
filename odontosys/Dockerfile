@@ -6,7 +6,7 @@ WORKDIR /workspace
 COPY pom.xml .
 RUN mvn -q -DskipTests dependency:go-offline
 
-COPY odontosys/src ./src/
+COPY odontosys/src ./odontosys/src/
 RUN mvn -q -DskipTests package && \
     cp target/*SNAPSHOT.jar /workspace/app.jar
 
