@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     public SecurityConfig(
             JpaUserDetailsService jpaUserDetailsService,
-            @Value("${app.cors.allowed-origins:http://localhost:3000}") String allowedOrigins
+            @Value("${app.cors.allowed-origins:https://clinica-odontologica-lac.vercel.app}") String allowedOrigins
     ) {
         this.jpaUserDetailsService = jpaUserDetailsService;
         this.allowedOrigins = Arrays.stream(allowedOrigins.split(","))
