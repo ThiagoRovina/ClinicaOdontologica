@@ -134,7 +134,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>trabalho.ClinicaOdontologicaApplication</mainClass>
+					<mainClass>trabalho.ClinicaOdontologica.ClinicaOdontologicaApplication</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
