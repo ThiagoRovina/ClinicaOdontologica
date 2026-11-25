@@ -6,7 +6,7 @@ WORKDIR /workspace
 COPY pom.xml .
 RUN mvn -q -DskipTests dependency:go-offline
 
-COPY COPY src ./src/
+COPY src ./src/
 RUN mvn -q -DskipTests package && \
     cp target/*SNAPSHOT.jar /workspace/app.jar
 
